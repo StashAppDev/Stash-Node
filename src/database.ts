@@ -1,5 +1,5 @@
 import { createConnection } from 'typeorm';
-import { Scene } from 'entities/scene';
+import { Scene } from './entities/scene';
 
 export const databaseInitializer = async () => {
 

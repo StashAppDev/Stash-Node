@@ -1,0 +1,23 @@
+type Gallery {
+  id: ID!
+  checksum: String!
+  path: String!
+  title: String
+
+  # Function
+  files: [GalleryFilesType]
+}
+
+type GalleryFilesType {
+  index: Int!
+  name: String
+  path: String
+}
+
+type Query {
+  findGallery(id: ID!): Gallery
+}
+
+schema {
+  query: Query
+}

@@ -3,3 +3,5 @@ src/**/*.js
 src/**/*.js.map
 database.sqlite
 database.db
+builds
+dist
