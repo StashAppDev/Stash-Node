@@ -1,3 +1,6 @@
+"""
+Gallery type
+"""
 type Gallery {
   id: ID!
   checksum: String!
@@ -14,10 +17,25 @@ type GalleryFilesType {
   path: String
 }
 
+type Tag {
+  id: ID!
+  name: String!
+}
+
+input TagCreateInput {
+  name: String!
+}
+
 type Query {
   findGallery(id: ID!): Gallery
+  findTag(id: ID!): Tag
+}
+
+type Mutation {
+  tagCreate(input: TagCreateInput!): Tag
 }
 
 schema {
   query: Query
+  mutation: Mutation
 }

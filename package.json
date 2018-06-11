@@ -12,6 +12,9 @@
   "pkg": {
     "scripts": [
       "dist/**/*.js"
+    ],
+    "assets": [
+      "src/**/*.graphql"
     ]
   },
   "dependencies": {

@@ -1,5 +1,7 @@
+import { getManager } from "typeorm";
+
 export class GalleryController {
-  static find(id: string) {
+  static async find(id: string) {
     console.log("find " + id);
   }
 }

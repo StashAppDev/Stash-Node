@@ -5,7 +5,7 @@
             "name": "Run Server",
             "type": "node",
             "request": "launch",
-            "args": ["${workspaceRoot}/src/server.ts"],
+            "args": ["${workspaceRoot}/src/index.ts"],
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
