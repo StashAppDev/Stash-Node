@@ -1,10 +1,10 @@
-import express from 'express';
-import bodyParser from 'body-parser';
+import path from 'path';
+import fs from 'fs';
 import gql from 'graphql-tag';
 import { IncomingMessage } from 'http';
 
+import express from 'express';
 import { ApolloServer } from 'apollo-server';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { importSchema } from 'graphql-import';
 
 import { databaseInitializer } from './database';
@@ -21,7 +21,16 @@ export type StashRunOptions = {
 
 //region Schema
 
-const schemaString = importSchema('./src/schema.graphql');
+/// NOTE: For debugging the pkg container...
+// function walkSync(dir: string): string {
+//   if (!fs.lstatSync(dir).isDirectory()) return dir;
+//   return fs.readdirSync(dir).map(f => walkSync(path.join(dir, f))).join('\n');
+// }
+// console.log(walkSync(path.join(__dirname, '../')))
+
+// NOTE: This path looks weird, but is required for pkg
+const schemaPath = path.join(__dirname, '../src/schema.graphql');
+const schemaString = importSchema(schemaPath);
 const schema = gql`
   ${schemaString}
 `;
@@ -53,6 +62,8 @@ const resolvers = {
 export async function run(options: StashRunOptions) {
   if (!options.port) { options.port = 4000; }
 
+  const app = express();
+
   await databaseInitializer();
 
   const server = new ApolloServer({
@@ -63,8 +74,10 @@ export async function run(options: StashRunOptions) {
     })
   });
 
-  server.listen({http: {port: options.port}}).then(({ url }) => {
-    console.log(`🚀 Server ready at ${url}`)
+  server.applyMiddleware({ app });
+
+  server.listen({ port: options.port }, () => {
+    console.log(`🚀 Server ready at http://localhost:${options.port}${server.graphqlPath}`)
   });
 
 }
