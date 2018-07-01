@@ -1,3 +1,7 @@
+#######################################
+# Gallery
+#######################################
+
 """
 Gallery type
 """
@@ -17,6 +21,27 @@ type GalleryFilesType {
   path: String
 }
 
+#######################################
+# Scene
+#######################################
+
+type Scene {
+  id: ID!
+  title: String
+  rating: Int
+  
+  # TODO
+}
+
+type FindScenesResultType {
+  count: Int!
+  scenes: [Scene]!
+}
+
+#######################################
+# Tag
+#######################################
+
 type Tag {
   id: ID!
   name: String!
@@ -26,9 +51,45 @@ input TagCreateInput {
   name: String!
 }
 
+#######################################
+# Filters
+#######################################
+
+enum SortDirectionEnum {
+  ASC
+  DESC
+}
+
+input FindFilterType {
+  q: String
+  page: Int
+  per_page: Int
+  sort: String
+  direction: SortDirectionEnum
+}
+
+enum ResolutionEnum {
+  "240p", LOW
+  "480p", STANDARD
+  "720p", STANDARD_HD
+  "1080p", FULL_HD
+  "4k", FOUR_K
+}
+
+input SceneFilterType {
+  rating: Int
+  resolution: ResolutionEnum
+  # TODO
+}
+
+#############
+# Root Schema
+#############
+
 type Query {
   findGallery(id: ID!): Gallery
   findTag(id: ID!): Tag
+  findScenes(scene_filter: SceneFilterType, scene_ids: [Int], filter: FindFilterType): FindScenesResultType!
 }
 
 type Mutation {

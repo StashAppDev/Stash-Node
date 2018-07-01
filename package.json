@@ -7,7 +7,8 @@
   "scripts" : {
     "start": "nodemon",
     "build": "tsc",
-    "package": "yarn build && pkg package.json --out-path builds"
+    "package": "yarn build && pkg package.json --out-path builds",
+    "schema": "node regen-types.js"
   },
   "pkg": {
     "scripts": [
@@ -33,6 +34,9 @@
     "@types/express": "4.16.0",
     "@types/graphql": "0.13.1",
     "@types/node": "10.5.0",
+    "apollo-codegen": "0.20.2",
+    "graphql-code-generator": "0.9.4",
+    "graphql-codegen-typescript-template": "0.9.4",
     "nodemon": "1.17.5",
     "pkg": "4.3.1",
     "ts-node": "7.0.0",

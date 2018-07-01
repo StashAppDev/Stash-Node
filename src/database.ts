@@ -2,8 +2,8 @@ import path from 'path';
 
 import { createConnection } from 'typeorm';
 
-import { Scene } from './entities/scene';
-import { Tag } from './entities/tag';
+import { SceneEntity } from './entities/scene.entity';
+import { TagEntity } from './entities/tag.entity';
 
 export const databaseInitializer = async () => {
   const executionDirectory = path.dirname(process.execPath);
@@ -15,8 +15,8 @@ export const databaseInitializer = async () => {
     logging: ["query", "error"],
     maxQueryExecutionTime: 90,
     entities: [
-      Scene,
-      Tag
+      SceneEntity,
+      TagEntity
     ],
     synchronize: true,
   }).then((connection) => {

@@ -1,6 +1,7 @@
 node_modules
 src/**/*.js
 src/**/*.js.map
+src/schema.json
 database.sqlite
 database.db
 builds
