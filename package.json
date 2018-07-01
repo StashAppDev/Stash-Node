@@ -7,7 +7,7 @@
   "scripts" : {
     "start": "nodemon",
     "build": "tsc",
-    "package": "yarn build && pkg package.json --out-path builds",
+    "package": "yarn build && pkg package.json --out-path builds && sh copy_native_modules.sh",
     "schema": "node regen-types.js"
   },
   "pkg": {
