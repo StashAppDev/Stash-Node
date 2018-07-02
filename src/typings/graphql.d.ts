@@ -1,5 +1,5 @@
 /* tslint:disable */
-/** Generated in 2018-07-01T13:55:51-07:00 */
+/** Generated in 2018-07-01T15:47:19-07:00 */
 
 export interface Query {
   findGallery?: Gallery | null;
@@ -34,7 +34,13 @@ export interface FindScenesResultType {
 export interface Scene {
   id: string;
   title?: string | null;
+  details?: string | null;
+  url?: string | null;
   rating?: number | null;
+  path?: string | null;
+  checksum?: string | null;
+  size?: string | null;
+  duration?: number | null;
 }
 
 export interface Mutation {

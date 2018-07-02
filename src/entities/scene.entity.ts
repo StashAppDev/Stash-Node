@@ -11,6 +11,24 @@ export class SceneEntity implements Scene {
   title: string;
 
   @Column()
+  details: string;
+
+  @Column()
+  url: string;
+
+  @Column()
   rating: number;
+
+  @Column()
+  path: string;
+
+  @Column()
+  checksum: string;
+
+  @Column()
+  size: string;
+
+  @Column()
+  duration: number;
 
 }

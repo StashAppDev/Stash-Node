@@ -28,8 +28,14 @@ type GalleryFilesType {
 type Scene {
   id: ID!
   title: String
+  details: String
+  url: String
   rating: Int
-  
+  path: String
+  checksum: String
+  size: String
+  duration: Float
+
   # TODO
 }
 

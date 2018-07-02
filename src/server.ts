@@ -15,7 +15,7 @@ import { FindScenesQueryArgs } from './typings/graphql';
 
 //#region Types
 
-export type StashRunOptions = {
+export type StashServerOptions = {
   port?: number;
 };
 
@@ -57,7 +57,7 @@ const resolvers = {
 
 //#endregion
 
-export async function run(options: StashRunOptions) {
+export async function run(options: StashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
