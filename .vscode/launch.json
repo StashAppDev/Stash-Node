@@ -10,6 +10,7 @@
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",
+            "outputCapture": "std"
         },
         {
             "name": "Run Scan",
@@ -20,6 +21,7 @@
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",
+            "outputCapture": "std"
         }
     ]
 }

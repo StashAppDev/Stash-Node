@@ -12,8 +12,10 @@ export const databaseInitializer = async () => {
   return await createConnection({
     type: "sqlite",
     database: databasePath,
-    logging: ["query", "error"],
-    maxQueryExecutionTime: 90,
+    // TODO
+    // logging: ["query", "error"],
+    // logging: ["error"],
+    // maxQueryExecutionTime: 90,
     entities: [
       SceneEntity,
       TagEntity

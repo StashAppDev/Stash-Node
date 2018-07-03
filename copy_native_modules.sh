@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ./node_modules/node-pre-gyp/bin/node-pre-gyp install -C ./node_modules/sqlite3/ --target_platform=darwin
 ./node_modules/node-pre-gyp/bin/node-pre-gyp install -C ./node_modules/sqlite3/ --target_platform=win32
 ./node_modules/node-pre-gyp/bin/node-pre-gyp install -C ./node_modules/sqlite3/ --target_platform=linux

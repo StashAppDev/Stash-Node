@@ -1,6 +1,7 @@
 import { run, StashServerOptions } from './server';
 import program from 'commander';
-import { StashManager } from './manager/stash-manager';
+import { Manager } from './stash/manager.stash';
+import { databaseInitializer } from './database';
 
 program
   .version('0.0.1', '-v, --version')
@@ -14,8 +15,9 @@ program
 
 program
   .command('scan')
-  .action(() => {
-    StashManager.getInstance().scan();
+  .action(async () => {
+    await databaseInitializer();
+    Manager.getInstance().scan('');
   });
 
 program
