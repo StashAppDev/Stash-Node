@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import { IncomingMessage } from "http";
 import path from "path";
 
-import { ApolloServer } from "apollo-server";
+import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import { importSchema } from "graphql-import";
 
@@ -62,6 +62,10 @@ export async function run(options: IStashServerOptions) {
 
   const app = express();
 
+  app.get("/scenes/:id/stream", (req, res) => {
+    SceneController.stream(req, res);
+  });
+
   await databaseInitializer();
 
   const server = new ApolloServer({
@@ -75,7 +79,7 @@ export async function run(options: IStashServerOptions) {
 
   server.applyMiddleware({ app, path: serverPath });
 
-  server.listen({ port: options.port }, () => {
+  app.listen({ port: options.port }, () => {
     log.info(`🚀 Server ready at http://localhost:${options.port}${server.graphqlPath}`);
   });
 
