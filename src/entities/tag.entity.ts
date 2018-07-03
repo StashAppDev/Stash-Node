@@ -5,9 +5,9 @@ import { Tag } from "../typings/graphql";
 export class TagEntity implements Tag {
 
   @PrimaryGeneratedColumn()
-  id: string;
+  public id: string;
 
   @Column()
-  name: string;
+  public name: string;
 
 }

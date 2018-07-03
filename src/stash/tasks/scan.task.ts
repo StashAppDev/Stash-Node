@@ -1,11 +1,11 @@
-import { BaseTask } from "./base.task";
-import fse from 'fs-extra';
-import path from 'path';
-import { SceneEntity } from "../../entities/scene.entity";
+import fse from "fs-extra";
+import path from "path";
 import { getManager } from "typeorm";
-import { md5FromPath } from "../utils.stash";
-import { FFProbe } from "../ffprobe.stash";
+import { SceneEntity } from "../../entities/scene.entity";
 import { FFMpeg } from "../ffmpeg.stash";
+import { FFProbe } from "../ffprobe.stash";
+import { md5FromPath } from "../utils.stash";
+import { BaseTask } from "./base.task";
 
 export class ScanTask extends BaseTask {
   private filePath: string;
@@ -33,7 +33,7 @@ export class ScanTask extends BaseTask {
 
     await this.makeScreenshots(movie, checksum);
 
-    entity = await repository.findOne({checksum: checksum});
+    entity = await repository.findOne({checksum});
     if (!!entity) {
       this.manager.info(`${this.filePath} already exists.  Updating path...`);
       entity.path = this.filePath;
@@ -41,8 +41,8 @@ export class ScanTask extends BaseTask {
     } else {
       this.manager.info(`${this.filePath} doesn't exist.  Creating new item...`);
       entity = repository.create({
+        checksum,
         path: this.filePath,
-        checksum: checksum
       });
 
       if (klass === SceneEntity) {
@@ -68,7 +68,7 @@ export class ScanTask extends BaseTask {
     const normalPath = path.join(this.manager.paths.screenshots, `${checksum}.jpg`);
 
     if (fse.existsSync(thumbPath) && fse.existsSync(normalPath)) {
-      this.manager.verbose('Screenshots already exist for this path... skipping');
+      this.manager.verbose("Screenshots already exist for this path... skipping");
       return;
     }
 
@@ -89,7 +89,7 @@ export class ScanTask extends BaseTask {
   }
 
   private getClass() {
-    if (path.extname(this.filePath) === '.zip') {
+    if (path.extname(this.filePath) === ".zip") {
       // TODO Gallery
       throw new Error(`TODO Gallery ${this.filePath}`);
     } else {
@@ -98,7 +98,7 @@ export class ScanTask extends BaseTask {
   }
 
   private createFolders() {
-    const tmpPath = path.join(this.manager.paths.screenshots, 'tmp');
+    const tmpPath = path.join(this.manager.paths.screenshots, "tmp");
     fse.ensureDirSync(tmpPath);
   }
 }

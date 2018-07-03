@@ -1,78 +1,78 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Scene } from "../typings/graphql";
 
 @Entity("scenes")
 export class SceneEntity implements Scene {
 
   @PrimaryGeneratedColumn()
-  id: string;
+  public id: string;
 
   @Column({
+    nullable: true,
     type: "varchar",
-    nullable: true
   })
-  title?: string;
+  public title?: string;
 
   @Column({
+    nullable: true,
     type: "varchar",
-    nullable: true
   })
-  details?: string;
+  public details?: string;
 
   @Column({
+    nullable: true,
     type: "varchar",
-    nullable: true
   })
-  url?: string;
+  public url?: string;
 
   @Column({
+    nullable: true,
     type: "tinyint",
-    nullable: true
   })
-  rating?: number;
+  public rating?: number;
 
   @Column({
     type: "varchar",
-    unique: true
+    unique: true,
   })
-  path: string;
+  public path: string;
 
   @Column({
     type: "varchar",
-    unique: true
+    unique: true,
   })
-  checksum: string;
+  public checksum: string;
 
   @Column({
-    type: "varchar"
+    type: "varchar",
   })
-  size: string;
+  public size: string;
 
   @Column({
     precision: 7,
-    scale: 2
+    scale: 2,
   })
-  duration: number;
+  public duration: number;
 
   @Column({
-    type: "varchar"
+    type: "varchar",
   })
-  videoCodec: string;
+  public videoCodec: string;
 
   @Column({
-    type: "varchar"
+    type: "varchar",
   })
-  audioCodec: string;
+  public audioCodec: string;
 
   @Column({
-    type: "tinyint"
+    type: "tinyint",
   })
-  width: number;
+  public width: number;
 
   @Column({
-    type: "tinyint"
+    type: "tinyint",
   })
-  height: number;
+  public height: number;
 
   // @ManyToOne(type => StudioEntity, studio => studio.scenes)
   // studio: StudioEntity;

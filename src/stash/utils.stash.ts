@@ -1,11 +1,11 @@
-import fs from 'fs';
-import crypto from 'crypto';
-import childProcess from 'child_process';
+import childProcess from "child_process";
+import crypto from "crypto";
+import fs from "fs";
 
 export function md5FromPath(filePath: string) {
   const bufferSize = 8192;
-  const fd = fs.openSync(filePath, 'r');
-  const hash = crypto.createHash('md5');
+  const fd = fs.openSync(filePath, "r");
+  const hash = crypto.createHash("md5");
   const buffer = Buffer.alloc(bufferSize);
 
   try {
@@ -19,7 +19,7 @@ export function md5FromPath(filePath: string) {
     fs.closeSync(fd);
   }
 
-  return hash.digest('hex');
+  return hash.digest("hex");
 }
 
 // https://noraesae.net/2017/11/16/useful-utility-functions-in-typescript/

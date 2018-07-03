@@ -9,7 +9,9 @@
     "build": "tsc",
     "package": "yarn build && pkg package.json --out-path builds && sh copy_native_modules.sh && yarn package:ffmpeg",
     "package:ffmpeg": "sh download_ffmpeg.sh",
-    "schema": "node regen-types.js"
+    "schema": "node regen-types.js",
+    "lint": "tslint -c ./tslint.json 'src/**/*.ts'",
+    "lint:fix": "tslint --fix -c ./tslint.json 'src/**/*.ts'"
   },
   "pkg": {
     "scripts": [

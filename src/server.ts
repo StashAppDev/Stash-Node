@@ -1,63 +1,63 @@
-import path from 'path';
-import fs from 'fs';
-import gql from 'graphql-tag';
-import { IncomingMessage } from 'http';
+import gql from "graphql-tag";
+import { IncomingMessage } from "http";
+import path from "path";
 
-import express from 'express';
-import { ApolloServer } from 'apollo-server';
-import { importSchema } from 'graphql-import';
+import { ApolloServer } from "apollo-server";
+import express from "express";
+import { importSchema } from "graphql-import";
 
-import { databaseInitializer } from './database';
-import { GalleryController } from './controllers/gallery.controller';
-import { TagController } from './controllers/tag.controller';
-import { SceneController } from './controllers/scene.controller';
-import { FindScenesQueryArgs } from './typings/graphql';
+import { GalleryController } from "./controllers/gallery.controller";
+import { SceneController } from "./controllers/scene.controller";
+import { TagController } from "./controllers/tag.controller";
+import { databaseInitializer } from "./database";
+import { log } from "./logger";
+import { FindScenesQueryArgs } from "./typings/graphql";
 
 //#region Types
 
-export type StashServerOptions = {
+export interface IStashServerOptions {
   port?: number;
-};
+}
 
 //#endregion
 
 //#region Schema
 
 // NOTE: This path looks weird, but is required for pkg
-const schemaPath = path.join(__dirname, '../src/schema.graphql');
+const schemaPath = path.join(__dirname, "../src/schema.graphql");
 const schemaString = importSchema(schemaPath);
 const schema = gql`
   ${schemaString}
 `;
 
 const resolvers = {
+  Gallery: {
+    files(root: any, args: any, context: any) {
+      // TODO: Find files for given root id
+      // GalleryController.find(root.id);
+    },
+  },
+  Mutation: {
+    tagCreate(root: any, args: any, context: any) {
+      return TagController.create(args.input);
+    },
+  },
   Query: {
     findGallery(root: any, args: any, context: any) {
-      return {id: '1'};
+      return {id: "1"};
     },
     findTag(root: any, args: any, context: any) {
       return TagController.find(args.id);
     },
     findScenes(root: any, args: FindScenesQueryArgs, context: any) {
       return SceneController.findScenes(args);
-    }
+    },
   },
-  Mutation: {
-    tagCreate(root: any, args: any, context: any) {
-      return TagController.create(args.input);
-    }
-  },
-  Gallery: {
-    files(root: any, args: any, context: any) {
-      // TODO: Find files for given root id
-      // GalleryController.find(root.id);
-    }
-  }
 };
 
 //#endregion
 
-export async function run(options: StashServerOptions) {
+export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
@@ -65,18 +65,18 @@ export async function run(options: StashServerOptions) {
   await databaseInitializer();
 
   const server = new ApolloServer({
-    typeDefs: schema,
-    resolvers: resolvers,
     context: (request: IncomingMessage) => ({
-      request
-    })
+      request,
+    }),
+    resolvers,
+    typeDefs: schema,
   });
-  const serverPath = '/graphql';
+  const serverPath = "/graphql";
 
   server.applyMiddleware({ app, path: serverPath });
 
   server.listen({ port: options.port }, () => {
-    console.log(`🚀 Server ready at http://localhost:${options.port}${server.graphqlPath}`)
+    log.info(`🚀 Server ready at http://localhost:${options.port}${server.graphqlPath}`);
   });
 
 }

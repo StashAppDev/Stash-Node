@@ -1,18 +1,18 @@
 import { SelectQueryBuilder } from "typeorm";
-import { FindScenesQueryArgs } from "../typings/graphql";
 import { SceneEntity } from "../entities/scene.entity";
+import { FindScenesQueryArgs } from "../typings/graphql";
 import { BaseQueryBuilder } from "./base.querybuilder";
 
 export class SceneQueryBuilder extends BaseQueryBuilder<SceneEntity> {
-  args: FindScenesQueryArgs
+  public args: FindScenesQueryArgs;
 
   constructor(qb: SelectQueryBuilder<SceneEntity>, args: FindScenesQueryArgs) {
-    super(qb, args.filter)
+    super(qb, args.filter);
     this.args = args;
   }
 
-  filter(): SceneQueryBuilder {
-    if (!this.args.scene_filter) return this;
+  public filter(): SceneQueryBuilder {
+    if (!this.args.scene_filter) { return this; }
     const sceneFilter = this.args.scene_filter;
 
     if (!!sceneFilter.rating) {
@@ -23,7 +23,7 @@ export class SceneQueryBuilder extends BaseQueryBuilder<SceneEntity> {
   }
 
   private rating(rating: number): SceneQueryBuilder {
-    this.qb.andWhere('rating = :rating', { rating });
+    this.qb.andWhere("rating = :rating", { rating });
     return this;
   }
 }

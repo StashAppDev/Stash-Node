@@ -1,19 +1,20 @@
-import { log } from "./../logger";
 import glob from "glob";
+import PQueue from "p-queue";
+import { log } from "./../logger";
+import Paths from "./paths.stash";
 import { ScanTask } from "./tasks/scan.task";
-import Paths from './paths.stash';
-import PQueue from 'p-queue';
 
 export class Job {
-  id: string = '';
-  status: Job.Status = Job.Status.Idle;
-  message: string = '';
-  logs: string[] = [];
+  public id: string = "";
+  public status: Job.Status = Job.Status.Idle;
+  public message: string = "";
+  public logs: string[] = [];
 
-  currentItem: number = 0;
-  total: number = 0;
+  public currentItem: number = 0;
+  public total: number = 0;
 }
 
+// tslint:disable-next-line:no-namespace
 export namespace Job {
   export enum Status {
     Idle,
@@ -22,31 +23,27 @@ export namespace Job {
     Scan,
     Generate,
     Clean,
-    Scrape
+    Scrape,
   }
 }
 
 export class Manager {
 
-  readonly paths = new Paths();
-
   //#region Singleton
 
-  private static _instance: Manager = new Manager();
+  public static readonly instance: Manager = new Manager();
+
+  public readonly paths = new Paths();
+  public job: Job = new Job();
+  public queue: PQueue = new PQueue({concurrency: 1});
 
   constructor() {
-    if (Manager._instance){
-      throw new Error("Error: Instantiation failed: Use Manager.getInstance() instead of new.");
+    if (Manager.instance) {
+      throw new Error("Error: Instantiation failed: Use Manager.instance instead of new.");
     }
-    Manager._instance = this;
   }
 
-  public static getInstance(): Manager { return Manager._instance; }
-
   //#endregion
-
-  job: Job = new Job();
-  queue: PQueue = new PQueue({concurrency: 1});
 
   //#region Jobs
 
@@ -57,16 +54,16 @@ export class Manager {
     this.job.message = "Importing...";
     this.job.logs = [];
 
-    const scanPaths = glob.sync('**/*.{zip,m4v,mp4,mov,wmv}', {cwd: this.paths.stash, realpath: true});
+    const scanPaths = glob.sync("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: this.paths.stash, realpath: true});
     this.job.currentItem = 0;
     this.job.total = scanPaths.length;
-    log.info(`Starting scan of ${scanPaths.length} files`)
+    log.info(`Starting scan of ${scanPaths.length} files`);
 
-    scanPaths.forEach(path => {
+    scanPaths.forEach((path) => {
       this.queue.add(() => {
         this.job.currentItem += 1;
         const scanTask = new ScanTask(path);
-        return scanTask.start().catch(reason => {
+        return scanTask.start().catch((reason) => {
           this.handleError(reason);
         });
       });
@@ -82,27 +79,27 @@ export class Manager {
 
   //#region Logging
 
-  verbose(message: string) {
+  public verbose(message: string) {
     log.verbose(message);
     this.addLog(message);
   }
 
-  info(message: string) {
+  public info(message: string) {
     log.info(message);
     this.addLog(message);
   }
 
-  debug(message: string) {
+  public debug(message: string) {
     log.debug(message);
     this.addLog(message);
   }
 
-  warn(message: string) {
+  public warn(message: string) {
     log.warn(message);
     this.addLog(message);
   }
 
-  error(message: string) {
+  public error(message: string) {
     log.error(message);
     this.addLog(message);
   }
@@ -113,14 +110,14 @@ export class Manager {
 
   private idle() {
     this.job.status = Job.Status.Idle;
-    this.job.message = 'Waiting...';
+    this.job.message = "Waiting...";
     this.job.currentItem = 0;
     this.job.total = 0;
     this.triggerSubscription();
   }
 
   private addLog(message: string) {
-    this.job.logs.unshift(message)
+    this.job.logs.unshift(message);
     this.triggerSubscription();
   }
 

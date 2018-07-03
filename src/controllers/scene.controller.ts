@@ -4,14 +4,14 @@ import { SceneEntity } from "../entities/scene.entity";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 
 export class SceneController {
-  static async findScenes(args: FindScenesQueryArgs): Promise<FindScenesResultType> {
+  public static async findScenes(args: FindScenesQueryArgs): Promise<FindScenesResultType> {
     const sceneRepository = getManager().getRepository(SceneEntity);
-    var qb = sceneRepository.createQueryBuilder("scenes");
+    const qb = sceneRepository.createQueryBuilder("scenes");
 
     const helper = new SceneQueryBuilder(qb, args);
     helper
       .filter()
-      .sort(sceneRepository, 'title')
+      .sort(sceneRepository, "title")
       .paginate();
 
     const results = await helper.qb.getManyAndCount();
