@@ -66,6 +66,10 @@ export async function run(options: IStashServerOptions) {
     SceneController.stream(req, res);
   });
 
+  app.get("/scenes/:id/screenshot", (req, res) => {
+    SceneController.screenshot(req, res);
+  });
+
   await databaseInitializer();
 
   const server = new ApolloServer({

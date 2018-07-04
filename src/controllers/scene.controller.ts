@@ -1,8 +1,11 @@
 import express from "express";
+import fs from "fs";
+import path from "path";
 import { getManager } from "typeorm";
 import { FindScenesQueryArgs, FindScenesResultType } from "typings/graphql";
 import { SceneEntity } from "../entities/scene.entity";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
+import { Manager } from "../stash/manager.stash";
 
 export class SceneController {
   public static async findScenes(args: FindScenesQueryArgs): Promise<FindScenesResultType> {
@@ -21,9 +24,37 @@ export class SceneController {
   }
 
   public static async stream(req: express.Request, res: express.Response) {
+    const scene = await this.getScene(req);
+    res.sendFile(scene.path);
+  }
+
+  public static async screenshot(req: express.Request, res: express.Response) {
+    const scene = await this.getScene(req);
+
+    const screenshotPath = path.join(Manager.instance.paths.screenshots, `${scene.checksum}.jpg`);
+    const thumbnailPath = path.join(Manager.instance.paths.screenshots, `${scene.checksum}.thumb.jpg`);
+
+    const seconds = parseInt(req.query.seconds, 10);
+    const width = parseInt(req.query.width, 10);
+
+    const sendFileOptions = {
+      maxAge: 604800000, // 1 Week
+    };
+
+    if (!!seconds) {
+      // TODO
+      //   data = @scene.screenshot(seconds: params[:seconds], width: params[:width])
+      //   send_data data, filename: 'screenshot.jpg', disposition: 'inline'
+    } else if (fs.existsSync(thumbnailPath) && !!width && width < 400) {
+      res.sendFile(thumbnailPath, sendFileOptions);
+    } else {
+      res.sendFile(screenshotPath, sendFileOptions);
+    }
+  }
+
+  private static async getScene(req: express.Request): Promise<SceneEntity> {
     const sceneRepository = getManager().getRepository(SceneEntity);
     const id = req.params.id;
-    const scene = await sceneRepository.findOne(id);
-    res.sendFile(scene.path);
+    return await sceneRepository.findOne(id);
   }
 }
