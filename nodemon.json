@@ -1,5 +1,5 @@
 {
   "watch": ["./src"],
   "ext": "ts,graphql",
-  "exec": "ts-node --inspect -r tsconfig-paths/register ./src/index.ts"
+  "exec": "NODE_OPTIONS='--inspect' ts-node -r tsconfig-paths/register ./src/index.ts start"
 }
