@@ -11,6 +11,7 @@ import { SceneController } from "./controllers/scene.controller";
 import { TagController } from "./controllers/tag.controller";
 import { databaseInitializer } from "./database";
 import { log } from "./logger";
+import scenesRoutes from "./routes/scenes.route";
 import { FindScenesQueryArgs } from "./typings/graphql";
 
 //#region Types
@@ -61,14 +62,7 @@ export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
-
-  app.get("/scenes/:id/stream", (req, res) => {
-    SceneController.stream(req, res);
-  });
-
-  app.get("/scenes/:id/screenshot", (req, res) => {
-    SceneController.screenshot(req, res);
-  });
+  app.use("/scenes", scenesRoutes);
 
   await databaseInitializer();
 

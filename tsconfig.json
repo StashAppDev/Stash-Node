@@ -1,12 +1,19 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    // For TypeORM
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+
+    // Strict
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": true,
+    // "noUnusedLocals": true,
+
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
-    "noImplicitAny": true,
     "moduleResolution" : "node",
     "sourceMap": true,
     "baseUrl": "./src",

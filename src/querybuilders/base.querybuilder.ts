@@ -5,26 +5,22 @@ export class BaseQueryBuilder<T> {
   public qb: SelectQueryBuilder<T>;
   public findFilter: FindFilterType;
 
-  constructor(qb: SelectQueryBuilder<T>, findFilter: FindFilterType) {
+  constructor(qb: SelectQueryBuilder<T>, findFilter?: FindFilterType | null) {
     this.qb = qb;
-    this.findFilter = findFilter;
+    this.findFilter = !!findFilter ? findFilter : {};
   }
 
   public paginate(): BaseQueryBuilder<T> {
-    let page = 1;
-    if (this.findFilter.page < 1) {
+    let page = !!this.findFilter.page ? this.findFilter.page : 1;
+    if (page < 1) {
       page = 1;
-    } else if (!!this.findFilter.page) {
-      page = this.findFilter.page;
     }
 
-    let perPage = 25;
-    if (this.findFilter.per_page > 120) {
+    let perPage = !!this.findFilter.per_page ? this.findFilter.per_page : 25;
+    if (perPage > 120) {
       perPage = 120;
-    } else if (this.findFilter.per_page < 1) {
+    } else if (perPage < 1) {
       perPage = 1;
-    } else if (!!this.findFilter.per_page) {
-      perPage = this.findFilter.per_page;
     }
 
     this.qb
@@ -36,8 +32,9 @@ export class BaseQueryBuilder<T> {
 
   public sort(repository: Repository<T>, defaultSort: string): BaseQueryBuilder<T> {
     const sort = !!this.findFilter.sort ? this.findFilter.sort : defaultSort;
+    const findFilterDirection = !!this.findFilter.direction ? this.findFilter.direction : "ASC";
 
-    const sortDirection = ["ASC", "DESC"].includes(this.findFilter.direction) ? this.findFilter.direction : "ASC";
+    const sortDirection = ["ASC", "DESC"].includes(findFilterDirection) ? findFilterDirection : "ASC";
     const sortColumn = this.getColumnNames(repository).includes(sort) ? sort : defaultSort;
 
     if (sort.includes("_count")) {

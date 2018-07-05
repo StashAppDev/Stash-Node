@@ -16,7 +16,7 @@ export class SceneQueryBuilder extends BaseQueryBuilder<SceneEntity> {
     const sceneFilter = this.args.scene_filter;
 
     if (!!sceneFilter.rating) {
-      this.rating(this.args.scene_filter.rating);
+      this.rating(sceneFilter.rating);
     }
 
     return this;

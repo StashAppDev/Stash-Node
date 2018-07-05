@@ -2,7 +2,7 @@ import { getManager } from "typeorm";
 import { TagEntity } from "../entities/tag.entity";
 
 export class TagController {
-  public static async find(id: string): Promise<TagEntity> {
+  public static async find(id: string): Promise<TagEntity | undefined> {
     const tagRepository = getManager().getRepository(TagEntity);
     return tagRepository.findOne(id);
   }

@@ -4,6 +4,7 @@ import path from "path";
 import { getManager } from "typeorm";
 import { FindScenesQueryArgs, FindScenesResultType } from "typings/graphql";
 import { SceneEntity } from "../entities/scene.entity";
+import { log } from "../logger";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { Manager } from "../stash/manager.stash";
 
@@ -24,12 +25,15 @@ export class SceneController {
   }
 
   public static async stream(req: express.Request, res: express.Response) {
-    const scene = await this.getScene(req);
+    const scene = await this.getScene(req, res);
+    if (scene === undefined) { return; }
+
     res.sendFile(scene.path);
   }
 
   public static async screenshot(req: express.Request, res: express.Response) {
-    const scene = await this.getScene(req);
+    const scene = await this.getScene(req, res);
+    if (scene === undefined) { return; }
 
     const screenshotPath = path.join(Manager.instance.paths.screenshots, `${scene.checksum}.jpg`);
     const thumbnailPath = path.join(Manager.instance.paths.screenshots, `${scene.checksum}.thumb.jpg`);
@@ -52,9 +56,17 @@ export class SceneController {
     }
   }
 
-  private static async getScene(req: express.Request): Promise<SceneEntity> {
+  /**
+   * Will send the status code if given a response.  Return if the result is undefined.
+   */
+  private static async getScene(req: express.Request, res?: express.Response): Promise<SceneEntity|undefined> {
     const sceneRepository = getManager().getRepository(SceneEntity);
     const id = req.params.id;
-    return await sceneRepository.findOne(id);
+    const scene = await sceneRepository.findOne(id);
+    if (scene === undefined && res !== undefined) {
+      log.warn(`${req.url}: Unabled to find scene with id ${id}`);
+      res.sendStatus(404);
+    }
+    return scene;
   }
 }
