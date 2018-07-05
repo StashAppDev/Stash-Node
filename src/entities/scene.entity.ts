@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { StudioEntity } from "./studio.entity";
 
 @Entity("scenes")
@@ -47,4 +47,7 @@ export class SceneEntity {
 
   @ManyToOne((type) => StudioEntity, (studio) => studio.scenes)
   public studio: StudioEntity;
+
+  // @OneToOne()
+  // public gallery: GalleryEntity;
 }

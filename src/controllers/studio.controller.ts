@@ -1,5 +1,6 @@
 import { getManager } from "typeorm";
 import { StudioEntity } from "../entities/studio.entity";
+import { processImage } from "../stash/utils.stash";
 import { StudioCreateInput, StudioUpdateInput } from "../typings/graphql";
 
 export class StudioController {
@@ -10,7 +11,13 @@ export class StudioController {
 
   public static async create(input: StudioCreateInput): Promise<StudioEntity> {
     const studioRepository = getManager().getRepository(StudioEntity);
-    const newStudio = studioRepository.create(input);
+    const newStudio = studioRepository.create({
+      name: input.name,
+      url: input.url,
+    });
+    if (!!input.image) {
+      processImage(input, newStudio);
+    }
     return studioRepository.save(newStudio);
   }
 
@@ -20,7 +27,7 @@ export class StudioController {
     studio.name = input.name;
     studio.url = input.url;
     if (!!input.image) {
-      studio.image = input.image;
+      processImage(input, studio);
     }
     return studioRepository.save(studio);
   }

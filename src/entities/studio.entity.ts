@@ -6,7 +6,7 @@ export class StudioEntity {
   @PrimaryGeneratedColumn()
   public id: string;
 
-  @Column({ type: "blob", length: 1048576 })
+  @Column({ type: "blob" })
   public image: string;
 
   @Column({ type: "varchar", unique: true })

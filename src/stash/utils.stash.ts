@@ -1,6 +1,7 @@
 import childProcess from "child_process";
 import crypto from "crypto";
 import fs from "fs";
+import tempy from "tempy";
 
 export function md5FromPath(filePath: string) {
   const bufferSize = 8192;
@@ -20,6 +21,18 @@ export function md5FromPath(filePath: string) {
   }
 
   return hash.digest("hex");
+}
+
+export function processImage(params: { image?: string | null }, object: { checksum: string, image: string }) {
+  if (!params.image) { return; }
+
+  const image = Buffer.from(params.image, "base64");
+
+  const tempFile = tempy.file({extension: "jpg"});
+  fs.writeFileSync(tempFile, image, "binary");
+
+  object.checksum = md5FromPath(tempFile);
+  object.image = image.toString("utf8");
 }
 
 // https://noraesae.net/2017/11/16/useful-utility-functions-in-typescript/
