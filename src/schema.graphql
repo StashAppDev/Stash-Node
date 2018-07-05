@@ -11,8 +11,8 @@ type Gallery {
   path: String!
   title: String
 
-  # Function
-  files: [GalleryFilesType]
+  # The files in the gallery
+  files: [GalleryFilesType]! # Resolver
 }
 
 type GalleryFilesType {
@@ -22,26 +22,164 @@ type GalleryFilesType {
 }
 
 #######################################
+# Performer
+#######################################
+
+type Performer {
+  id: ID!
+  checksum: String!
+  name: String
+  url: String
+  twitter: String
+  instagram: String
+  birthdate: String
+  ethnicity: String
+  country: String
+  eye_color: String
+  height: String
+  measurements: String
+  fake_tits: String
+  career_length: String
+  tattoos: String
+  piercings: String
+  aliases: String
+  favorite: Boolean!
+
+  image_path: String # Resolver
+  scene_count: Int # Resolver
+  scenes: [Scene]!
+}
+
+#######################################
+# Scene Marker Tag
+#######################################
+
+type SceneMarkerTag {
+  tag: Tag
+  scene_markers: [SceneMarker]!
+}
+
+#######################################
+# Scene Marker
+#######################################
+
+type SceneMarker {
+  id: ID!
+  scene: Scene!
+  title: String!
+  seconds: Float!
+  primary_tag: Tag!
+  tags: [Tag]!
+
+  stream: String! # Resolver
+  preview: String! # Resolver
+}
+
+#######################################
 # Scene
 #######################################
 
+type SceneFileType {
+  size: String
+  duration: Float
+  video_codec: String
+  audio_codec: String
+  width: Int
+  height: Int
+}
+
+type ScenePathsType {
+  screenshot: String # Resolver
+  preview: String # Resolver
+  stream: String # Resolver
+  webp: String # Resolver
+  vtt: String # Resolver
+  chapters_vtt: String # Resolver
+}
+
 type Scene {
   id: ID!
+  checksum: String!
   title: String
   details: String
   url: String
+  date: String
   rating: Int
-  path: String
-  checksum: String
-  size: String
-  duration: Float
+  path: String!
 
-  # TODO
+  file: SceneFileType! # Resolver
+  paths: ScenePathsType! # Resolver
+  is_streamable: Boolean! # Resolver
+
+  scene_markers: [SceneMarker]!
+  gallery: Gallery
+  studio: Studio
+  tags: [Tag]!
+  performers: [Performer]!
+
+  scene_marker_tags: [SceneMarkerTag]! # TODO remove?
 }
 
 type FindScenesResultType {
   count: Int!
   scenes: [Scene]!
+}
+
+#######################################
+# Scraped Performer
+#######################################
+
+"""
+A performer from a scraping operation...
+"""
+type ScrapedPerformer {
+  name: String
+  url: String
+  twitter: String
+  instagram: String
+  birthdate: String
+  ethnicity: String
+  country: String
+  eye_color: String
+  height: String
+  measurements: String
+  fake_tits: String
+  career_length: String
+  tattoos: String
+  piercings: String
+  aliases: String
+}
+
+#######################################
+# Studio
+#######################################
+
+type Studio {
+  id: ID!
+  checksum: String!
+  name: String!
+  url: String
+
+  image_path: String # Resolver
+  scene_cound: Int # Resolver
+}
+
+input StudioCreateInput {
+  name: String!
+  url: String
+  image: String!
+}
+
+input StudioUpdateInput {
+  id: ID!
+  name: String
+  url: String
+  image: String
+}
+
+type FindStudiosResultType {
+  count: Int!
+  studios: [Studio]!
 }
 
 #######################################
@@ -51,9 +189,17 @@ type FindScenesResultType {
 type Tag {
   id: ID!
   name: String!
+
+  scene_count: Int # Resolver
+  scene_marker_count: Int # Resolver
 }
 
 input TagCreateInput {
+  name: String!
+}
+
+input TagUpdateInput {
+  id: ID!
   name: String!
 }
 
@@ -93,13 +239,21 @@ input SceneFilterType {
 #############
 
 type Query {
-  findGallery(id: ID!): Gallery
-  findTag(id: ID!): Tag
   findScenes(scene_filter: SceneFilterType, scene_ids: [Int], filter: FindFilterType): FindScenesResultType!
+
+  findStudio(id: ID!): Studio
+  findStudios(filter: FindFilterType): FindStudiosResultType!
+
+  findGallery(id: ID!): Gallery
+
+  findTag(id: ID!): Tag
 }
 
 type Mutation {
+  studioCreate(input: StudioCreateInput!): Studio
+  studioUpdate(input: StudioUpdateInput!): Studio
   tagCreate(input: TagCreateInput!): Tag
+  tagUpdate(input: TagUpdateInput!): Tag
 }
 
 schema {

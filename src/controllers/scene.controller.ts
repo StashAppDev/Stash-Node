@@ -9,7 +9,7 @@ import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { Manager } from "../stash/manager.stash";
 
 export class SceneController {
-  public static async findScenes(root: any, args: FindScenesQueryArgs, context: any): Promise<FindScenesResultType> {
+  public static async findScenes(root: any, args: FindScenesQueryArgs, context: any) {
     const sceneRepository = getManager().getRepository(SceneEntity);
     const qb = sceneRepository.createQueryBuilder("scenes");
 

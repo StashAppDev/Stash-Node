@@ -1,80 +1,50 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Scene } from "../typings/graphql";
+import { StudioEntity } from "./studio.entity";
 
 @Entity("scenes")
-export class SceneEntity implements Scene {
-
+export class SceneEntity {
   @PrimaryGeneratedColumn()
   public id: string;
 
-  @Column({
-    nullable: true,
-    type: "varchar",
-  })
-  public title?: string;
-
-  @Column({
-    nullable: true,
-    type: "varchar",
-  })
-  public details?: string;
-
-  @Column({
-    nullable: true,
-    type: "varchar",
-  })
-  public url?: string;
-
-  @Column({
-    nullable: true,
-    type: "tinyint",
-  })
-  public rating?: number;
-
-  @Column({
-    type: "varchar",
-    unique: true,
-  })
-  public path: string;
-
-  @Column({
-    type: "varchar",
-    unique: true,
-  })
+  @Column({ type: "varchar", unique: true })
   public checksum: string;
 
-  @Column({
-    type: "varchar",
-  })
+  @Column({ type: "varchar", nullable: true })
+  public title?: string;
+
+  @Column({ type: "varchar", nullable: true })
+  public details?: string;
+
+  @Column({ type: "varchar", nullable: true })
+  public url?: string;
+
+  @Column({ type: "varchar", nullable: true })
+  public date?: string;
+
+  @Column({ type: "tinyint", nullable: true })
+  public rating?: number;
+
+  @Column({ type: "varchar", unique: true })
+  public path: string;
+
+  @Column({ type: "varchar" })
   public size: string;
 
-  @Column({
-    precision: 7,
-    scale: 2,
-  })
+  @Column({ precision: 7, scale: 2 })
   public duration: number;
 
-  @Column({
-    type: "varchar",
-  })
+  @Column({ type: "varchar" })
   public videoCodec: string;
 
-  @Column({
-    type: "varchar",
-  })
+  @Column({ type: "varchar" })
   public audioCodec: string;
 
-  @Column({
-    type: "tinyint",
-  })
+  @Column({ type: "tinyint" })
   public width: number;
 
-  @Column({
-    type: "tinyint",
-  })
+  @Column({ type: "tinyint" })
   public height: number;
 
-  // @ManyToOne(type => StudioEntity, studio => studio.scenes)
-  // studio: StudioEntity;
-
+  @ManyToOne((type) => StudioEntity, (studio) => studio.scenes)
+  public studio: StudioEntity;
 }

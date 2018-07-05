@@ -3,6 +3,7 @@ import path from "path";
 import { createConnection } from "typeorm";
 
 import { SceneEntity } from "./entities/scene.entity";
+import { StudioEntity } from "./entities/studio.entity";
 import { TagEntity } from "./entities/tag.entity";
 import { log } from "./logger";
 
@@ -14,6 +15,7 @@ export const databaseInitializer = async () => {
     database: databasePath,
     entities: [
       SceneEntity,
+      StudioEntity,
       TagEntity,
     ],
     synchronize: true,
