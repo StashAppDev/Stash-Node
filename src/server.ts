@@ -1,62 +1,14 @@
-import gql from "graphql-tag";
-import { IncomingMessage } from "http";
-import path from "path";
-
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
-import { importSchema } from "graphql-import";
-
-import { GalleryController } from "./controllers/gallery.controller";
-import { SceneController } from "./controllers/scene.controller";
-import { TagController } from "./controllers/tag.controller";
+import { IncomingMessage } from "http";
 import { databaseInitializer } from "./database";
 import { log } from "./logger";
+import { resolvers, typeDefs } from "./resolvers";
 import scenesRoutes from "./routes/scenes.route";
-import { FindScenesQueryArgs } from "./typings/graphql";
-
-//#region Types
 
 export interface IStashServerOptions {
   port?: number;
 }
-
-//#endregion
-
-//#region Schema
-
-// NOTE: This path looks weird, but is required for pkg
-const schemaPath = path.join(__dirname, "../src/schema.graphql");
-const schemaString = importSchema(schemaPath);
-const schema = gql`
-  ${schemaString}
-`;
-
-const resolvers = {
-  Gallery: {
-    files(root: any, args: any, context: any) {
-      // TODO: Find files for given root id
-      // GalleryController.find(root.id);
-    },
-  },
-  Mutation: {
-    tagCreate(root: any, args: any, context: any) {
-      return TagController.create(args.input);
-    },
-  },
-  Query: {
-    findGallery(root: any, args: any, context: any) {
-      return {id: "1"};
-    },
-    findTag(root: any, args: any, context: any) {
-      return TagController.find(args.id);
-    },
-    findScenes(root: any, args: FindScenesQueryArgs, context: any) {
-      return SceneController.findScenes(args);
-    },
-  },
-};
-
-//#endregion
 
 export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
@@ -71,7 +23,7 @@ export async function run(options: IStashServerOptions) {
       request,
     }),
     resolvers,
-    typeDefs: schema,
+    typeDefs,
   });
   const serverPath = "/graphql";
 
