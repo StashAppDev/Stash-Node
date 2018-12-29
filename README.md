@@ -3,6 +3,10 @@
 * Run `yarn start` in terminal
 * Attach to Process in VSCode
 
+# Node
+
+* Run `nvm use` to use the correct node version
+
 ### For Dev
 
 https://medium.com/aherforth/how-to-get-auto-restart-and-breakpoint-support-with-typescript-and-node-5af589dd8687

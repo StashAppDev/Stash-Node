@@ -22,7 +22,7 @@ export async function run(options: IStashServerOptions) {
     context: (request: IncomingMessage) => ({
       request,
     }),
-    resolvers,
+    resolvers: resolvers as any, // TODO: https://github.com/prisma/graphqlgen/issues/124
     typeDefs,
   });
   const serverPath = "/graphql";
