@@ -1,0 +1,61 @@
+{
+  "name": "stash-electron",
+  "productName": "Stash",
+  "homepage": "http://todo",
+  "repository": "todo/todo",
+  "description": "todo",
+  "version": "0.0.1",
+  "author": {
+    "name": "StashAppDev",
+    "email": "stashappdev@gmail.com"
+  },
+  "main": "lib/main",
+  "build": {
+    "appId": "com.github.stashapp",
+    "mac": {
+    },
+    "win": {
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "snap",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": false
+    },
+    "files": [
+      "lib/**/!(*.map)"
+    ],
+    "directories": {
+      "output": "build-electron"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "release": "npm run build && electron-builder -lmw",
+    "release:mac": "npm run build && electron-builder -m",
+    "release:win": "npm run build && electron-builder -w",
+    "release:linux": "npm run build && electron-builder -l",
+    "lint": "tslint -c ./tslint.json 'src/**/*.ts'",
+    "start": "yarn build:ts && yarn start:electron",
+    "start:electron": "electron dist/main"
+  },
+  "dependencies": {
+    "electron-is-dev": "1.0.1",
+    "electron-log": "2.2.17",
+    "electron-updater": "4.0.6",
+    "stashapp": "0.0.1"
+  },
+  "devDependencies": {
+    "electron": "4.0.0",
+    "electron-builder": "20.38.4",
+    "electron-devtools-installer": "2.2.4"
+  }
+}

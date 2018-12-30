@@ -1,0 +1,36 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    // For TypeORM
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    // Strict
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": true,
+    // "noUnusedLocals": true,
+
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es6",
+    "moduleResolution" : "node",
+    "sourceMap": true,
+    "baseUrl": "./src",
+    "outDir": "dist",
+    "lib": [
+      "es6",
+      "es2017",
+      "dom",
+      "esnext"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
