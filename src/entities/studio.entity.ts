@@ -7,7 +7,7 @@ export class StudioEntity {
   public id: string;
 
   @Column({ type: "blob" })
-  public image: string;
+  public image: Buffer;
 
   @Column({ type: "varchar", unique: true })
   public checksum: string;

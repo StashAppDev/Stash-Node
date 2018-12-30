@@ -8,6 +8,7 @@ import { TagController } from "./controllers/tag.controller";
 import { SceneEntity } from "./entities/scene.entity";
 import {
   FindScenesQueryArgs,
+  FindStudioQueryArgs,
   SceneFileType,
   ScenePathsType,
   StudioCreateMutationArgs,
@@ -53,6 +54,9 @@ export const resolvers = {
     },
     findScenes(root: any, args: FindScenesQueryArgs, context: any) {
       return SceneController.findScenes(root, args, context);
+    },
+    findStudio(root: any, args: FindStudioQueryArgs, context: any) {
+      return StudioController.find(args.id);
     },
   },
   Scene: {

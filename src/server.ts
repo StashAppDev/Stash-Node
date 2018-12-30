@@ -4,7 +4,8 @@ import { IncomingMessage } from "http";
 import { databaseInitializer } from "./database";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
-import scenesRoutes from "./routes/scenes.route";
+import sceneRoutes from "./routes/scene.route";
+import studioRoutes from "./routes/studio.route";
 
 export interface IStashServerOptions {
   port?: number;
@@ -14,7 +15,8 @@ export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
-  app.use("/scenes", scenesRoutes);
+  app.use("/scenes", sceneRoutes);
+  app.use("/studios", studioRoutes);
 
   await databaseInitializer();
 

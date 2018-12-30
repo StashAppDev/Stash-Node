@@ -24,6 +24,8 @@ export default class {
   public readonly ffprobe: string;
 
   constructor() {
+    // TODO: When run on debugger this is "~/.nvm⁩/versions⁩/node⁩/v10.4.1⁩/bin⁩".  I coppied the config.json
+    // and junk there.
     const executionDirectory = path.dirname(process.execPath);
     const configPath = path.join(executionDirectory, "config.json");
 
@@ -36,7 +38,7 @@ export default class {
     }
 
     if (!fs.existsSync(configPath)) {
-      throw new Error("No config.json found");
+      throw new Error(`No config.json found at ${configPath}`);
     }
 
     const jsonFile = fs.readFileSync(configPath, "utf8");
