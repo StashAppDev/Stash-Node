@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.settings.json",
+  "compilerOptions": {
+    // For TypeORM
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    "rootDir": "src",
+    "outDir": "dist",
+    // "lib": [
+    //   "es6",
+    //   "es2017",
+    //   "dom",
+    //   "esnext"
+    // ],
+    // "typeRoots": [
+    //   "node_modules/@types"
+    // ],
+    "skipLibCheck": true
+  }
+}

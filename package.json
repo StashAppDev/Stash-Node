@@ -4,14 +4,19 @@
     "packages/*"
   ],
   "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "tsc -b packages/stash-electron packages/stash-server",
+    "lint": "lerna run lint",
+    "clean": "rimraf packages/**/lib"
   },
   "devDependencies": {
     "@types/node": "10.12.18",
+    "lerna": "3.8.0",
     "nodemon": "1.18.9",
+    "rimraf": "2.6.2",
     "ts-node": "7.0.1",
     "tsconfig-paths": "3.7.0",
     "tslint": "5.12.0",
     "typescript": "3.2.2"
-  },
-  "dependencies": {}
+  }
 }

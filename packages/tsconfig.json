@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "stash-electron" },
+    { "path": "stash-server" }
+  ]
+}

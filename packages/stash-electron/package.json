@@ -51,7 +51,7 @@
     "electron-is-dev": "1.0.1",
     "electron-log": "2.2.17",
     "electron-updater": "4.0.6",
-    "stashapp": "0.0.1"
+    "stash-server": "0.0.1"
   },
   "devDependencies": {
     "electron": "4.0.0",
