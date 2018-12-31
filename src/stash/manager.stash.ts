@@ -1,7 +1,7 @@
 import glob from "glob";
 import PQueue from "p-queue";
 import { log } from "./../logger";
-import Paths from "./paths.stash";
+import { StashPaths } from "./paths.stash";
 import { ScanTask } from "./tasks/scan.task";
 
 export class Job {
@@ -27,23 +27,16 @@ export namespace Job {
   }
 }
 
-export class Manager {
+class Manager {
 
-  //#region Singleton
-
-  public static readonly instance: Manager = new Manager();
-
-  public readonly paths = new Paths();
   public job: Job = new Job();
   public queue: PQueue = new PQueue({concurrency: 1});
 
-  constructor() {
-    if (Manager.instance) {
-      throw new Error("Error: Instantiation failed: Use Manager.instance instead of new.");
-    }
+  public async bootstrap() {
+    const promise = StashPaths.ensureConfigFile();
+    await promise;
+    return promise;
   }
-
-  //#endregion
 
   //#region Jobs
 
@@ -54,7 +47,7 @@ export class Manager {
     this.job.message = "Importing...";
     this.job.logs = [];
 
-    const scanPaths = glob.sync("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: this.paths.stash, realpath: true});
+    const scanPaths = glob.sync("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: StashPaths.stash, realpath: true});
     this.job.currentItem = 0;
     this.job.total = scanPaths.length;
     log.info(`Starting scan of ${scanPaths.length} files`);
@@ -68,6 +61,8 @@ export class Manager {
         });
       });
     });
+
+    this.idle();
   }
 
   //#endregion
@@ -132,3 +127,5 @@ export class Manager {
 
   //#endregion
 }
+
+export const StashManager = new Manager();

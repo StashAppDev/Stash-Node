@@ -1,9 +1,15 @@
 import fs from "fs";
 import fse from "fs-extra";
+import inquirer from "inquirer";
 import os from "os";
 import path from "path";
 
-export default class {
+class Paths {
+  public readonly executionDirectory: string = path.dirname(process.execPath);
+  public readonly configDirectory: string = path.join(os.homedir(), ".stash");
+  public readonly configFile: string = path.join(this.configDirectory, "config.json");
+  public readonly databaseFile: string = path.join(this.configDirectory, "stash.sqlite");
+
   public readonly stash: string;
   public readonly metadata: string;
   public readonly cache: string;
@@ -24,24 +30,22 @@ export default class {
   public readonly ffprobe: string;
 
   constructor() {
-    // TODO: When run on debugger this is "~/.nvm⁩/versions⁩/node⁩/v10.4.1⁩/bin⁩".  I coppied the config.json
-    // and junk there.
-    const executionDirectory = path.dirname(process.execPath);
-    const configPath = path.join(executionDirectory, "config.json");
-
-    if (os.platform() === "win32") {
-      this.ffmpeg = path.join(executionDirectory, "ffmpeg.exe");
-      this.ffprobe = path.join(executionDirectory, "ffprobe.exe");
-    } else {
-      this.ffmpeg = path.join(executionDirectory, "ffmpeg");
-      this.ffprobe = path.join(executionDirectory, "ffprobe");
+    const ffmpegDirectories = [this.executionDirectory, this.configDirectory];
+    const ffmpegFileName: string = os.platform() === "win32" ? "ffmpeg.exe" : "ffmpeg";
+    const ffprobeFileName: string = os.platform() === "win32" ? "ffprobe.exe" : "ffprobe";
+    for (const directory of ffmpegDirectories) {
+      const ffmpegPath = path.join(directory, ffmpegFileName);
+      const ffprobePath = path.join(directory, ffprobeFileName);
+      if (fs.existsSync(ffmpegPath)) { this.ffmpeg = ffmpegPath; }
+      if (fs.existsSync(ffprobePath)) { this.ffprobe = ffprobePath; }
     }
 
-    if (!fs.existsSync(configPath)) {
-      throw new Error(`No config.json found at ${configPath}`);
-    }
+    if (!fs.existsSync(this.configFile)) { throw new Error(`config.json not found at ${this.configFile}`); }
+    const ffmpegErrorText = `\nPlace it in one of the following folders:\n\n${ffmpegDirectories.join("\n")}\n`;
+    if (!fs.existsSync(this.ffmpeg)) { throw new Error(`FFMPEG not found. ${ffmpegErrorText}`); }
+    if (!fs.existsSync(this.ffprobe)) { throw new Error(`FFProbe not found. ${ffmpegErrorText}`); }
 
-    const jsonFile = fs.readFileSync(configPath, "utf8");
+    const jsonFile = fs.readFileSync(this.configFile, "utf8");
     const jsonConfig = JSON.parse(jsonFile);
 
     this.stash       = jsonConfig.stash;
@@ -69,4 +73,28 @@ export default class {
     fse.ensureDirSync(this.markers);
     fse.ensureDirSync(this.transcode);
   }
+
+  public async ensureConfigFile() {
+    if (fs.existsSync(this.configFile)) { return; }
+
+    const validation = (value: string) => {
+      if (fse.existsSync(value)) {
+        return true;
+      } else {
+        return "Not a valid folder";
+      }
+    };
+
+    return inquirer.prompt([
+      { message: "Media folder path", name: "stash", type: "input", validate: validation },
+      { message: "Metadata folder path", name: "metadata", type: "input", validate: validation },
+      { message: "Cache folder path", name: "cache", type: "input", validate: validation },
+      { message: "Downloads folder path", name: "downloads", type: "input", validate: validation },
+    ]).then((answers: any) => {
+      const json = JSON.stringify(answers);
+      fs.writeFileSync(this.configFile, json, "utf8");
+    });
+  }
 }
+
+export const StashPaths = new Paths();

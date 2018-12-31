@@ -1,18 +1,14 @@
-import path from "path";
-
 import { createConnection } from "typeorm";
 
 import { SceneEntity } from "./entities/scene.entity";
 import { StudioEntity } from "./entities/studio.entity";
 import { TagEntity } from "./entities/tag.entity";
 import { log } from "./logger";
+import { StashPaths } from "./stash/paths.stash";
 
 export const databaseInitializer = async () => {
-  const executionDirectory = path.dirname(process.execPath);
-  const databasePath = path.join(executionDirectory, "stash.sqlite");
-
   return await createConnection({
-    database: databasePath,
+    database: StashPaths.databaseFile,
     entities: [
       SceneEntity,
       StudioEntity,

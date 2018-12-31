@@ -1,6 +1,6 @@
 import childProcess from "child_process";
 import { FFProbe } from "./ffprobe.stash";
-import { Manager } from "./manager.stash";
+import { StashPaths } from "./paths.stash";
 
 export class FFMpeg {
 
@@ -25,7 +25,7 @@ export class FFMpeg {
   }
 
   private run(args: string[]) {
-    const ffmpegPath = Manager.instance.paths.ffmpeg;
+    const ffmpegPath = StashPaths.ffmpeg;
     return this.spawn(ffmpegPath, args);
   }
 

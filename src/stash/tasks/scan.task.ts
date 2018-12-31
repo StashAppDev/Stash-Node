@@ -64,8 +64,8 @@ export class ScanTask extends BaseTask {
       return;
     }
 
-    const thumbPath = path.join(this.manager.paths.screenshots, `${checksum}.thumb.jpg`);
-    const normalPath = path.join(this.manager.paths.screenshots, `${checksum}.jpg`);
+    const thumbPath = path.join(this.paths.screenshots, `${checksum}.thumb.jpg`);
+    const normalPath = path.join(this.paths.screenshots, `${checksum}.jpg`);
 
     if (fse.existsSync(thumbPath) && fse.existsSync(normalPath)) {
       this.manager.verbose("Screenshots already exist for this path... skipping");
@@ -98,7 +98,7 @@ export class ScanTask extends BaseTask {
   }
 
   private createFolders() {
-    const tmpPath = path.join(this.manager.paths.screenshots, "tmp");
+    const tmpPath = path.join(this.paths.screenshots, "tmp");
     fse.ensureDirSync(tmpPath);
   }
 }

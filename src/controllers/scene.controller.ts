@@ -2,11 +2,12 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import { getManager } from "typeorm";
-import { FindScenesQueryArgs, FindScenesResultType } from "typings/graphql";
 import { SceneEntity } from "../entities/scene.entity";
 import { log } from "../logger";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
-import { Manager } from "../stash/manager.stash";
+import { StashManager } from "../stash/manager.stash";
+import { StashPaths } from "../stash/paths.stash";
+import { FindScenesQueryArgs, FindScenesResultType } from "../typings/graphql";
 
 export class SceneController {
   public static async findScenes(root: any, args: FindScenesQueryArgs, context: any) {
@@ -35,8 +36,8 @@ export class SceneController {
     const scene = await this.getScene(req, res);
     if (scene === undefined) { return; }
 
-    const screenshotPath = path.join(Manager.instance.paths.screenshots, `${scene.checksum}.jpg`);
-    const thumbnailPath = path.join(Manager.instance.paths.screenshots, `${scene.checksum}.thumb.jpg`);
+    const screenshotPath = path.join(StashPaths.screenshots, `${scene.checksum}.jpg`);
+    const thumbnailPath = path.join(StashPaths.screenshots, `${scene.checksum}.thumb.jpg`);
 
     const seconds = parseInt(req.query.seconds, 10);
     const width = parseInt(req.query.width, 10);

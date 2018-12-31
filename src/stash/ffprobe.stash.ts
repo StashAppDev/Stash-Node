@@ -1,7 +1,7 @@
 import childProcess from "child_process";
 import fs from "fs";
 import mathjs from "mathjs";
-import { Manager } from "./manager.stash";
+import { StashPaths } from "./paths.stash";
 
 // TODO: Schema base off this https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd
 // https://github.com/streamio/streamio-ffmpeg/blob/master/lib/ffmpeg/movie.rb
@@ -29,7 +29,7 @@ export class FFProbe {
   constructor(filePath: string) {
     // TODO: Async?
     const params = ["-show_streams", "-count_frames", "-show_format", "-show_error", "-print_format", "json", filePath];
-    const ffprobe = childProcess.spawnSync(Manager.instance.paths.ffprobe, params);
+    const ffprobe = childProcess.spawnSync(StashPaths.ffprobe, params);
 
     if (ffprobe.error) {
       throw ffprobe.error;
