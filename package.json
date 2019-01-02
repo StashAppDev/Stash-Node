@@ -18,7 +18,8 @@
       "dist/**/*.js"
     ],
     "assets": [
-      "src/**/*.graphql"
+      "src/**/*.graphql",
+      "dist-ui/**/*"
     ]
   },
   "dependencies": {

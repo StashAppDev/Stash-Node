@@ -10,6 +10,7 @@ import { StashPaths } from "../stash/paths.stash";
 import { FindScenesQueryArgs, FindScenesResultType } from "../typings/graphql";
 
 export class SceneController {
+  // TODO : Promise<FindScenesResultType>
   public static async findScenes(root: any, args: FindScenesQueryArgs, context: any) {
     const sceneRepository = getManager().getRepository(SceneEntity);
     const qb = sceneRepository.createQueryBuilder("scenes");

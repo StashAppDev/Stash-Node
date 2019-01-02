@@ -6,3 +6,4 @@ database.sqlite
 database.db
 builds
 dist
+dist-ui

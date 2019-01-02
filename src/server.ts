@@ -1,6 +1,7 @@
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import { IncomingMessage } from "http";
+import path from "path";
 import { databaseInitializer } from "./database";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
@@ -17,6 +18,7 @@ export async function run(options: IStashServerOptions) {
   const app = express();
   app.use("/scenes", sceneRoutes);
   app.use("/studios", studioRoutes);
+  app.use(express.static(path.join(__dirname, "../dist-ui")));
 
   await databaseInitializer();
 
@@ -32,14 +34,14 @@ export async function run(options: IStashServerOptions) {
   server.applyMiddleware({ app, path: serverPath });
 
   app.listen({ port: options.port }, () => {
-    log.info(`🚀 Server ready at http://localhost:${options.port}${server.graphqlPath}`);
+    log.info(`🚀 Server ready at http://localhost:${options.port}`);
   });
 
 }
 
 // // NOTE: For debugging the pkg container...
 // function walkSync(dir: string): string {
-//   if (!fs.lstatSync(dir).isDirectory()) return dir;
-//   return fs.readdirSync(dir).map(f => walkSync(path.join(dir, f))).join('\n');
+//   if (!fs.lstatSync(dir).isDirectory()) { return dir; }
+//   return fs.readdirSync(dir).map((f: any) => walkSync(path.join(dir, f))).join("\n");
 // }
-// console.log(walkSync(path.join(__dirname, '../')))
+// log.info(walkSync(path.join(__dirname, "../")));
