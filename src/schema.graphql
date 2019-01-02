@@ -151,6 +151,18 @@ type ScrapedPerformer {
 }
 
 #######################################
+# Stats
+#######################################
+
+type StatsResultType {
+  scene_count: Int!
+  gallery_count: Int!
+  performer_count: Int!
+  studio_count: Int!
+  tag_count: Int!
+}
+
+#######################################
 # Studio
 #######################################
 
@@ -161,7 +173,7 @@ type Studio {
   url: String
 
   image_path: String # Resolver
-  scene_cound: Int # Resolver
+  scene_count: Int # Resolver
 }
 
 input StudioCreateInput {
@@ -247,6 +259,8 @@ type Query {
   findGallery(id: ID!): Gallery
 
   findTag(id: ID!): Tag
+
+  stats: StatsResultType!
 }
 
 type Mutation {

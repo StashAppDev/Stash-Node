@@ -58,6 +58,9 @@ export const resolvers = {
     findStudio(root: any, args: FindStudioQueryArgs, context: any) {
       return StudioController.find(args.id);
     },
+    stats(root: any, args: any, context: any) {
+      return { scene_count: 100, gallery_count: 0, performer_count: 0, studio_count: 0, tag_count: 4 };
+    },
   },
   Scene: {
     file(root: SceneEntity, args: any, context: any): SceneFileType {
