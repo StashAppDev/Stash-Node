@@ -8,12 +8,12 @@ const router = express.Router();
 //   next();
 // });
 
-router.get("/:id/stream", (req, res) => {
-  SceneController.stream(req, res);
+router.get("/:id/stream", (req, res, next) => {
+  SceneController.stream(req, res, next);
 });
 
-router.get("/:id/screenshot", (req, res) => {
-  SceneController.screenshot(req, res);
+router.get("/:id/screenshot", (req, res, next) => {
+  SceneController.screenshot(req, res, next);
 });
 
 export default router;

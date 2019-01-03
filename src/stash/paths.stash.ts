@@ -95,6 +95,14 @@ class Paths {
       fs.writeFileSync(this.configFile, json, "utf8");
     });
   }
+
+  public screenshotPath(checksum: string): string {
+    return path.join(this.screenshots, `${checksum}.jpg`);
+  }
+
+  public thumbnailScreenshotPath(checksum: string): string {
+    return path.join(this.screenshots, `${checksum}.thumb.jpg`);
+  }
 }
 
 export const StashPaths = new Paths();

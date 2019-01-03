@@ -1,4 +1,5 @@
 import express from "express";
+import FileType from "file-type";
 import { getManager } from "typeorm";
 import { StudioEntity } from "../entities/studio.entity";
 import { processImage } from "../stash/utils.stash";
@@ -10,8 +11,7 @@ export class StudioController {
   // #region GraphQL Resolvers
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
-    const studioRepository = getManager().getRepository(StudioEntity);
-    return studioRepository.findOne(args.id);
+    return getEntity(StudioEntity, args.id);
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {
@@ -39,17 +39,20 @@ export class StudioController {
 
   // #endregion
 
-  public static async image(req: express.Request, res: express.Response) {
-    const studio = await getEntity(StudioEntity, req, res);
-    if (studio === undefined) { return; }
+  public static async image(req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+      // if (req.fresh) { return; } // TODO
 
-    // TODO
+      const studio = await getEntity(StudioEntity, req.params.id);
 
-    // const sendFileOptions = {
-    //   maxAge: 604800000, // 1 Week
-    // };
+      const fileType = FileType(studio.image);
+      if (fileType == null) { throw Error(`Unable to find file type for studio image ${studio.id}`); }
 
-    res.type("jpg");
-    res.send(studio.image);
+      res.type(fileType.mime);
+      res.setHeader("Cache-Control", "public, max-age=604800000"); // 1 Week
+      res.send(studio.image);
+    } catch (e) {
+      next(e);
+    }
   }
 }

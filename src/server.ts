@@ -3,6 +3,7 @@ import express from "express";
 import path from "path";
 import { URL } from "url";
 import { databaseInitializer } from "./database";
+import { HttpError } from "./errors/http.error";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
 import sceneRoutes from "./routes/scene.route";
@@ -26,6 +27,17 @@ export async function run(options: IStashServerOptions) {
   app.use("/studios", studioRoutes);
   app.use(express.static(path.join(__dirname, "../dist-ui")));
   app.use("*", express.static(path.join(__dirname, "../dist-ui/index.html")));
+
+  // Error handling
+  app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.headersSent) {
+      return next(err);
+    }
+    const code = err instanceof HttpError ? err.code : 500;
+    const message =
+      err instanceof HttpError ? err.message : `Internal Server Error<br/><br/>${err.message}<br/><br/>${err.stack}`;
+    return res.status(code).send(message);
+  });
 
   await databaseInitializer();
 

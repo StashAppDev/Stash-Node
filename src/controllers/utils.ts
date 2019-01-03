@@ -1,25 +1,23 @@
-import express = require("express");
 import { getManager } from "typeorm";
+import { HttpError } from "../errors/http.error";
 import { log } from "../logger";
 
 /**
  * Fetch an entity of the given type.
  *
  * @param type The entity type
- * @param req the express request
- * @param res the express response
+ * @param id The id of the entity
  */
 export async function getEntity<T>(
   type: new() => T, // https://stackoverflow.com/a/38311757
-  req: express.Request,
-  res?: express.Response,
-): Promise<T|undefined> {
+  id: string,
+): Promise<T> {
   const repository = getManager().getRepository(type.name);
-  const id = req.params.id;
   const entity = await repository.findOne(id);
-  if (entity === undefined && res !== undefined) {
-    log.warn(`${req.url}: Unable to find ${type.name} with id ${id}`);
-    res.sendStatus(404);
+  if (entity === undefined) {
+    const message = `Unable to find ${type.name} with id ${id}`;
+    log.warn(message);
+    throw new HttpError(404, message);
   }
   return entity as T;
 }

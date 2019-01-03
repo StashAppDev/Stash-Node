@@ -64,8 +64,8 @@ export class ScanTask extends BaseTask {
       return;
     }
 
-    const thumbPath = path.join(this.paths.screenshots, `${checksum}.thumb.jpg`);
-    const normalPath = path.join(this.paths.screenshots, `${checksum}.jpg`);
+    const thumbPath = this.paths.thumbnailScreenshotPath(checksum);
+    const normalPath = this.paths.screenshotPath(checksum);
 
     if (fse.existsSync(thumbPath) && fse.existsSync(normalPath)) {
       this.manager.verbose("Screenshots already exist for this path... skipping");

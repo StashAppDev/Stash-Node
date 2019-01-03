@@ -1,6 +1,5 @@
 import express from "express";
 import fs from "fs";
-import path from "path";
 import { getManager } from "typeorm";
 import { SceneEntity } from "../entities/scene.entity";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
@@ -24,34 +23,40 @@ export class SceneController {
     return { scenes: results[0], count: results[1] };
   }
 
-  public static async stream(req: express.Request, res: express.Response) {
-    const scene = await getEntity(SceneEntity, req, res);
-    if (scene === undefined) { return; }
-    res.sendFile(scene.path);
+  public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+      const scene = await getEntity(SceneEntity, req.params.id);
+      res.sendFile(scene.path);
+    } catch (e) {
+      next(e);
+    }
   }
 
-  public static async screenshot(req: express.Request, res: express.Response) {
-    const scene = await getEntity(SceneEntity, req, res);
-    if (scene === undefined) { return; }
+  public static async screenshot(req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+      const scene = await getEntity(SceneEntity, req.params.id);
 
-    const screenshotPath = path.join(StashPaths.screenshots, `${scene.checksum}.jpg`);
-    const thumbnailPath = path.join(StashPaths.screenshots, `${scene.checksum}.thumb.jpg`);
+      const screenshotPath = StashPaths.screenshotPath(scene.checksum);
+      const thumbnailPath = StashPaths.thumbnailScreenshotPath(scene.checksum);
 
-    const seconds = parseInt(req.query.seconds, 10);
-    const width = parseInt(req.query.width, 10);
+      const seconds = parseInt(req.query.seconds, 10);
+      const width = parseInt(req.query.width, 10);
 
-    const sendFileOptions = {
-      maxAge: 604800000, // 1 Week
-    };
+      const sendFileOptions = {
+        maxAge: 604800000, // 1 Week
+      };
 
-    if (!!seconds) {
-      // TODO
-      //   data = @scene.screenshot(seconds: params[:seconds], width: params[:width])
-      //   send_data data, filename: 'screenshot.jpg', disposition: 'inline'
-    } else if (fs.existsSync(thumbnailPath) && !!width && width < 400) {
-      res.sendFile(thumbnailPath, sendFileOptions);
-    } else {
-      res.sendFile(screenshotPath, sendFileOptions);
+      if (!!seconds) {
+        // TODO
+        //   data = @scene.screenshot(seconds: params[:seconds], width: params[:width])
+        //   send_data data, filename: 'screenshot.jpg', disposition: 'inline'
+      } else if (fs.existsSync(thumbnailPath) && !!width && width < 400) {
+        res.sendFile(thumbnailPath, sendFileOptions);
+      } else {
+        res.sendFile(screenshotPath, sendFileOptions);
+      }
+    } catch (e) {
+      next(e);
     }
   }
 }
