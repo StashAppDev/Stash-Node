@@ -1,6 +1,5 @@
 import express from "express";
 import { StudioController } from "../controllers/studio.controller";
-import { log } from "../logger";
 
 const router = express.Router();
 

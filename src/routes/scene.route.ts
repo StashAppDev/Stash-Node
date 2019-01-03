@@ -1,6 +1,5 @@
 import express from "express";
 import { SceneController } from "../controllers/scene.controller";
-import { log } from "../logger";
 
 const router = express.Router();
 

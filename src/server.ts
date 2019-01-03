@@ -1,7 +1,7 @@
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
-import { IncomingMessage } from "http";
 import path from "path";
+import { URL } from "url";
 import { databaseInitializer } from "./database";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
@@ -12,6 +12,12 @@ export interface IStashServerOptions {
   port?: number;
 }
 
+export interface IGraphQLContext {
+  req: express.Request;
+  res: express.Response;
+  baseUrl: URL;
+}
+
 export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
@@ -19,12 +25,15 @@ export async function run(options: IStashServerOptions) {
   app.use("/scenes", sceneRoutes);
   app.use("/studios", studioRoutes);
   app.use(express.static(path.join(__dirname, "../dist-ui")));
+  app.use("*", express.static(path.join(__dirname, "../dist-ui/index.html")));
 
   await databaseInitializer();
 
   const server = new ApolloServer({
-    context: (request: IncomingMessage) => ({
-      request,
+    context: (msg: {req: express.Request, res: express.Response}): IGraphQLContext => ({
+      baseUrl: new URL(`${msg.req.protocol}://${msg.req.get("host")}`),
+      req: msg.req,
+      res: msg.res,
     }),
     resolvers: resolvers as any, // TODO: https://github.com/prisma/graphqlgen/issues/124
     typeDefs,
@@ -34,9 +43,8 @@ export async function run(options: IStashServerOptions) {
   server.applyMiddleware({ app, path: serverPath });
 
   app.listen({ port: options.port }, () => {
-    log.info(`🚀 Server ready at http://localhost:${options.port}`);
+    log.info(`Server ready at http://localhost:${options.port}`);
   });
-
 }
 
 // // NOTE: For debugging the pkg container...

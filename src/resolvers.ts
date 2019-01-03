@@ -1,21 +1,12 @@
 import { importSchema } from "graphql-import";
 import gql from "graphql-tag";
 import path from "path";
+import { URL } from "url";
 import { GalleryController } from "./controllers/gallery.controller";
 import { SceneController } from "./controllers/scene.controller";
 import { StudioController } from "./controllers/studio.controller";
 import { TagController } from "./controllers/tag.controller";
-import { SceneEntity } from "./entities/scene.entity";
-import {
-  FindScenesQueryArgs,
-  FindStudioQueryArgs,
-  SceneFileType,
-  ScenePathsType,
-  StudioCreateMutationArgs,
-  StudioUpdateMutationArgs,
-  TagCreateMutationArgs,
-  TagUpdateMutationArgs,
-} from "./typings/graphql";
+import { GQL, IResolvers } from "./typings/graphql";
 
 // NOTE: This path looks weird, but is required for pkg
 const schemaPath = path.join(__dirname, "../src/schema.graphql");
@@ -24,46 +15,47 @@ export const typeDefs = gql`
   ${schemaString}
 `;
 
-export const resolvers = {
+export const resolvers: IResolvers = {
   Gallery: {
-    files(root: any, args: any, context: any) {
+    files(root, args, context, info): GQL.GalleryFilesType[] {
       // TODO: Find files for given root id
       // GalleryController.find(root.id);
+      return [];
     },
   },
   Mutation: {
-    studioCreate(root: any, args: StudioCreateMutationArgs, context: any) {
-      return StudioController.create(args.input);
+    studioCreate(root, args, context, info): GQL.Studio {
+      return StudioController.studioCreate(root, args, context, info);
     },
-    studioUpdate(root: any, args: StudioUpdateMutationArgs, context: any) {
-      return StudioController.update(args.input);
+    studioUpdate(root, args, context, info): GQL.Studio {
+      return StudioController.studioUpdate(root, args, context, info);
     },
-    tagCreate(root: any, args: TagCreateMutationArgs, context: any) {
-      return TagController.create(args.input);
+    tagCreate(root, args, context, info): GQL.Tag {
+      return TagController.tagCreate(root, args, context, info);
     },
-    tagUpdate(root: any, args: TagUpdateMutationArgs, context: any) {
-      return TagController.update(args.input);
+    tagUpdate(root, args, context, info): GQL.Tag {
+      return TagController.tagUpdate(root, args, context, info);
     },
   },
   Query: {
-    findGallery(root: any, args: any, context: any) {
-      return {id: "1"};
+    findGallery(root, args, context, info): GQL.Gallery {
+      return GalleryController.findGallery(root, args, context, info);
     },
-    findTag(root: any, args: any, context: any) {
-      return TagController.find(args.id);
+    findTag(root, args, context, info): GQL.Tag {
+      return TagController.findTag(root, args, context, info);
     },
-    findScenes(root: any, args: FindScenesQueryArgs, context: any) {
-      return SceneController.findScenes(root, args, context);
+    findScenes(root, args, context, info): GQL.FindScenesResultType {
+      return SceneController.findScenes(root, args, context, info);
     },
-    findStudio(root: any, args: FindStudioQueryArgs, context: any) {
-      return StudioController.find(args.id);
+    findStudio(root, args, context, info): GQL.Studio {
+      return StudioController.findStudio(root, args, context, info);
     },
-    stats(root: any, args: any, context: any) {
+    stats(root, args, context, info): GQL.StatsResultType {
       return { scene_count: 100, gallery_count: 0, performer_count: 0, studio_count: 0, tag_count: 4 };
     },
   },
   Scene: {
-    file(root: SceneEntity, args: any, context: any): SceneFileType {
+    file(root, args, context, info): GQL.SceneFileType {
       return {
         audio_codec: root.audioCodec,
         duration: root.duration,
@@ -73,13 +65,19 @@ export const resolvers = {
         width: root.width,
       };
     },
-    paths(root: SceneEntity, args: any, context: any): ScenePathsType {
+    paths(root, args, context, info): GQL.ScenePathsType {
       return {
         // TODO
+        screenshot: new URL(`/scenes/${root.id}/screenshot`, context.baseUrl).toString(),
       };
     },
-    is_streamable(root: SceneEntity, args: any, context: any): boolean {
+    is_streamable(root, args, context, info): boolean {
       return true; // TODO
     },
+
+    // TODO: remove these.  Don't need these resolvers
+    scene_markers(): GQL.SceneMarker[] { return []; },
+    tags(): GQL.Tag[] { return []; },
+    performers(): GQL.Performer[] { return []; },
   },
 };

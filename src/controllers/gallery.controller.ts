@@ -1,7 +1,12 @@
-import { getManager } from "typeorm";
+import { QueryResolvers } from "../typings/graphql";
 
 export class GalleryController {
-  public static async find(id: string) {
+
+  // #region GraphQL Resolvers
+
+  public static findGallery: QueryResolvers.FindGalleryResolver = async (root, args, context, info) => {
     // TODO
   }
+
+  // #endregion
 }

@@ -1,12 +1,12 @@
 import { SelectQueryBuilder } from "typeorm";
 import { SceneEntity } from "../entities/scene.entity";
-import { FindScenesQueryArgs } from "../typings/graphql";
+import { GQL } from "../typings/graphql";
 import { BaseQueryBuilder } from "./base.querybuilder";
 
 export class SceneQueryBuilder extends BaseQueryBuilder<SceneEntity> {
-  public args: FindScenesQueryArgs;
+  public args: GQL.FindScenesQueryArgs;
 
-  constructor(qb: SelectQueryBuilder<SceneEntity>, args: FindScenesQueryArgs) {
+  constructor(qb: SelectQueryBuilder<SceneEntity>, args: GQL.FindScenesQueryArgs) {
     super(qb, args.filter);
     this.args = args;
   }

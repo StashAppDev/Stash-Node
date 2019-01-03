@@ -9,26 +9,24 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
-    // "noUnusedLocals": true,
+    "noUnusedLocals": true,
 
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es2018",
     "moduleResolution" : "node",
     "sourceMap": true,
     "baseUrl": "./src",
     "rootDir": "src",
     "outDir": "dist",
     "lib": [
-      "es6",
-      "es2017",
-      "dom",
+      "es2018",
       "esnext"
     ],
     "typeRoots": [
       "node_modules/@types"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true // TODO remove this once schema is built
   },
   "exclude": [
     "node_modules",

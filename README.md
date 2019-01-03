@@ -15,3 +15,8 @@ https://medium.com/@dupski/debug-typescript-in-vs-code-without-compiling-using-t
 https://medium.com/airbnb-engineering/unlocking-test-performance-migrating-from-mocha-to-jest-2796c508ec50
 
 https://stackoverflow.com/a/42907043
+
+
+# TODO
+
+* Starting without a config file is broken again.

@@ -2,8 +2,14 @@ schema: ./src/schema.graphql
 overwrite: true
 generates:
   ./src/typings/graphql.d.ts:
+    config:
+      schemaNamespace: "GQL"
+      contextType: ../server#IGraphQLContext
+      mappers:
+        Scene: ../entities/scene.entity#SceneEntity
     plugins:
       - add: "/* tslint:disable */"
       - time
       - typescript-common
       - typescript-server
+      - typescript-resolvers

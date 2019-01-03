@@ -3,15 +3,13 @@ import fs from "fs";
 import path from "path";
 import { getManager } from "typeorm";
 import { SceneEntity } from "../entities/scene.entity";
-import { log } from "../logger";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
-import { StashManager } from "../stash/manager.stash";
 import { StashPaths } from "../stash/paths.stash";
-import { FindScenesQueryArgs, FindScenesResultType } from "../typings/graphql";
+import { QueryResolvers } from "../typings/graphql";
+import { getEntity } from "./utils";
 
 export class SceneController {
-  // TODO : Promise<FindScenesResultType>
-  public static async findScenes(root: any, args: FindScenesQueryArgs, context: any) {
+  public static findScenes: QueryResolvers.FindScenesResolver = async (root, args, context, info) => {
     const sceneRepository = getManager().getRepository(SceneEntity);
     const qb = sceneRepository.createQueryBuilder("scenes");
 
@@ -27,14 +25,13 @@ export class SceneController {
   }
 
   public static async stream(req: express.Request, res: express.Response) {
-    const scene = await this.getScene(req, res);
+    const scene = await getEntity(SceneEntity, req, res);
     if (scene === undefined) { return; }
-
     res.sendFile(scene.path);
   }
 
   public static async screenshot(req: express.Request, res: express.Response) {
-    const scene = await this.getScene(req, res);
+    const scene = await getEntity(SceneEntity, req, res);
     if (scene === undefined) { return; }
 
     const screenshotPath = path.join(StashPaths.screenshots, `${scene.checksum}.jpg`);
@@ -56,19 +53,5 @@ export class SceneController {
     } else {
       res.sendFile(screenshotPath, sendFileOptions);
     }
-  }
-
-  /**
-   * Will send the status code if given a response.  Return if the result is undefined.
-   */
-  private static async getScene(req: express.Request, res?: express.Response): Promise<SceneEntity|undefined> {
-    const sceneRepository = getManager().getRepository(SceneEntity);
-    const id = req.params.id;
-    const scene = await sceneRepository.findOne(id);
-    if (scene === undefined && res !== undefined) {
-      log.warn(`${req.url}: Unabled to find scene with id ${id}`);
-      res.sendStatus(404);
-    }
-    return scene;
   }
 }

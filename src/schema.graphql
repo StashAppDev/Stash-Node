@@ -86,6 +86,8 @@ type SceneFileType {
   audio_codec: String
   width: Int
   height: Int
+  framerate: Float
+  bitrate: Int
 }
 
 type ScenePathsType {
