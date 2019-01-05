@@ -15,6 +15,7 @@
   },
   "pkg": {
     "scripts": [
+      "require.js",
       "dist/**/*.js"
     ],
     "assets": [
@@ -37,9 +38,10 @@
     "mathjs": "5.4.0",
     "p-queue": "3.0.0",
     "reflect-metadata": "0.1.12",
+    "sequelize": "4.42.0",
+    "sequelize-typescript": "0.6.6",
     "sqlite3": "4.0.4",
     "tempy": "0.2.1",
-    "typeorm": "0.2.11",
     "winston": "3.1.0"
   },
   "devDependencies": {
@@ -53,6 +55,7 @@
     "@types/mathjs": "4.4.4",
     "@types/node": "10.12.18",
     "@types/p-queue": "3.0.0",
+    "@types/sequelize": "4.27.33",
     "@types/tempy": "0.2.0",
     "graphql-code-generator": "0.15.2",
     "graphql-codegen-add": "0.15.2",

@@ -1,7 +1,6 @@
 import fse from "fs-extra";
 import path from "path";
-import { getManager } from "typeorm";
-import { SceneEntity } from "../../entities/scene.entity";
+import { Scene } from "../../models/scene.model";
 import { FFMpeg } from "../ffmpeg.stash";
 import { FFProbe } from "../ffprobe.stash";
 import { md5FromPath } from "../utils.stash";
@@ -21,9 +20,7 @@ export class ScanTask extends BaseTask {
 
     const movie = new FFProbe(this.filePath);
 
-    const repository = getManager().getRepository(klass);
-    let entity = await repository.findOne({path: this.filePath});
-
+    let entity = await klass.findOne({where: {path: this.filePath}});
     if (!!entity) {
       await this.makeScreenshots(movie, entity.checksum);
       return; // We already have this item in the database, keep going
@@ -33,19 +30,19 @@ export class ScanTask extends BaseTask {
 
     await this.makeScreenshots(movie, checksum);
 
-    entity = await repository.findOne({checksum});
+    entity = await klass.findOne({where: {checksum}});
     if (!!entity) {
       this.manager.info(`${this.filePath} already exists.  Updating path...`);
       entity.path = this.filePath;
-      repository.save(entity);
+      entity.save();
     } else {
       this.manager.info(`${this.filePath} doesn't exist.  Creating new item...`);
-      entity = repository.create({
+      entity = await klass.build({
         checksum,
         path: this.filePath,
       });
 
-      if (klass === SceneEntity) {
+      if (klass === Scene) {
         entity.size        = movie.size.toString();
         entity.duration    = movie.duration;
         entity.videoCodec  = movie.videoCodec;
@@ -54,12 +51,12 @@ export class ScanTask extends BaseTask {
         entity.height      = movie.height;
       }
 
-      await repository.save(entity);
+      await entity.save();
     }
   }
 
   private async makeScreenshots(movie: FFProbe, checksum: string) {
-    if (this.getClass() !== SceneEntity) {
+    if (this.getClass() !== Scene) {
       this.manager.verbose(`Trying to make screenshots for ${this.getClass()}.  Skipping...`);
       return;
     }
@@ -93,7 +90,7 @@ export class ScanTask extends BaseTask {
       // TODO Gallery
       throw new Error(`TODO Gallery ${this.filePath}`);
     } else {
-      return SceneEntity;
+      return Scene;
     }
   }
 

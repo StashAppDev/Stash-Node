@@ -1,7 +1,6 @@
 import express from "express";
 import FileType from "file-type";
-import { getManager } from "typeorm";
-import { StudioEntity } from "../entities/studio.entity";
+import { Studio } from "../models/studio.model";
 import { processImage } from "../stash/utils.stash";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
@@ -11,30 +10,28 @@ export class StudioController {
   // #region GraphQL Resolvers
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
-    return getEntity(StudioEntity, args.id);
+    return getEntity(Studio, args.id);
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {
-    const studioRepository = getManager().getRepository(StudioEntity);
-    const newStudio = studioRepository.create({
+    const newStudio = Studio.build({
       name: args.input.name,
       url: args.input.url,
     });
     if (!!args.input.image) {
       processImage(args.input, newStudio);
     }
-    return studioRepository.save(newStudio);
+    return newStudio.save();
   }
 
   public static studioUpdate: MutationResolvers.StudioUpdateResolver = async (root, args, context, info) => {
-    const studioRepository = getManager().getRepository(StudioEntity);
-    const studio = await studioRepository.findOneOrFail(args.input.id);
+    const studio = await getEntity(Studio, args.input.id);
     studio.name = args.input.name;
     studio.url = args.input.url;
     if (!!args.input.image) {
       processImage(args.input, studio);
     }
-    return studioRepository.save(studio);
+    return studio.save();
   }
 
   // #endregion
@@ -43,7 +40,7 @@ export class StudioController {
     try {
       // if (req.fresh) { return; } // TODO
 
-      const studio = await getEntity(StudioEntity, req.params.id);
+      const studio = await getEntity(Studio, req.params.id);
 
       const fileType = FileType(studio.image);
       if (fileType == null) { throw Error(`Unable to find file type for studio image ${studio.id}`); }

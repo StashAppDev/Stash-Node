@@ -1,5 +1,5 @@
 import program from "commander";
-import { databaseInitializer } from "./database";
+import { Database } from "./database";
 import { IStashServerOptions, run } from "./server";
 import { StashManager } from "./stash/manager.stash";
 
@@ -17,7 +17,7 @@ function configureCommander() {
   program
     .command("scan")
     .action(async () => {
-      await databaseInitializer();
+      await Database.initialize();
       StashManager.scan("");
     });
 

@@ -1,12 +1,14 @@
-import { Repository, SelectQueryBuilder } from "typeorm";
+import { IFindOptions, Model } from "sequelize-typescript";
+import { Database } from "../database";
 import { FindFilterType } from "../typings/graphql";
 
-export class BaseQueryBuilder<T> {
-  public qb: SelectQueryBuilder<T>;
+export class BaseQueryBuilder<T extends Model<T>> {
+  public opts: IFindOptions<T> = {};
+  public model: any;
   public findFilter: FindFilterType;
 
-  constructor(qb: SelectQueryBuilder<T>, findFilter?: FindFilterType | null) {
-    this.qb = qb;
+  constructor(model: new() => T, findFilter?: FindFilterType | null) {
+    this.model = model;
     this.findFilter = !!findFilter ? findFilter : {};
   }
 
@@ -23,19 +25,18 @@ export class BaseQueryBuilder<T> {
       perPage = 1;
     }
 
-    this.qb
-      .skip((page - 1) * perPage)
-      .take(perPage);
+    this.opts.offset = (page - 1) * perPage;
+    this.opts.limit = perPage;
 
     return this;
   }
 
-  public sort(repository: Repository<T>, defaultSort: string): BaseQueryBuilder<T> {
+  public sort(defaultSort: string): BaseQueryBuilder<T> {
     const sort = !!this.findFilter.sort ? this.findFilter.sort : defaultSort;
     const findFilterDirection = !!this.findFilter.direction ? this.findFilter.direction : "ASC";
 
     const sortDirection = ["ASC", "DESC"].includes(findFilterDirection) ? findFilterDirection : "ASC";
-    const sortColumn = this.getColumnNames(repository).includes(sort) ? sort : defaultSort;
+    const sortColumn = this.getColumnNames().includes(sort) ? sort : defaultSort;
 
     if (sort.includes("_count")) {
       // t_name = params[:sort].split('_').first.pluralize
@@ -44,15 +45,16 @@ export class BaseQueryBuilder<T> {
     } else if (sort === "filesize") {
       // reorder("cast(#{table_name}.size as integer) #{sort_direction}") // TODO
     } else if (sort === "random") {
-      this.qb.orderBy("RANDOM()");
+      this.opts.order = Database.sequelize.random();
     } else {
-      this.qb.orderBy(`${repository.metadata.tableName}.${sortColumn}`, sortDirection);
+      // TODO make sure this continues to work
+      this.opts.order = Database.sequelize.literal(`${this.model.name}.${sortColumn} ${sortDirection}`);
     }
 
     return this;
   }
 
-  private getColumnNames(repository: Repository<T>): string[] {
-    return repository.metadata.columns.map((column) => column.databaseName);
+  private getColumnNames(): string[] {
+    return Object.keys(this.model.fieldRawAttributesMap);
   }
 }

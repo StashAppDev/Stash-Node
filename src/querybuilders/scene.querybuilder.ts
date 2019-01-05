@@ -1,13 +1,12 @@
-import { SelectQueryBuilder } from "typeorm";
-import { SceneEntity } from "../entities/scene.entity";
+import { Scene } from "../models/scene.model";
 import { GQL } from "../typings/graphql";
 import { BaseQueryBuilder } from "./base.querybuilder";
 
-export class SceneQueryBuilder extends BaseQueryBuilder<SceneEntity> {
+export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
   public args: GQL.FindScenesQueryArgs;
 
-  constructor(qb: SelectQueryBuilder<SceneEntity>, args: GQL.FindScenesQueryArgs) {
-    super(qb, args.filter);
+  constructor(args: GQL.FindScenesQueryArgs) {
+    super(Scene, args.filter);
     this.args = args;
   }
 
@@ -23,7 +22,7 @@ export class SceneQueryBuilder extends BaseQueryBuilder<SceneEntity> {
   }
 
   private rating(rating: number): SceneQueryBuilder {
-    this.qb.andWhere("rating = :rating", { rating });
+    this.opts.where = { ...this.opts.where, ...{ rating } };
     return this;
   }
 }

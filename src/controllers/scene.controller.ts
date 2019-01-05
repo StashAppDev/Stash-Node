@@ -1,7 +1,6 @@
 import express from "express";
 import fs from "fs";
-import { getManager } from "typeorm";
-import { SceneEntity } from "../entities/scene.entity";
+import { Scene } from "../models/scene.model";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { StashPaths } from "../stash/paths.stash";
 import { QueryResolvers } from "../typings/graphql";
@@ -9,23 +8,20 @@ import { getEntity } from "./utils";
 
 export class SceneController {
   public static findScenes: QueryResolvers.FindScenesResolver = async (root, args, context, info) => {
-    const sceneRepository = getManager().getRepository(SceneEntity);
-    const qb = sceneRepository.createQueryBuilder("scenes");
-
-    const helper = new SceneQueryBuilder(qb, args);
+    const helper = new SceneQueryBuilder(args);
     helper
       .filter()
-      .sort(sceneRepository, "title")
+      .sort("title")
       .paginate();
 
-    const results = await helper.qb.getManyAndCount();
+    const results = await Scene.findAndCountAll(helper.opts);
 
-    return { scenes: results[0], count: results[1] };
+    return { scenes: results.rows, count: results.count };
   }
 
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(SceneEntity, req.params.id);
+      const scene = await getEntity(Scene, req.params.id);
       res.sendFile(scene.path);
     } catch (e) {
       next(e);
@@ -34,7 +30,7 @@ export class SceneController {
 
   public static async screenshot(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(SceneEntity, req.params.id);
+      const scene = await getEntity(Scene, req.params.id);
 
       const screenshotPath = StashPaths.screenshotPath(scene.checksum);
       const thumbnailPath = StashPaths.thumbnailScreenshotPath(scene.checksum);

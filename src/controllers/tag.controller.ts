@@ -1,26 +1,22 @@
-import { getManager } from "typeorm";
-import { TagEntity } from "../entities/tag.entity";
+import { Tag } from "../models/tag.model";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
+import { getEntity } from "./utils";
 
 export class TagController {
   // #region GraphQL Resolvers
 
   public static findTag: QueryResolvers.FindTagResolver = async (root, args, context, info) => {
-    const tagRepository = getManager().getRepository(TagEntity);
-    return tagRepository.findOne(args.id);
+    return getEntity(Tag, args.id);
   }
 
   public static tagCreate: MutationResolvers.TagCreateResolver = async (root, args, context, info) => {
-    const tagRepository = getManager().getRepository(TagEntity);
-    const newTag = tagRepository.create(args.input);
-    return tagRepository.save(newTag);
+    return Tag.create(args.input);
   }
 
   public static tagUpdate: MutationResolvers.TagUpdateResolver = async (root, args, context, info) => {
-    const tagRepository = getManager().getRepository(TagEntity);
-    const tag = await tagRepository.findOneOrFail(args.input.id);
+    const tag = await getEntity(Tag, args.input.id);
     tag.name = args.input.name;
-    return tagRepository.save(tag);
+    return tag.save();
   }
 
   // #endregion
