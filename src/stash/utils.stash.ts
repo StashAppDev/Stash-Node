@@ -33,7 +33,7 @@ export function md5FromPath(filePath: string) {
  * needs to be striped.
  * @see /app/graphql/concerns/image_processor.rb
  */
-export function processImage(params: { image?: string | null }, object: { checksum: string, image: Buffer }) {
+export function processImage(params: { image?: string }, object: { checksum?: string, image?: Buffer }) {
   if (!params.image) { return; }
 
   const image = Buffer.from(params.image, "base64");

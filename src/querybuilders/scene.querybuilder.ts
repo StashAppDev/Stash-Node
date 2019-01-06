@@ -1,12 +1,13 @@
-import { Scene } from "../models/scene.model";
+import { Database } from "../db/database";
+import { ISceneAttributes, ISceneInstance } from "../db/models/scene.model";
 import { GQL } from "../typings/graphql";
 import { BaseQueryBuilder } from "./base.querybuilder";
 
-export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
+export class SceneQueryBuilder extends BaseQueryBuilder<ISceneInstance, ISceneAttributes> {
   public args: GQL.FindScenesQueryArgs;
 
   constructor(args: GQL.FindScenesQueryArgs) {
-    super(Scene, args.filter);
+    super(Database.Scene, args.filter);
     this.args = args;
   }
 

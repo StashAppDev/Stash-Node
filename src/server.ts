@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import path from "path";
 import { URL } from "url";
-import { Database } from "./database";
+import { Database } from "./db/database";
 import { HttpError } from "./errors/http.error";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";

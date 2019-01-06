@@ -1,5 +1,5 @@
 import program from "commander";
-import { Database } from "./database";
+import { Database } from "./db/database";
 import { IStashServerOptions, run } from "./server";
 import { StashManager } from "./stash/manager.stash";
 

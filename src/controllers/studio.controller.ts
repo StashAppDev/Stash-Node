@@ -1,6 +1,7 @@
 import express from "express";
 import FileType from "file-type";
-import { Studio } from "../models/studio.model";
+import { Database } from "../db/database";
+import { IStudioAttributes, IStudioInstance } from "../db/models/studio.model";
 import { processImage } from "../stash/utils.stash";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
@@ -10,11 +11,11 @@ export class StudioController {
   // #region GraphQL Resolvers
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
-    return getEntity(Studio, args.id);
+    return getEntity<IStudioInstance, IStudioAttributes>(args.id);
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {
-    const newStudio = Studio.build({
+    const newStudio = Database.Studio.build({
       name: args.input.name,
       url: args.input.url,
     });
@@ -25,7 +26,7 @@ export class StudioController {
   }
 
   public static studioUpdate: MutationResolvers.StudioUpdateResolver = async (root, args, context, info) => {
-    const studio = await getEntity(Studio, args.input.id);
+    const studio = await getEntity<IStudioInstance, IStudioAttributes>(args.input.id);
     studio.name = args.input.name;
     studio.url = args.input.url;
     if (!!args.input.image) {
@@ -40,9 +41,9 @@ export class StudioController {
     try {
       // if (req.fresh) { return; } // TODO
 
-      const studio = await getEntity(Studio, req.params.id);
+      const studio = await getEntity<IStudioInstance, IStudioAttributes>(req.params.id);
 
-      const fileType = FileType(studio.image);
+      const fileType = FileType(studio.image!);
       if (fileType == null) { throw Error(`Unable to find file type for studio image ${studio.id}`); }
 
       res.type(fileType.mime);

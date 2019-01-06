@@ -1,18 +1,18 @@
-import { IFindOptions, Model } from "sequelize-typescript";
-import { Database } from "../database";
+import { FindOptions } from "sequelize";
+import { Database } from "../db/database";
 import { FindFilterType } from "../typings/graphql";
 
-export class BaseQueryBuilder<T extends Model<T>> {
-  public opts: IFindOptions<T> = {};
+export class BaseQueryBuilder<TInstance, TAttributes> {
+  public opts: FindOptions<TAttributes> = {};
   public model: any;
   public findFilter: FindFilterType;
 
-  constructor(model: new() => T, findFilter?: FindFilterType | null) {
+  constructor(model: any, findFilter?: FindFilterType | null) {
     this.model = model;
     this.findFilter = !!findFilter ? findFilter : {};
   }
 
-  public paginate(): BaseQueryBuilder<T> {
+  public paginate(): BaseQueryBuilder<TInstance, TAttributes> {
     let page = !!this.findFilter.page ? this.findFilter.page : 1;
     if (page < 1) {
       page = 1;
@@ -31,7 +31,7 @@ export class BaseQueryBuilder<T extends Model<T>> {
     return this;
   }
 
-  public sort(defaultSort: string): BaseQueryBuilder<T> {
+  public sort(defaultSort: string): BaseQueryBuilder<TInstance, TAttributes> {
     const sort = !!this.findFilter.sort ? this.findFilter.sort : defaultSort;
     const findFilterDirection = !!this.findFilter.direction ? this.findFilter.direction : "ASC";
 
@@ -48,7 +48,7 @@ export class BaseQueryBuilder<T extends Model<T>> {
       this.opts.order = Database.sequelize.random();
     } else {
       // TODO make sure this continues to work
-      this.opts.order = Database.sequelize.literal(`${this.model.name}.${sortColumn} ${sortDirection}`);
+      this.opts.order = Database.sequelize.literal(`${this.model!.name}.${sortColumn} ${sortDirection}`);
     }
 
     return this;

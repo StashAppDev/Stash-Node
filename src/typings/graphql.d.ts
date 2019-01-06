@@ -1,7 +1,6 @@
 /* tslint:disable */
-// Generated in 2019-01-02T12:22:34-08:00
-/** COMMON */
-export type Maybe<T> = T | null;
+// Generated in 2019-01-06T01:44:55-08:00
+export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
   rating?: Maybe<number>;
@@ -61,7 +60,6 @@ export enum SortDirectionEnum {
   Asc = "ASC",
   Desc = "DESC"
 }
-/** SERVER */
 export namespace GQL {
   // ====================================================
   // Types
@@ -365,7 +363,6 @@ export namespace GQL {
     input: TagUpdateInput;
   }
 }
-/** RESOLVERS */
 import { GraphQLResolveInfo } from "graphql";
 
 import { SceneEntity } from "../entities/scene.entity";

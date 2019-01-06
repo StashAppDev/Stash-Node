@@ -1,6 +1,6 @@
 import fse from "fs-extra";
 import path from "path";
-import { Scene } from "../../models/scene.model";
+import { Database } from "../../db/database";
 import { FFMpeg } from "../ffmpeg.stash";
 import { FFProbe } from "../ffprobe.stash";
 import { md5FromPath } from "../utils.stash";
@@ -21,7 +21,7 @@ export class ScanTask extends BaseTask {
     const movie = new FFProbe(this.filePath);
 
     let entity = await klass.findOne({where: {path: this.filePath}});
-    if (!!entity) {
+    if (!!entity && !!entity.checksum) {
       await this.makeScreenshots(movie, entity.checksum);
       return; // We already have this item in the database, keep going
     }
@@ -42,7 +42,7 @@ export class ScanTask extends BaseTask {
         path: this.filePath,
       });
 
-      if (klass === Scene) {
+      if (this.getClass() === Database.Scene) {
         entity.size        = movie.size.toString();
         entity.duration    = movie.duration;
         entity.videoCodec  = movie.videoCodec;
@@ -56,7 +56,7 @@ export class ScanTask extends BaseTask {
   }
 
   private async makeScreenshots(movie: FFProbe, checksum: string) {
-    if (this.getClass() !== Scene) {
+    if (this.getClass() !== Database.Scene) {
       this.manager.verbose(`Trying to make screenshots for ${this.getClass()}.  Skipping...`);
       return;
     }
@@ -90,7 +90,7 @@ export class ScanTask extends BaseTask {
       // TODO Gallery
       throw new Error(`TODO Gallery ${this.filePath}`);
     } else {
-      return Scene;
+      return Database.Scene;
     }
   }
 

@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
-import { Scene } from "../models/scene.model";
+import { Database } from "../db/database";
+import { ISceneAttributes, ISceneInstance } from "../db/models/scene.model";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { StashPaths } from "../stash/paths.stash";
 import { QueryResolvers } from "../typings/graphql";
@@ -14,15 +15,15 @@ export class SceneController {
       .sort("title")
       .paginate();
 
-    const results = await Scene.findAndCountAll(helper.opts);
+    const results = await Database.Scene.findAndCountAll(helper.opts);
 
     return { scenes: results.rows, count: results.count };
   }
 
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, req.params.id);
-      res.sendFile(scene.path);
+      const scene = await getEntity<ISceneInstance, ISceneAttributes>(req.params.id);
+      res.sendFile(scene.path!);
     } catch (e) {
       next(e);
     }
@@ -30,10 +31,10 @@ export class SceneController {
 
   public static async screenshot(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, req.params.id);
+      const scene = await getEntity<ISceneInstance, ISceneAttributes>(req.params.id);
 
-      const screenshotPath = StashPaths.screenshotPath(scene.checksum);
-      const thumbnailPath = StashPaths.thumbnailScreenshotPath(scene.checksum);
+      const screenshotPath = StashPaths.screenshotPath(scene.checksum!);
+      const thumbnailPath = StashPaths.thumbnailScreenshotPath(scene.checksum!);
 
       const seconds = parseInt(req.query.seconds, 10);
       const width = parseInt(req.query.width, 10);
