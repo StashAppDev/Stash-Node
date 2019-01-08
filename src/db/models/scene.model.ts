@@ -56,16 +56,16 @@ export interface ISceneInstance extends Sequelize.Instance<ISceneAttributes>, IS
   hasPerformers: Sequelize.BelongsToManyHasAssociationsMixin<IPerformerInstance, IPerformerInstance["id"]>;
   countPerformers: Sequelize.BelongsToManyCountAssociationsMixin;
 
-  getSceneMarkers: Sequelize.HasManyGetAssociationsMixin<ISceneMarkerInstance>;
-  setSceneMarkers: Sequelize.HasManySetAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  addSceneMarkers: Sequelize.HasManyAddAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  addSceneMarker: Sequelize.HasManyAddAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  createSceneMarker: Sequelize.HasManyCreateAssociationMixin<ISceneMarkerAttributes, ISceneMarkerInstance["id"]>;
-  removeSceneMarker: Sequelize.HasManyRemoveAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  removeSceneMarkers: Sequelize.HasManyRemoveAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  hasSceneMarker: Sequelize.HasManyHasAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  hasSceneMarkers: Sequelize.HasManyHasAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  countSceneMarkers: Sequelize.HasManyCountAssociationsMixin;
+  getScene_markers: Sequelize.HasManyGetAssociationsMixin<ISceneMarkerInstance>;
+  setScene_markers: Sequelize.HasManySetAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  addScene_markers: Sequelize.HasManyAddAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  addScene_marker: Sequelize.HasManyAddAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  createScene_marker: Sequelize.HasManyCreateAssociationMixin<ISceneMarkerAttributes, ISceneMarkerInstance["id"]>;
+  removeScene_marker: Sequelize.HasManyRemoveAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  removeScene_markers: Sequelize.HasManyRemoveAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  hasScene_marker: Sequelize.HasManyHasAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  hasScene_markers: Sequelize.HasManyHasAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
+  countScene_markers: Sequelize.HasManyCountAssociationsMixin;
 
   getTags: Sequelize.BelongsToManyGetAssociationsMixin<ITagInstance>;
   setTags: Sequelize.BelongsToManySetAssociationsMixin<ITagInstance, ITagInstance["id"], "scenes_tags">;
