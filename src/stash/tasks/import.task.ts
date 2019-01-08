@@ -130,13 +130,13 @@ export class ImportTask extends BaseTask {
 
       // Return early if we are missing a json file.
       const sceneJson = StashJson.getScene(mappingJson.checksum);
-      if (!sceneJson) { return; }
+      if (!sceneJson) { continue; }
 
       // Get the tags from the tags json if we have it
       if (!!sceneJson.tags) { tagNames.push(...sceneJson.tags); }
 
       // Get the tags from the markers if we have marker json
-      if (!sceneJson.markers) { return; }
+      if (!sceneJson.markers) { continue; }
       sceneJson.markers.forEach((markerJson) => {
         if (!!markerJson.primary_tag) { tagNames.push(markerJson.primary_tag); }
         if (!!markerJson.tags) { tagNames.push(...markerJson.tags); }
