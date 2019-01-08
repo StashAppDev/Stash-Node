@@ -120,7 +120,7 @@ export const SceneFactory = (
     Scene.hasMany(Database.SceneMarker, { as: "scene_markers", foreignKey: "scene_id", onDelete: "CASCADE" });
     Scene.belongsTo(Database.Studio, { as: "studio", foreignKey: "studio_id" });
     Scene.belongsToMany(Database.Tag, { as: "tags", through: "scenes_tags", foreignKey: "scene_id" });
-    Scene.belongsToMany(Database.Performer, { as: "scenes", through: "performers_scenes", foreignKey: "scene_id" });
+    Scene.belongsToMany(Database.Performer, { as: "performers", through: "performers_scenes", foreignKey: "scene_id" });
   };
 
   return Scene;

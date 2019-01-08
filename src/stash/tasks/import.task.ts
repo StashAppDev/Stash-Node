@@ -292,6 +292,7 @@ export class ImportTask extends BaseTask {
       }
       await transaction.commit();
     } catch (e) {
+      StashManager.error(`Failed to save scenes!  Error: ${e}`);
       transaction.rollback();
     }
   }
