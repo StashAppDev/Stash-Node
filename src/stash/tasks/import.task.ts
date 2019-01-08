@@ -34,17 +34,17 @@ export class ImportTask extends BaseTask {
 
   public async importPerformers() {
     const performers: IPerformerAttributes[] = [];
-    this.mappings.performers.forEach((performerMappingJson, i) => {
+    for (const [i, mappingJson] of this.mappings.performers.entries()) {
       const index = i + 1;
-      const performerJson = StashJson.getPerformer(performerMappingJson.checksum);
-      if (!performerMappingJson.checksum || !performerMappingJson.name || !performerJson) { return; }
+      const performerJson = StashJson.getPerformer(mappingJson.checksum);
+      if (!mappingJson.checksum || !mappingJson.name || !performerJson) { return; }
 
       StashManager.info(`Reading performer ${index} of ${this.mappings.performers.length}\r`);
 
       const performer: IPerformerAttributes = {
         image: Buffer.from(performerJson.image!, "base64"),
-        checksum: performerMappingJson.checksum,
-        name: performerMappingJson.name,
+        checksum: mappingJson.checksum,
+        name: mappingJson.name,
         url: performerJson.url,
         twitter: performerJson.twitter,
         instagram: performerJson.instagram,
@@ -63,7 +63,7 @@ export class ImportTask extends BaseTask {
       };
 
       performers.push(performer);
-    });
+    }
 
     StashManager.info("Importing performers...");
     await this.bulkCreate(Database.Performer, performers);
@@ -72,22 +72,22 @@ export class ImportTask extends BaseTask {
 
   private async importStudios() {
     const studios: IStudioAttributes[] = [];
-    this.mappings.studios.forEach((studioMappingJson, i) => {
+    for (const [i, mappingJson] of this.mappings.studios.entries()) {
       const index = i + 1;
-      const studioJson = StashJson.getStudio(studioMappingJson.checksum);
-      if (!studioMappingJson.checksum || !studioMappingJson.name || !studioJson) { return; }
+      const studioJson = StashJson.getStudio(mappingJson.checksum);
+      if (!mappingJson.checksum || !mappingJson.name || !studioJson) { return; }
 
       StashManager.info(`Reading studio ${index} of ${this.mappings.studios.length}\r`);
 
       const studio: IStudioAttributes = {
-        checksum: studioMappingJson.checksum,
+        checksum: mappingJson.checksum,
         image: Buffer.from(studioJson.image, "base64"),
-        name: studioMappingJson.name,
+        name: mappingJson.name,
         url: studioJson.url,
       };
 
       studios.push(studio);
-    });
+    }
 
     StashManager.info("Importing studios...");
     await this.bulkCreate(Database.Studio, studios);
@@ -96,7 +96,7 @@ export class ImportTask extends BaseTask {
 
   private async importGalleries() {
     const galleries: IGalleryAttributes[] = [];
-    this.mappings.galleries.forEach((mappingJson, i) => {
+    for (const [i, mappingJson] of this.mappings.galleries.entries()) {
       const index = i + 1;
       if (!mappingJson.checksum || !mappingJson.path) { return; }
 
@@ -108,7 +108,7 @@ export class ImportTask extends BaseTask {
       };
 
       galleries.push(gallery);
-    });
+    }
 
     StashManager.info("Importing galleries...");
     await this.bulkCreate(Database.Gallery, galleries);
@@ -119,7 +119,7 @@ export class ImportTask extends BaseTask {
     const tagNames: string[] = [];
     const tags: ITagAttributes[] = [];
 
-    this.mappings.scenes.forEach((mappingJson, i) => {
+    for (const [i, mappingJson] of this.mappings.scenes.entries()) {
       const index = i + 1;
       if (!mappingJson.checksum || !mappingJson.path) {
         StashManager.warn(`Scene mapping without checksum and path! ${mappingJson}`);
@@ -141,7 +141,7 @@ export class ImportTask extends BaseTask {
         if (!!markerJson.primary_tag) { tagNames.push(markerJson.primary_tag); }
         if (!!markerJson.tags) { tagNames.push(...markerJson.tags); }
       });
-    });
+    }
 
     const uniqueTagNames = [...new Set(tagNames)];
     uniqueTagNames.forEach((tagName) => {

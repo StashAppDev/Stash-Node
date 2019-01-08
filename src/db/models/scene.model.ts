@@ -43,12 +43,13 @@ export interface ISceneInstance extends Sequelize.Instance<ISceneAttributes>, IS
 
   getPerformers: Sequelize.BelongsToManyGetAssociationsMixin<IPerformerInstance>;
   setPerformers:
-    Sequelize.BelongsToManySetAssociationsMixin<IPerformerInstance, IPerformerInstance["id"], "scenes_tags">;
+    Sequelize.BelongsToManySetAssociationsMixin<IPerformerInstance, IPerformerInstance["id"], "performers_scenes">;
   addPerformers:
-    Sequelize.BelongsToManyAddAssociationsMixin<IPerformerInstance, IPerformerInstance["id"], "scenes_tags">;
-  addPerformer: Sequelize.BelongsToManyAddAssociationMixin<IPerformerInstance, IPerformerInstance["id"], "scenes_tags">;
+    Sequelize.BelongsToManyAddAssociationsMixin<IPerformerInstance, IPerformerInstance["id"], "performers_scenes">;
+  addPerformer:
+    Sequelize.BelongsToManyAddAssociationMixin<IPerformerInstance, IPerformerInstance["id"], "performers_scenes">;
   createPerformers:
-    Sequelize.BelongsToManyCreateAssociationMixin<IPerformerAttributes, IPerformerInstance["id"], "scenes_tags">;
+    Sequelize.BelongsToManyCreateAssociationMixin<IPerformerAttributes, IPerformerInstance["id"], "performers_scenes">;
   removePerformer: Sequelize.BelongsToManyRemoveAssociationMixin<IPerformerInstance, IPerformerInstance["id"]>;
   removePerformers: Sequelize.BelongsToManyRemoveAssociationsMixin<IPerformerInstance, IPerformerInstance["id"]>;
   hasPerformer: Sequelize.BelongsToManyHasAssociationMixin<IPerformerInstance, IPerformerInstance["id"]>;
