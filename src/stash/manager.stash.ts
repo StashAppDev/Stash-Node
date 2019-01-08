@@ -1,7 +1,9 @@
 import glob from "glob";
 import PQueue from "p-queue";
+import { Database } from "../db/database";
 import { log } from "./../logger";
 import { StashPaths } from "./paths.stash";
+import { ImportTask } from "./tasks/import.task";
 import { ScanTask } from "./tasks/scan.task";
 
 export class Job {
@@ -40,11 +42,30 @@ class Manager {
 
   //#region Jobs
 
-  public scan(jobId: string) {
+  public async import(jobId: string) {
     if (this.job.status !== Job.Status.Idle) { return; }
     this.job.id = jobId;
     this.job.status = Job.Status.Import;
     this.job.message = "Importing...";
+    this.job.logs = [];
+
+    await Database.reset();
+
+    const importTask = new ImportTask();
+    try {
+      await importTask.start();
+    } catch (e) {
+      this.handleError(e);
+    }
+
+    this.idle();
+  }
+
+  public async scan(jobId: string) {
+    if (this.job.status !== Job.Status.Idle) { return; }
+    this.job.id = jobId;
+    this.job.status = Job.Status.Scan;
+    this.job.message = "Scanning...";
     this.job.logs = [];
 
     const scanPaths = glob.sync("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: StashPaths.stash, realpath: true});
@@ -53,15 +74,17 @@ class Manager {
     log.info(`Starting scan of ${scanPaths.length} files`);
 
     scanPaths.forEach((path) => {
-      this.queue.add(() => {
+      this.queue.add(async () => {
         this.job.currentItem += 1;
         const scanTask = new ScanTask(path);
-        return scanTask.start().catch((reason) => {
-          this.handleError(reason);
-        });
+        return scanTask.start();
+      }).catch((reason: Error) => {
+        this.handleError(reason);
       });
     });
 
+    // TODO check this
+    await this.queue.onEmpty();
     this.idle();
   }
 
@@ -121,8 +144,8 @@ class Manager {
     // TODO
   }
 
-  private handleError(error: any) {
-    log.error(error);
+  private handleError(error: Error) {
+    log.error(`${error.message}\n${error.stack}`);
   }
 
   //#endregion

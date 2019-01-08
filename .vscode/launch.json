@@ -29,6 +29,17 @@
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",
             "outputCapture": "std"
+        },
+        {
+            "name": "Run Import",
+            "type": "node",
+            "request": "launch",
+            "args": ["${workspaceRoot}/src/index.ts", "import"],
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+            "sourceMaps": true,
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector",
+            "outputCapture": "std"
         }
     ]
 }

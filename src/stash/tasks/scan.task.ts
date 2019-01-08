@@ -8,58 +8,63 @@ import { BaseTask } from "./base.task";
 
 export class ScanTask extends BaseTask {
   private filePath: string;
+  private movie?: FFProbe;
 
   constructor(filePath: string) {
     super();
     this.filePath = filePath;
+    if (this.getClass() === Database.Scene) {
+      this.movie = new FFProbe(this.filePath);
+    }
   }
 
   public async start() {
+    this.manager.verbose(this.filePath);
     this.createFolders();
     const klass = this.getClass();
 
-    const movie = new FFProbe(this.filePath);
-
-    let entity = await klass.findOne({where: {path: this.filePath}});
-    if (!!entity && !!entity.checksum) {
-      await this.makeScreenshots(movie, entity.checksum);
-      return; // We already have this item in the database, keep going
+    let entity;
+    if (klass === Database.Scene) {
+      entity = await klass.findOne({where: {path: this.filePath}});
+    } else if (klass === Database.Gallery) {
+      entity = await klass.findOne({where: {path: this.filePath}});
     }
+    if (!!entity) { return; } // We already have this item in the database, keep going
 
     const checksum = this.calculateChecksum();
 
-    await this.makeScreenshots(movie, checksum);
+    await this.makeScreenshots(checksum);
 
-    entity = await klass.findOne({where: {checksum}});
+    if (klass === Database.Scene) {
+      entity = await klass.findOne({where: { checksum }});
+    } else if (klass === Database.Gallery) {
+      entity = await klass.findOne({where: { checksum }});
+    }
     if (!!entity) {
       this.manager.info(`${this.filePath} already exists.  Updating path...`);
       entity.path = this.filePath;
-      entity.save();
+      await entity.save();
     } else {
       this.manager.info(`${this.filePath} doesn't exist.  Creating new item...`);
-      entity = await klass.build({
-        checksum,
-        path: this.filePath,
-      });
 
-      if (this.getClass() === Database.Scene) {
-        entity.size        = movie.size.toString();
-        entity.duration    = movie.duration;
-        entity.videoCodec  = movie.videoCodec;
-        entity.audioCodec  = movie.audioCodec;
-        entity.width       = movie.width;
-        entity.height      = movie.height;
+      if (klass === Database.Scene) {
+        entity = await klass.build({ checksum, path: this.filePath });
+        entity.size        = this.movie!.size.toString();
+        entity.duration    = this.movie!.duration;
+        entity.videoCodec  = this.movie!.videoCodec;
+        entity.audioCodec  = this.movie!.audioCodec;
+        entity.width       = this.movie!.width;
+        entity.height      = this.movie!.height;
+        await entity.save();
+      } else if (klass === Database.Gallery) {
+        entity = await klass.build({ checksum, path: this.filePath });
+        await entity.save();
       }
-
-      await entity.save();
     }
   }
 
-  private async makeScreenshots(movie: FFProbe, checksum: string) {
-    if (this.getClass() !== Database.Scene) {
-      this.manager.verbose(`Trying to make screenshots for ${this.getClass()}.  Skipping...`);
-      return;
-    }
+  private async makeScreenshots(checksum: string) {
+    if (this.getClass() !== Database.Scene) { return; }
 
     const thumbPath = this.paths.thumbnailScreenshotPath(checksum);
     const normalPath = this.paths.screenshotPath(checksum);
@@ -69,8 +74,8 @@ export class ScanTask extends BaseTask {
       return;
     }
 
-    await this.makeScreenshot(movie, thumbPath, 5, 320);
-    await this.makeScreenshot(movie, normalPath, 2, movie.width);
+    await this.makeScreenshot(this.movie!, thumbPath, 5, 320);
+    await this.makeScreenshot(this.movie!, normalPath, 2, this.movie!.width);
   }
 
   private async makeScreenshot(movie: FFProbe, outputPath: string, quality: number, width: number) {
@@ -87,8 +92,7 @@ export class ScanTask extends BaseTask {
 
   private getClass() {
     if (path.extname(this.filePath) === ".zip") {
-      // TODO Gallery
-      throw new Error(`TODO Gallery ${this.filePath}`);
+      return Database.Gallery;
     } else {
       return Database.Scene;
     }

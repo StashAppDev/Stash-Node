@@ -1,6 +1,5 @@
-// tslint:disable:object-literal-sort-keys
 import * as Sequelize from "sequelize";
-import { SequelizeAttributes } from "../../typings/sequelize-attributes";
+import { Database } from "../database";
 import { ISceneAttributes, ISceneInstance } from "./scene.model";
 
 export interface IStudioAttributes {
@@ -31,30 +30,27 @@ export const StudioFactory = (
   sequelize: Sequelize.Sequelize,
   DataTypes: Sequelize.DataTypes,
 ): Sequelize.Model<IStudioInstance, IStudioAttributes> => {
-  const attributes: SequelizeAttributes<IStudioAttributes> = {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-    },
-    image: {
-      allowNull: false,
-      type: DataTypes.BLOB,
-    },
-    checksum: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      unique: true,
-    },
+  // tslint:disable:object-literal-sort-keys
+  const attributes: Sequelize.DefineModelAttributes<IStudioAttributes> = {
+    id: { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true },
+    image: { type: DataTypes.BLOB, allowNull: false },
+    checksum: { type: DataTypes.STRING, allowNull: false, unique: true },
     name: { type: DataTypes.STRING },
     url: { type: DataTypes.STRING },
   };
+  // tslint:enable:object-literal-sort-keys
 
-  const Studio = sequelize.define<IStudioInstance, IStudioAttributes>("studios", attributes);
+  const options: Sequelize.DefineOptions<IStudioInstance> = {
+    indexes: [
+      { name: "index_studios_on_checksum", fields: ["checksum"] },
+      { name: "index_studios_on_name", fields: ["name"] },
+    ],
+  };
 
-  Studio.associate = (models) => {
-    Studio.hasMany(models.scenes, { as: "scene" });
+  const Studio = sequelize.define<IStudioInstance, IStudioAttributes>("studios", attributes, options);
+
+  Studio.associate = () => {
+    Studio.hasMany(Database.Scene, { as: "scene" });
   };
 
   return Studio;

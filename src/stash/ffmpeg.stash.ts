@@ -16,7 +16,7 @@ export class FFMpeg {
       "-y",
       "-i", this.filePath,
       "-vframes", "1",
-      "-q:v", "1",
+      "-q:v", quality.toString(10),
       "-vf", `scale=${width}:-1`,
       "-f", "image2",
       outputPath,

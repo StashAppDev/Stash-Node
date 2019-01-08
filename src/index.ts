@@ -18,7 +18,14 @@ function configureCommander() {
     .command("scan")
     .action(async () => {
       await Database.initialize();
-      StashManager.scan("");
+      await StashManager.scan("");
+    });
+
+  program
+    .command("import")
+    .action(async () => {
+      await Database.initialize();
+      await StashManager.import("");
     });
 
   program

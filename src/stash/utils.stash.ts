@@ -2,6 +2,8 @@ import childProcess from "child_process";
 import crypto from "crypto";
 import fs from "fs";
 import tempy from "tempy";
+import { IJsonObject } from "./json.stash";
+import { StashManager } from "./manager.stash";
 
 export function md5FromPath(filePath: string) {
   const bufferSize = 8192;
@@ -43,6 +45,25 @@ export function processImage(params: { image?: string }, object: { checksum?: st
 
   object.checksum = md5FromPath(tempFile);
   object.image = image;
+}
+
+export function parseJsonFile(filePath: string) {
+  try {
+    const jsonFile = fs.readFileSync(filePath, "utf8");
+    const json = JSON.parse(jsonFile);
+    return json;
+  } catch (e) {
+    StashManager.warn(`Failed to parse json file ${filePath}! Error: ${e}`);
+  }
+}
+
+export function writeJsonFile(filePath: string, json: IJsonObject) {
+  try {
+    const jsonString = JSON.stringify(json, undefined, 2);
+    fs.writeFileSync(filePath, jsonString, "utf8");
+  } catch (e) {
+    StashManager.warn(`Failed to write json file ${filePath}! Error: ${e}`);
+  }
 }
 
 // https://noraesae.net/2017/11/16/useful-utility-functions-in-typescript/

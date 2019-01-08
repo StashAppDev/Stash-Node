@@ -3,6 +3,7 @@ import fse from "fs-extra";
 import inquirer from "inquirer";
 import os from "os";
 import path from "path";
+import { parseJsonFile, writeJsonFile } from "./utils.stash";
 
 class Paths {
   public readonly executionDirectory: string = path.dirname(process.execPath);
@@ -45,8 +46,7 @@ class Paths {
     if (!fs.existsSync(this.ffmpeg)) { throw new Error(`FFMPEG not found. ${ffmpegErrorText}`); }
     if (!fs.existsSync(this.ffprobe)) { throw new Error(`FFProbe not found. ${ffmpegErrorText}`); }
 
-    const jsonFile = fs.readFileSync(this.configFile, "utf8");
-    const jsonConfig = JSON.parse(jsonFile);
+    const jsonConfig = parseJsonFile(this.configFile);
 
     this.stash       = jsonConfig.stash;
     this.metadata    = jsonConfig.metadata;
@@ -91,8 +91,7 @@ class Paths {
       { message: "Cache folder path", name: "cache", type: "input", validate: validation },
       { message: "Downloads folder path", name: "downloads", type: "input", validate: validation },
     ]).then((answers: any) => {
-      const json = JSON.stringify(answers);
-      fs.writeFileSync(this.configFile, json, "utf8");
+      writeJsonFile(this.configFile, answers);
     });
   }
 
@@ -103,6 +102,9 @@ class Paths {
   public thumbnailScreenshotPath(checksum: string): string {
     return path.join(this.screenshots, `${checksum}.thumb.jpg`);
   }
+
+  public performerJsonPath(checksum: string) { return path.join(StashPaths.performers, `${checksum}.json`); }
+  public studioJsonPath(checksum: string) { return path.join(StashPaths.studios, `${checksum}.json`); }
 }
 
 export const StashPaths = new Paths();

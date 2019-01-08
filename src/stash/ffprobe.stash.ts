@@ -36,6 +36,10 @@ export class FFProbe {
     }
 
     this.metadata = JSON.parse(ffprobe.stdout.toString());
+    if (!!this.metadata.error) {
+      const error = this.metadata.error;
+      throw new Error(`FFProbe [${filePath}] -> Code: ${error.code}, Message: ${error.string}`);
+    }
 
     this.path = filePath;
 
