@@ -260,11 +260,11 @@ export class ImportTask extends BaseTask {
         }
         if (!!sceneJson.tags) {
           const tags = await this.getTags(sceneJson.tags, transaction);
-          scene.setTags(tags, { transaction });
+          await scene.setTags(tags, { transaction });
         }
         if (!!sceneJson.markers) {
           const markers: ISceneMarkerAttributes[] = [];
-          sceneJson.markers.forEach(async (markerJson) => {
+          for (const markerJson of sceneJson.markers) {
             const marker: ISceneMarkerAttributes = {
               title: markerJson.title,
               seconds: markerJson.seconds,
@@ -277,7 +277,7 @@ export class ImportTask extends BaseTask {
             if (!!markerTags) { marker.tags = markerTags; }
 
             markers.push(marker);
-          });
+          }
 
           let sceneMarkers: ISceneMarkerInstance[] = [];
           try {
@@ -287,7 +287,7 @@ export class ImportTask extends BaseTask {
             throw e;
           }
 
-          scene.setSceneMarkers(sceneMarkers, { transaction });
+          await scene.setScene_markers(sceneMarkers, { transaction });
         }
       }
       await transaction.commit();
