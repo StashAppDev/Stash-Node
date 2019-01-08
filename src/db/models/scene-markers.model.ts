@@ -5,6 +5,7 @@ import { ITagAttributes, ITagInstance } from "./tag.model";
 
 export interface ISceneMarkerAttributes {
   id?: number;
+  title: string;
   seconds?: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -38,10 +39,13 @@ export const SceneMarkerFactory = (
   sequelize: Sequelize.Sequelize,
   DataTypes: Sequelize.DataTypes,
 ): Sequelize.Model<ISceneMarkerInstance, ISceneMarkerAttributes> => {
+  // tslint:disable:object-literal-sort-keys
   const attributes: Sequelize.DefineModelAttributes<ISceneMarkerAttributes> = {
     id:       { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true },
+    title:    { type: DataTypes.STRING, allowNull: false },
     seconds:  { type: DataTypes.DECIMAL, allowNull: false},
   };
+  // tslint:enable:object-literal-sort-keys
 
   const options: Sequelize.DefineOptions<ISceneMarkerInstance> = {
     indexes: [

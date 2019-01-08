@@ -21,8 +21,12 @@ export interface ISceneAttributes {
   audioCodec?: string;
   width?: number;
   height?: number;
+  framerate?: number;
+  bitrate?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  performers?: IPerformerAttributes[] | Array<IPerformerAttributes["id"]>;
+  sceneMarkers?: ISceneMarkerAttributes[] | Array<ISceneMarkerAttributes["id"]>;
   studio?: IStudioAttributes | IStudioAttributes["id"];
   gallery?: IGalleryAttributes | IGalleryAttributes["id"];
   tags?: ITagAttributes[] | Array<ITagAttributes["id"]>;
@@ -55,7 +59,7 @@ export interface ISceneInstance extends Sequelize.Instance<ISceneAttributes>, IS
   setSceneMarkers: Sequelize.HasManySetAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
   addSceneMarkers: Sequelize.HasManyAddAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
   addSceneMarker: Sequelize.HasManyAddAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
-  createSceneMarkers: Sequelize.HasManyCreateAssociationMixin<ISceneMarkerAttributes, ISceneMarkerInstance["id"]>;
+  createSceneMarker: Sequelize.HasManyCreateAssociationMixin<ISceneMarkerAttributes, ISceneMarkerInstance["id"]>;
   removeSceneMarker: Sequelize.HasManyRemoveAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
   removeSceneMarkers: Sequelize.HasManyRemoveAssociationsMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
   hasSceneMarker: Sequelize.HasManyHasAssociationMixin<ISceneMarkerInstance, ISceneMarkerInstance["id"]>;
@@ -88,12 +92,14 @@ export const SceneFactory = (
     date: { type: DataTypes.STRING }, // TODO: date?
     rating: { type: DataTypes.TINYINT },
     path: { type: DataTypes.STRING, allowNull: false, unique: true },
-    size: { type: DataTypes.STRING, allowNull: false },
-    duration: { type: DataTypes.DECIMAL({ precision: 7, scale: 2 }), allowNull: false },
-    videoCodec: { type: DataTypes.STRING, allowNull: false, field: "video_codec" },
-    audioCodec: { type: DataTypes.STRING, allowNull: false, field: "audio_codec" },
-    width: { type: DataTypes.TINYINT, allowNull: false },
-    height: { type: DataTypes.TINYINT, allowNull: false },
+    size: { type: DataTypes.STRING },
+    duration: { type: DataTypes.DECIMAL({ precision: 7, scale: 2 }) },
+    videoCodec: { type: DataTypes.STRING, field: "video_codec" },
+    audioCodec: { type: DataTypes.STRING, field: "audio_codec" },
+    width: { type: DataTypes.TINYINT},
+    height: { type: DataTypes.TINYINT },
+    framerate: { type: DataTypes.DECIMAL({ precision: 7, scale: 2 }) },
+    bitrate: { type: DataTypes.INTEGER },
   };
   // tslint:enable:object-literal-sort-keys
 

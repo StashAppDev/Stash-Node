@@ -104,6 +104,7 @@ class Paths {
   }
 
   public performerJsonPath(checksum: string) { return path.join(StashPaths.performers, `${checksum}.json`); }
+  public sceneJsonPath(checksum: string) { return path.join(StashPaths.scenes, `${checksum}.json`); }
   public studioJsonPath(checksum: string) { return path.join(StashPaths.studios, `${checksum}.json`); }
 }
 

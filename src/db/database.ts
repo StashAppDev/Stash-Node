@@ -5,6 +5,7 @@ import { GalleryFactory, IGalleryAttributes, IGalleryInstance } from "./models/g
 import { IPerformerAttributes, IPerformerInstance, PerformerFactory } from "./models/performer.model";
 import { ISceneMarkerAttributes, ISceneMarkerInstance, SceneMarkerFactory } from "./models/scene-markers.model";
 import { AddSceneScopes, ISceneAttributes, ISceneInstance, SceneFactory } from "./models/scene.model";
+import { IScrapedItemAttributes, IScrapedItemInstance, ScrapedItemFactory } from "./models/scraped-item";
 import { IStudioAttributes, IStudioInstance, StudioFactory } from "./models/studio.model";
 import { ITagAttributes, ITagInstance, TagFactory } from "./models/tag.model";
 
@@ -16,6 +17,7 @@ class DatabaseImpl {
   public Performer: Sequelize.Model<IPerformerInstance, IPerformerAttributes>;
   public Scene: Sequelize.Model<ISceneInstance, ISceneAttributes>;
   public SceneMarker: Sequelize.Model<ISceneMarkerInstance, ISceneMarkerAttributes>;
+  public ScrapedItem: Sequelize.Model<IScrapedItemInstance, IScrapedItemAttributes>;
   public Studio: Sequelize.Model<IStudioInstance, IStudioAttributes>;
   public Tag: Sequelize.Model<ITagInstance, ITagAttributes>;
 
@@ -41,6 +43,7 @@ class DatabaseImpl {
     this.Performer = PerformerFactory(this.sequelize, this.Sequelize);
     this.Scene = SceneFactory(this.sequelize, this.Sequelize);
     this.SceneMarker = SceneMarkerFactory(this.sequelize, this.Sequelize);
+    this.ScrapedItem = ScrapedItemFactory(this.sequelize, this.Sequelize);
     this.Studio = StudioFactory(this.sequelize, this.Sequelize);
     this.Tag = TagFactory(this.sequelize, this.Sequelize);
 
