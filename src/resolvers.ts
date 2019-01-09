@@ -3,9 +3,11 @@ import gql from "graphql-tag";
 import path from "path";
 import { URL } from "url";
 import { GalleryController } from "./controllers/gallery.controller";
+import { SceneMarkerController } from "./controllers/scene-marker.controller";
 import { SceneController } from "./controllers/scene.controller";
 import { StudioController } from "./controllers/studio.controller";
 import { TagController } from "./controllers/tag.controller";
+import { Database } from "./db/database";
 import { GQL, IResolvers } from "./typings/graphql";
 
 // NOTE: This path looks weird, but is required for pkg
@@ -44,21 +46,36 @@ export const resolvers: IResolvers = {
     findTag(root, args, context, info): GQL.Tag {
       return TagController.findTag(root, args, context, info);
     },
+    findScene(root, args, context, info): GQL.Scene {
+      return SceneController.findScene(root, args, context, info);
+    },
     findScenes(root, args, context, info): GQL.FindScenesResultType {
       return SceneController.findScenes(root, args, context, info);
     },
     findStudio(root, args, context, info): GQL.Studio {
       return StudioController.findStudio(root, args, context, info);
     },
-    stats(root, args, context, info): GQL.StatsResultType {
-      return { scene_count: 100, gallery_count: 0, performer_count: 0, studio_count: 0, tag_count: 4 };
+    sceneMarkerTags(root, args, context, info)/*: QueryResolvers.SceneMarkerTagsResolver<any>*/ {
+      return SceneMarkerController.sceneMarkerTags(root, args, context, info);
+    },
+    async stats(root, args, context, info): Promise<GQL.StatsResultType> {
+      // tslint:disable:variable-name
+      const scene_count = await Database.Scene.count();
+      const gallery_count = await Database.Gallery.count();
+      const performer_count = await Database.Performer.count();
+      const studio_count = await Database.Studio.count();
+      const tag_count = await Database.Tag.count();
+      return { scene_count, gallery_count, performer_count, studio_count, tag_count };
+      // tslint:enable:variable-name
     },
   },
   Scene: {
     file(root, args, context, info): GQL.SceneFileType {
       return {
         audio_codec: root.audioCodec,
+        bitrate: root.bitrate,
         duration: root.duration,
+        framerate: root.framerate,
         height: root.height,
         size: root.size,
         video_codec: root.videoCodec,
@@ -67,8 +84,11 @@ export const resolvers: IResolvers = {
     },
     paths(root, args, context, info): GQL.ScenePathsType {
       return {
-        // TODO
+        // TODO:  Get these paths from the resolver?
+        preview: new URL(`/scenes/${root.id}/preview`, context.baseUrl).toString(),
         screenshot: new URL(`/scenes/${root.id}/screenshot`, context.baseUrl).toString(),
+        stream: new URL(`/scenes/${root.id}/stream.mp4`, context.baseUrl).toString(),
+        webp: new URL(`/scenes/${root.id}/webp`, context.baseUrl).toString(),
       };
     },
     is_streamable(root, args, context, info): boolean {

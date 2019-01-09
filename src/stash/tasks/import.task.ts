@@ -4,12 +4,12 @@ import { IGalleryAttributes } from "../../db/models/gallery.model";
 import { IPerformerAttributes } from "../../db/models/performer.model";
 import { ISceneMarkerAttributes, ISceneMarkerInstance } from "../../db/models/scene-markers.model";
 import { ISceneAttributes, ISceneInstance } from "../../db/models/scene.model";
+import { IScrapedItemAttributes, IScrapedItemInstance } from "../../db/models/scraped-item";
 import { IStudioAttributes } from "../../db/models/studio.model";
 import { ITagAttributes } from "../../db/models/tag.model";
 import { IMappingJson, IScrapedJson, StashJson } from "../json.stash";
 import { StashManager } from "../manager.stash";
 import { BaseTask } from "./base.task";
-import { IScrapedItemAttributes, IScrapedItemInstance } from "../../db/models/scraped-item";
 
 export class ImportTask extends BaseTask {
   private mappings: IMappingJson;

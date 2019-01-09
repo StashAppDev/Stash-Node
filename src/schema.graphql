@@ -55,7 +55,7 @@ type Performer {
 #######################################
 
 type SceneMarkerTag {
-  tag: Tag
+  tag: Tag!
   scene_markers: [SceneMarker]!
 }
 
@@ -253,6 +253,7 @@ input SceneFilterType {
 #############
 
 type Query {
+  findScene(id: ID, checksum: String): Scene
   findScenes(scene_filter: SceneFilterType, scene_ids: [Int], filter: FindFilterType): FindScenesResultType!
 
   findStudio(id: ID!): Studio
@@ -263,6 +264,11 @@ type Query {
   findTag(id: ID!): Tag
 
   stats: StatsResultType!
+
+  """
+  Organize scene markers by tag for a given scene ID
+  """
+  sceneMarkerTags(scene_id: ID): [SceneMarkerTag]! # TODO ID! scene_id
 }
 
 type Mutation {

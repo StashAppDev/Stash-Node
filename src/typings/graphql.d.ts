@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-06T01:44:55-08:00
+// Generated in 2019-01-08T18:32:42-08:00
 export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
@@ -66,6 +66,8 @@ export namespace GQL {
   // ====================================================
 
   export interface Query {
+    findScene?: Maybe<Scene>;
+
     findScenes: FindScenesResultType;
 
     findStudio?: Maybe<Studio>;
@@ -77,12 +79,8 @@ export namespace GQL {
     findTag?: Maybe<Tag>;
 
     stats: StatsResultType;
-  }
-
-  export interface FindScenesResultType {
-    count: number;
-
-    scenes: (Maybe<Scene>)[];
+    /** Organize scene markers by tag for a given scene ID */
+    sceneMarkerTags: (Maybe<SceneMarkerTag>)[];
   }
 
   export interface Scene {
@@ -261,9 +259,15 @@ export namespace GQL {
   }
 
   export interface SceneMarkerTag {
-    tag?: Maybe<Tag>;
+    tag: Tag;
 
     scene_markers: (Maybe<SceneMarker>)[];
+  }
+
+  export interface FindScenesResultType {
+    count: number;
+
+    scenes: (Maybe<Scene>)[];
   }
 
   export interface FindStudiosResultType {
@@ -331,6 +335,11 @@ export namespace GQL {
   // Arguments
   // ====================================================
 
+  export interface FindSceneQueryArgs {
+    id?: Maybe<string>;
+
+    checksum?: Maybe<string>;
+  }
   export interface FindScenesQueryArgs {
     scene_filter?: Maybe<SceneFilterType>;
 
@@ -349,6 +358,9 @@ export namespace GQL {
   }
   export interface FindTagQueryArgs {
     id: string;
+  }
+  export interface SceneMarkerTagsQueryArgs {
+    scene_id?: Maybe<string>;
   }
   export interface StudioCreateMutationArgs {
     input: StudioCreateInput;
@@ -420,6 +432,8 @@ export type DirectiveResolverFn<TResult, TArgs = {}, TContext = {}> = (
 
 export namespace QueryResolvers {
   export interface Resolvers<Context = IGraphQLContext, TypeParent = {}> {
+    findScene?: FindSceneResolver<Maybe<SceneEntity>, TypeParent, Context>;
+
     findScenes?: FindScenesResolver<FindScenesResultType, TypeParent, Context>;
 
     findStudio?: FindStudioResolver<Maybe<Studio>, TypeParent, Context>;
@@ -435,6 +449,23 @@ export namespace QueryResolvers {
     findTag?: FindTagResolver<Maybe<Tag>, TypeParent, Context>;
 
     stats?: StatsResolver<StatsResultType, TypeParent, Context>;
+    /** Organize scene markers by tag for a given scene ID */
+    sceneMarkerTags?: SceneMarkerTagsResolver<
+      (Maybe<SceneMarkerTag>)[],
+      TypeParent,
+      Context
+    >;
+  }
+
+  export type FindSceneResolver<
+    R = Maybe<SceneEntity>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, FindSceneArgs>;
+  export interface FindSceneArgs {
+    id?: Maybe<string>;
+
+    checksum?: Maybe<string>;
   }
 
   export type FindScenesResolver<
@@ -491,28 +522,14 @@ export namespace QueryResolvers {
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
-}
-
-export namespace FindScenesResultTypeResolvers {
-  export interface Resolvers<
-    Context = IGraphQLContext,
-    TypeParent = FindScenesResultType
-  > {
-    count?: CountResolver<number, TypeParent, Context>;
-
-    scenes?: ScenesResolver<(Maybe<SceneEntity>)[], TypeParent, Context>;
+  export type SceneMarkerTagsResolver<
+    R = (Maybe<SceneMarkerTag>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, SceneMarkerTagsArgs>;
+  export interface SceneMarkerTagsArgs {
+    scene_id?: Maybe<string>;
   }
-
-  export type CountResolver<
-    R = number,
-    Parent = FindScenesResultType,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-  export type ScenesResolver<
-    R = (Maybe<SceneEntity>)[],
-    Parent = FindScenesResultType,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
 }
 
 export namespace SceneResolvers {
@@ -1141,7 +1158,7 @@ export namespace SceneMarkerTagResolvers {
     Context = IGraphQLContext,
     TypeParent = SceneMarkerTag
   > {
-    tag?: TagResolver<Maybe<Tag>, TypeParent, Context>;
+    tag?: TagResolver<Tag, TypeParent, Context>;
 
     scene_markers?: SceneMarkersResolver<
       (Maybe<SceneMarker>)[],
@@ -1151,13 +1168,35 @@ export namespace SceneMarkerTagResolvers {
   }
 
   export type TagResolver<
-    R = Maybe<Tag>,
+    R = Tag,
     Parent = SceneMarkerTag,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneMarkersResolver<
     R = (Maybe<SceneMarker>)[],
     Parent = SceneMarkerTag,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace FindScenesResultTypeResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = FindScenesResultType
+  > {
+    count?: CountResolver<number, TypeParent, Context>;
+
+    scenes?: ScenesResolver<(Maybe<SceneEntity>)[], TypeParent, Context>;
+  }
+
+  export type CountResolver<
+    R = number,
+    Parent = FindScenesResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type ScenesResolver<
+    R = (Maybe<SceneEntity>)[],
+    Parent = FindScenesResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1423,7 +1462,6 @@ export interface DeprecatedDirectiveArgs {
 
 export interface IResolvers {
   Query?: QueryResolvers.Resolvers;
-  FindScenesResultType?: FindScenesResultTypeResolvers.Resolvers;
   Scene?: SceneResolvers.Resolvers;
   SceneFileType?: SceneFileTypeResolvers.Resolvers;
   ScenePathsType?: ScenePathsTypeResolvers.Resolvers;
@@ -1434,6 +1472,7 @@ export interface IResolvers {
   Studio?: StudioResolvers.Resolvers;
   Performer?: PerformerResolvers.Resolvers;
   SceneMarkerTag?: SceneMarkerTagResolvers.Resolvers;
+  FindScenesResultType?: FindScenesResultTypeResolvers.Resolvers;
   FindStudiosResultType?: FindStudiosResultTypeResolvers.Resolvers;
   StatsResultType?: StatsResultTypeResolvers.Resolvers;
   Mutation?: MutationResolvers.Resolvers;

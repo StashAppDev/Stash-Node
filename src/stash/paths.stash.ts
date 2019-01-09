@@ -103,6 +103,14 @@ class Paths {
     return path.join(this.screenshots, `${checksum}.thumb.jpg`);
   }
 
+  public previewPath(checksum: string): string {
+    return path.join(this.screenshots, `${checksum}.mp4`);
+  }
+
+  public webpPath(checksum: string): string {
+    return path.join(this.screenshots, `${checksum}.webp`);
+  }
+
   public performerJsonPath(checksum: string) { return path.join(StashPaths.performers, `${checksum}.json`); }
   public sceneJsonPath(checksum: string) { return path.join(StashPaths.scenes, `${checksum}.json`); }
   public studioJsonPath(checksum: string) { return path.join(StashPaths.studios, `${checksum}.json`); }
