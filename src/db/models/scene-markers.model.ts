@@ -15,9 +15,9 @@ export interface ISceneMarkerAttributes {
 }
 
 export interface ISceneMarkerInstance extends Sequelize.Instance<ISceneMarkerAttributes>, ISceneMarkerAttributes {
-  getPrimaryTag: Sequelize.BelongsToGetAssociationMixin<ITagInstance>;
-  setPrimaryTag: Sequelize.BelongsToSetAssociationMixin<ITagInstance, ITagInstance["id"]>;
-  createPrimaryTag: Sequelize.BelongsToCreateAssociationMixin<ITagAttributes, ITagInstance>;
+  getPrimary_tag: Sequelize.BelongsToGetAssociationMixin<ITagInstance>;
+  setPrimary_tag: Sequelize.BelongsToSetAssociationMixin<ITagInstance, ITagInstance["id"]>;
+  createPrimary_tag: Sequelize.BelongsToCreateAssociationMixin<ITagAttributes, ITagInstance>;
 
   getTags: Sequelize.BelongsToManyGetAssociationsMixin<ITagInstance>;
   setTags: Sequelize.BelongsToManySetAssociationsMixin<ITagInstance, ITagInstance["id"], "scene_markers_tags">;

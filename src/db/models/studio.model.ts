@@ -27,16 +27,16 @@ export interface IStudioInstance extends Sequelize.Instance<IStudioAttributes>, 
   hasScenes: Sequelize.HasManyHasAssociationsMixin<ISceneInstance, ISceneInstance["id"]>;
   countScenes: Sequelize.HasManyCountAssociationsMixin;
 
-  getScrapedItems: Sequelize.HasManyGetAssociationsMixin<IScrapedItemInstance>;
-  setScrapedItems: Sequelize.HasManySetAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  addScrapedItems: Sequelize.HasManyAddAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  addScrapedItem: Sequelize.HasManyAddAssociationMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  createScrapedItem: Sequelize.HasManyCreateAssociationMixin<IScrapedItemAttributes, IScrapedItemInstance["id"]>;
-  removeScrapedItem: Sequelize.HasManyRemoveAssociationMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  removeScrapedItems: Sequelize.HasManyRemoveAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  hasScrapedItem: Sequelize.HasManyHasAssociationMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  hasScrapedItems: Sequelize.HasManyHasAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
-  countScrapedItems: Sequelize.HasManyCountAssociationsMixin;
+  getScraped_items: Sequelize.HasManyGetAssociationsMixin<IScrapedItemInstance>;
+  setScraped_items: Sequelize.HasManySetAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  addScraped_items: Sequelize.HasManyAddAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  addScraped_item: Sequelize.HasManyAddAssociationMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  createScraped_item: Sequelize.HasManyCreateAssociationMixin<IScrapedItemAttributes, IScrapedItemInstance["id"]>;
+  removeScraped_item: Sequelize.HasManyRemoveAssociationMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  removeScraped_items: Sequelize.HasManyRemoveAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  hasScraped_item: Sequelize.HasManyHasAssociationMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  hasScraped_items: Sequelize.HasManyHasAssociationsMixin<IScrapedItemInstance, IScrapedItemInstance["id"]>;
+  countScraped_items: Sequelize.HasManyCountAssociationsMixin;
 }
 
 export const StudioFactory = (

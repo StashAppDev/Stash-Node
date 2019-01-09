@@ -7,7 +7,7 @@
   "scripts" : {
     "start": "nodemon",
     "build": "tsc",
-    "package": "yarn build && pkg package.json --out-path builds && sh copy_native_modules.sh && yarn package:ffmpeg",
+    "package": "yarn build && pkg package.json --out-path builds --options max_old_space_size=4096 && sh copy_native_modules.sh && yarn package:ffmpeg",
     "package:ffmpeg": "sh download_ffmpeg.sh",
     "schema": "gql-gen",
     "lint": "tslint -c ./tslint.json 'src/**/*.ts'",

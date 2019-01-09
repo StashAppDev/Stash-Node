@@ -187,12 +187,10 @@ export class ImportTask extends BaseTask {
         const studio = await this.getStudio(mappingJson.studio, transaction);
         await scrapedItem.setStudio(studio, { transaction });
 
-        // TODO: Test this
         // Force update the timestamp
         const id = scrapedItem!.id!;
-        await Database.ScrapedItem.update(
-          { updatedAt: scrapedItem.updatedAt }, { where: { id }, transaction, silent: true },
-        );
+        const updatedAt = new Date(mappingJson.updated_at);
+        await Database.ScrapedItem.update({ updatedAt }, { where: { id }, transaction, silent: true });
       }
 
       await transaction.commit();
@@ -263,31 +261,30 @@ export class ImportTask extends BaseTask {
           await scene.setTags(tags, { transaction });
         }
         if (!!sceneJson.markers) {
-          const markers: ISceneMarkerAttributes[] = [];
+          const sceneMarkers: ISceneMarkerInstance[] = [];
           for (const markerJson of sceneJson.markers) {
-            const marker: ISceneMarkerAttributes = {
+            const markerAttributes: ISceneMarkerAttributes = {
               title: markerJson.title,
               seconds: markerJson.seconds,
             };
 
+            const marker = await Database.SceneMarker.create(markerAttributes, { transaction });
+
             const primaryTag = await this.getTag(markerJson.primary_tag, transaction);
-            if (!!primaryTag) { marker.primaryTag = primaryTag; }
+            if (!!primaryTag) { await marker.setPrimary_tag(primaryTag, { transaction }); }
 
             const markerTags = await this.getTags(markerJson.tags, transaction);
-            if (!!markerTags) { marker.tags = markerTags; }
+            if (!!markerTags) { await marker.setTags(markerTags, { transaction }); }
 
-            markers.push(marker);
+            sceneMarkers.push(marker);
           }
 
-          let sceneMarkers: ISceneMarkerInstance[] = [];
           try {
-            sceneMarkers = await Database.SceneMarker.bulkCreate(markers, { transaction });
+            await scene.setScene_markers(sceneMarkers, { transaction });
           } catch (e) {
             StashManager.error(`Failed to save scene <${sceneAttributes.path}> due to invalid scene markers`);
             throw e;
           }
-
-          await scene.setScene_markers(sceneMarkers, { transaction });
         }
       }
       await transaction.commit();

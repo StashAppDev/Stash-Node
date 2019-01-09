@@ -67,7 +67,7 @@ export interface IScrapedItemJson extends IJsonObject {
   title?: string;
   description?: string;
   url?: string;
-  date?: string; // TODO: date?
+  date?: string;
   rating?: string;
   tags?: string;
   models?: string;
@@ -77,7 +77,7 @@ export interface IScrapedItemJson extends IJsonObject {
   video_filename?: string;
   video_url?: string;
   studio: string;
-  updated_at: Date; // TODO: date?
+  updated_at: string;
 }
 
 export interface IStudioJson extends IJsonObject {
