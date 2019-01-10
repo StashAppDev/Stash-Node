@@ -24,7 +24,7 @@ export class SceneController {
       .sort("title")
       .paginate();
 
-    const results = await Database.Scene.findAndCountAll(helper.opts);
+    const results = await Database.Scene.scope(helper.scopeOpts).findAndCountAll(helper.opts);
 
     // TODO: Model instance doesn't match the GQL interface... remove any?
     return { scenes: results.rows, count: results.count } as any;

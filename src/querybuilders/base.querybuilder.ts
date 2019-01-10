@@ -1,9 +1,10 @@
-import { FindOptions } from "sequelize";
+import { AnyWhereOptions, FindOptions, ScopeOptions } from "sequelize";
 import { Database } from "../db/database";
 import { FindFilterType } from "../typings/graphql";
 
 export class BaseQueryBuilder<TInstance, TAttributes> {
   public opts: FindOptions<TAttributes> = {};
+  public scopeOpts: Array<string | ScopeOptions | AnyWhereOptions> = [];
   public model: any;
   public findFilter: FindFilterType;
 

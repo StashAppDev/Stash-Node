@@ -5,6 +5,8 @@ import { IPerformerAttributes, IPerformerInstance } from "./performer.model";
 import { ISceneMarkerAttributes, ISceneMarkerInstance } from "./scene-marker.model";
 import { IStudioAttributes, IStudioInstance } from "./studio.model";
 import { ITagAttributes, ITagInstance } from "./tag.model";
+import { Op } from "sequelize";
+import { ResolutionEnum } from "../../typings/graphql";
 
 export interface ISceneAttributes {
   id?: number;
@@ -127,8 +129,21 @@ export const SceneFactory = (
 };
 
 export const AddSceneScopes = () => {
-  const fullScope: Sequelize.AnyFindOptions = {
+  const fullScope: Sequelize.FindOptions<ISceneAttributes> = {
     include: [{ model: Database.Studio, as: "studio" }],
   };
+
+  const resolution = (value: ResolutionEnum): Sequelize.FindOptions<ISceneAttributes> => {
+    switch (value) {
+      case "LOW": return { where: { height: { [Op.gte]: 240, [Op.lt]: 480 } } };
+      case "STANDARD": return { where: { height: { [Op.gte]: 480, [Op.lt]: 720 } } };
+      case "STANDARD_HD": return { where: { height: { [Op.gte]: 720, [Op.lt]: 1080 } } };
+      case "FULL_HD": return { where: { height: { [Op.gte]: 1080, [Op.lt]: 2160 } } };
+      case "FOUR_K": return { where: { height: { [Op.gte]: 2160 } } };
+      default: return { where: { height: { [Op.lt]: 240 } } };
+    }
+  };
+
   Database.Scene.addScope("defaultScope", fullScope);
+  Database.Scene.addScope("resolution", resolution);
 };

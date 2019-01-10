@@ -1,6 +1,7 @@
+import { Op } from "sequelize";
 import { Database } from "../db/database";
 import { ISceneAttributes, ISceneInstance } from "../db/models/scene.model";
-import { GQL } from "../typings/graphql";
+import { GQL, ResolutionEnum } from "../typings/graphql";
 import { BaseQueryBuilder } from "./base.querybuilder";
 
 export class SceneQueryBuilder extends BaseQueryBuilder<ISceneInstance, ISceneAttributes> {
@@ -18,12 +19,20 @@ export class SceneQueryBuilder extends BaseQueryBuilder<ISceneInstance, ISceneAt
     if (!!sceneFilter.rating) {
       this.rating(sceneFilter.rating);
     }
+    if (!!sceneFilter.resolution) {
+      this.resolution(sceneFilter.resolution);
+    }
 
     return this;
   }
 
   private rating(rating: number): SceneQueryBuilder {
     this.opts.where = { ...this.opts.where, ...{ rating } };
+    return this;
+  }
+
+  private resolution(resolution: ResolutionEnum): SceneQueryBuilder {
+    this.scopeOpts.push({ method: ["resolution", resolution] });
     return this;
   }
 }

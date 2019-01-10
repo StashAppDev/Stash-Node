@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-09T16:32:54-08:00
+// Generated in 2019-01-09T18:44:13-08:00
 export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
@@ -203,18 +203,14 @@ export interface PerformerFilterType {
   filter_favorites?: Maybe<boolean>;
 }
 
-export enum ResolutionEnum {
-  Low = "LOW",
-  Standard = "STANDARD",
-  StandardHd = "STANDARD_HD",
-  FullHd = "FULL_HD",
-  FourK = "FOUR_K"
-}
+export type ResolutionEnum =
+  | "LOW"
+  | "STANDARD"
+  | "STANDARD_HD"
+  | "FULL_HD"
+  | "FOUR_K";
 
-export enum SortDirectionEnum {
-  Asc = "ASC",
-  Desc = "DESC"
-}
+export type SortDirectionEnum = "ASC" | "DESC";
 export namespace GQL {
   // ====================================================
   // Types

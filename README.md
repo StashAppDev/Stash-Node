@@ -21,3 +21,4 @@ https://stackoverflow.com/a/42907043
 # TODO
 
 * Starting without a config file is broken again.
+* Remove GQL namespace and import * as GQL instead?

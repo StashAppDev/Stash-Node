@@ -107,7 +107,7 @@ export const resolvers: IResolvers = {
       // TODO: Remove this.  Apollo has a bug where "scene_marker_tags" query wont work when updating markers.
       // https://github.com/apollographql/apollo-client/issues/1821
       return await SceneMarkerController.sceneMarkerTags(scene, {scene_id: scene!.id!.toString(10)}, context, info);
-    }
+    },
   },
   Studio: {
     image_path() {

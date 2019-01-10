@@ -5,6 +5,7 @@ generates:
     config:
       schemaNamespace: "GQL"
       contextType: ../server#IGraphQLContext
+      enumsAsTypes: true
       defaultMapper: FIXME-NOT-MAPPED-ADD-TYPE-TO-CODEGEN-YML
       mappers:
         Gallery: ../db/models/gallery.model#IGalleryInstance
