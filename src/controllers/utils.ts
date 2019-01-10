@@ -14,7 +14,8 @@ export async function getEntity<TInstance, TAttributes>(
   let entity: TInstance | null = null;
   if (!!identifier.id) {
     entity = await model.findOne({ where: { id: identifier.id } } as any);
-  } else if (!!identifier.checksum) {
+  }
+  if (!entity && !!identifier.checksum) {
     entity = await model.findOne({ where: { checksum: identifier.checksum } } as any);
   }
 

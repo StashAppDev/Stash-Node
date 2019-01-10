@@ -1,6 +1,8 @@
 import express from "express";
 import { SceneController } from "../controllers/scene.controller";
 import { StashPaths } from "../stash/paths.stash";
+import { Database } from "../db/database";
+import { getEntity } from "../controllers/utils";
 
 const router = express.Router();
 
@@ -29,21 +31,23 @@ router.get("/:id/vtt/chapter", (req, res, next) => {
   SceneController.chapterVtt(req, res, next);
 });
 
-router.get("/:id_thumbs.vtt", (req, res, next) => {
-  res.type("text/vtt");
-  const id = req.params.id_thumbs.replace("_thumbs", "");
+router.get("/:id_thumbs.vtt", async (req, res, next) => {
   try {
-    res.sendFile(StashPaths.sceneVttThumbsFilePath(id));
+    res.type("text/vtt");
+    const id = req.params.id_thumbs.replace("_thumbs", "");
+    const scene = await getEntity(Database.Scene, { id, checksum: id });
+    res.sendFile(StashPaths.sceneVttThumbsFilePath(scene!.checksum));
   } catch (e) {
     next(e);
   }
 });
 
-router.get("/:id_sprite.jpg", (req, res, next) => {
-  res.type("image/jpeg");
-  const id = req.params.id_thumbs.replace("_sprite", "");
+router.get("/:id_sprite.jpg", async (req, res, next) => {
   try {
-    res.sendFile(StashPaths.sceneVttSpriteFilePath(id));
+    res.type("image/jpeg");
+    const id = req.params.id_sprite.replace("_sprite", "");
+    const scene = await getEntity(Database.Scene, { id, checksum: id });
+    res.sendFile(StashPaths.sceneVttSpriteFilePath(scene!.checksum));
   } catch (e) {
     next(e);
   }
