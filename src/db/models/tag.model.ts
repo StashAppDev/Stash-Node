@@ -1,6 +1,6 @@
 import * as Sequelize from "sequelize";
 import { Database } from "../database";
-import { ISceneMarkerAttributes, ISceneMarkerInstance } from "./scene-markers.model";
+import { ISceneMarkerAttributes, ISceneMarkerInstance } from "./scene-marker.model";
 import { ISceneAttributes, ISceneInstance } from "./scene.model";
 
 export interface ITagAttributes {

@@ -2,16 +2,14 @@
 # Gallery
 #######################################
 
-"""
-Gallery type
-"""
+"""Gallery type"""
 type Gallery {
   id: ID!
   checksum: String!
   path: String!
   title: String
 
-  # The files in the gallery
+  """The files in the gallery"""
   files: [GalleryFilesType]! # Resolver
 }
 
@@ -19,6 +17,11 @@ type GalleryFilesType {
   index: Int!
   name: String
   path: String
+}
+
+type FindGalleriesResultType {
+  count: Int!
+  galleries: [Gallery]!
 }
 
 #######################################
@@ -50,6 +53,54 @@ type Performer {
   scenes: [Scene]!
 }
 
+input PerformerCreateInput {
+  name: String
+  url: String
+  birthdate: String
+  ethnicity: String
+  country: String
+  eye_color: String
+  height: String
+  measurements: String
+  fake_tits: String
+  career_length: String
+  tattoos: String
+  piercings: String
+  aliases: String
+  twitter: String
+  instagram: String
+  favorite: Boolean
+  """This should be base64 encoded"""
+  image: String!
+}
+
+input PerformerUpdateInput {
+  id: ID!
+  name: String
+  url: String
+  birthdate: String
+  ethnicity: String
+  country: String
+  eye_color: String
+  height: String
+  measurements: String
+  fake_tits: String
+  career_length: String
+  tattoos: String
+  piercings: String
+  aliases: String
+  twitter: String
+  instagram: String
+  favorite: Boolean
+  """This should be base64 encoded"""
+  image: String
+}
+
+type FindPerformersResultType {
+  count: Int!
+  performers: [Performer]!
+}
+
 #######################################
 # Scene Marker Tag
 #######################################
@@ -71,8 +122,38 @@ type SceneMarker {
   primary_tag: Tag!
   tags: [Tag]!
 
+  """The path to stream this marker"""
   stream: String! # Resolver
+  """The path to the preview image for this marker"""
   preview: String! # Resolver
+}
+
+input SceneMarkerCreateInput {
+  title: String!
+  seconds: Float!
+  scene_id: ID!
+  primary_tag_id: ID!
+  tag_ids: [ID]
+}
+
+input SceneMarkerUpdateInput {
+  id: ID!
+  title: String!
+  seconds: Float!
+  scene_id: ID!
+  primary_tag_id: ID!
+  tag_ids: [ID]
+}
+
+type FindSceneMarkersResultType {
+  count: Int!
+  scene_markers: [SceneMarker]!
+}
+
+type MarkerStringsResultType {
+  count: Int!
+  id: ID!
+  title: String!
 }
 
 #######################################
@@ -122,6 +203,20 @@ type Scene {
   scene_marker_tags: [SceneMarkerTag]! # TODO remove?
 }
 
+input SceneUpdateInput {
+  clientMutationId: String
+  id: ID!
+  title: String
+  details: String
+  url: String
+  date: String
+  rating: Int
+  studio_id: ID
+  gallery_id: ID
+  performer_ids: [ID]
+  tag_ids: [ID]
+}
+
 type FindScenesResultType {
   count: Int!
   scenes: [Scene]!
@@ -131,9 +226,7 @@ type FindScenesResultType {
 # Scraped Performer
 #######################################
 
-"""
-A performer from a scraping operation...
-"""
+"""A performer from a scraping operation..."""
 type ScrapedPerformer {
   name: String
   url: String
@@ -181,6 +274,7 @@ type Studio {
 input StudioCreateInput {
   name: String!
   url: String
+  """This should be base64 encoded"""
   image: String!
 }
 
@@ -188,6 +282,7 @@ input StudioUpdateInput {
   id: ID!
   name: String
   url: String
+  """This should be base64 encoded"""
   image: String
 }
 
@@ -217,6 +312,10 @@ input TagUpdateInput {
   name: String!
 }
 
+input TagDestroyInput {
+  id: ID!
+}
+
 #######################################
 # Filters
 #######################################
@@ -242,43 +341,130 @@ enum ResolutionEnum {
   "4k", FOUR_K
 }
 
+input PerformerFilterType {
+  """Filter by favorite"""
+  filter_favorites: Boolean
+}
+
+input SceneMarkerFilterType {
+  """Filter to only include scene markers with this tag"""
+  tag_id: ID
+  """Filter to only include scene markers with these tags"""
+  tags: [ID]
+  """Filter to only include scene markers attached to a scene with these tags"""
+  scene_tags: [ID]
+  """Filter to only include scene markers with these performers"""
+  performers: [ID]
+}
+
 input SceneFilterType {
+  """Filter by rating"""
   rating: Int
+  """Filter by resolution"""
   resolution: ResolutionEnum
-  # TODO
+  """Filter to only include scenes which have markers. `true` or `false`"""
+  has_markers: String
+  """Filter to only include scenes missing this property"""
+  is_missing: String
+  """Filter to only include scenes with this studio"""
+  studio_id: ID
+  """Filter to only include scenes with these tags"""
+  tags: [ID]
+  """Filter to only include scenes with this performer"""
+  performer_id: ID
 }
 
 #############
 # Root Schema
 #############
 
+"""The query root for this schema"""
 type Query {
+  """Find a scene by ID or Checksum"""
   findScene(id: ID, checksum: String): Scene
+  """A function which queries Scene objects"""
   findScenes(scene_filter: SceneFilterType, scene_ids: [Int], filter: FindFilterType): FindScenesResultType!
 
+  """A function which queries SceneMarker objects"""
+  findSceneMarkers(scene_marker_filter: SceneMarkerFilterType filter: FindFilterType): FindSceneMarkersResultType!
+
+  """Find a studio by ID"""
   findStudio(id: ID!): Studio
+  """A function which queries Studio objects"""
   findStudios(filter: FindFilterType): FindStudiosResultType!
 
   findGallery(id: ID!): Gallery
+  findGalleries(filter: FindFilterType): FindGalleriesResultType!
 
   findTag(id: ID!): Tag
 
-  stats: StatsResultType!
+  """Retrieve random scene markers for the wall"""
+  markerWall(q: String): [SceneMarker]!
+  """Retrieve random scenes for the wall"""
+  sceneWall(q: String): [Scene]!
 
-  """
-  Organize scene markers by tag for a given scene ID
-  """
+  """Get marker strings"""
+  markerStrings(q: String, sort: String): [MarkerStringsResultType]!
+  """Get the list of valid galleries for a given scene ID"""
+  validGalleriesForScene(scene_id: ID): [Gallery]!
+  """Get stats"""
+  stats: StatsResultType!
+  """Organize scene markers by tag for a given scene ID"""
   sceneMarkerTags(scene_id: ID): [SceneMarkerTag]! # TODO ID! scene_id
+
+  # Scrapers
+
+  """Scrape a performer using Freeones"""
+  scrapeFreeones(performer_name: String!): ScrapedPerformer
+  """Scrape a list of performers from a query"""
+  scrapeFreeonesPerformerList(query: String!): [String]!
+
+  # Metadata
+
+  """Start an import. Returns the job ID"""
+  metadataImport: String!
+  """Start an export. Returns the job ID"""
+  metadataExport: String!
+  """Start a scan. Returns the job ID"""
+  metadataScan: String!
+  """Start generating content. Returns the job ID"""
+  metadataGenerate: String!
+  """Clean metadata. Returns the job ID"""
+  metadataClean: String!
+
+  # Get everything
+
+  allPerformers: [Performer]!
+  allStudios: [Studio]!
+  allTags: [Tag]!
+  allSceneMarkers: [SceneMarker]!
 }
 
 type Mutation {
+  sceneUpdate(input: SceneUpdateInput!): Scene
+
+  sceneMarkerCreate(input: SceneMarkerCreateInput!): SceneMarker
+  sceneMarkerUpdate(input: SceneMarkerUpdateInput!): SceneMarker
+  sceneMarkerDestroy(id: ID!): Boolean!
+
+  performerCreate(input: PerformerCreateInput!): Performer
+  performerUpdate(input: PerformerUpdateInput!): Performer
+
   studioCreate(input: StudioCreateInput!): Studio
   studioUpdate(input: StudioUpdateInput!): Studio
+
   tagCreate(input: TagCreateInput!): Tag
   tagUpdate(input: TagUpdateInput!): Tag
+  tagDestroy(input: TagDestroyInput!): Boolean!
+}
+
+type Subscription {
+  """Update from the meatadata manager"""
+  metadataUpdate: String!
 }
 
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }

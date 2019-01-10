@@ -8,18 +8,17 @@ export class SceneMarkerController {
   // #region GraphQL Resolvers
 
   // TODO: test
-  public static sceneMarkerTags:
-    QueryResolvers.SceneMarkerTagsResolver<GQL.SceneMarkerTag[]> = async (root, args, context, info) => {
+  public static sceneMarkerTags: QueryResolvers.SceneMarkerTagsResolver = async (root, args, context, info) => {
     const tags: { [s: number]: GQL.SceneMarkerTag } = {};
-    const scene = await getEntity(Database.Scene, args.scene_id);
+    const scene = await getEntity(Database.Scene, { id: args.scene_id! });
     const markers = await scene.getScene_markers();
     for (const marker of markers) {
-      const primaryTag = (marker.primaryTag as ITagAttributes);
-      if (!primaryTag.id) { throw Error("What?"); }
-      if (!tags.hasOwnProperty(primaryTag.id)) {
-        tags[primaryTag.id] = { tag: SceneMarkerController.tagModelToGraphQL(primaryTag), scene_markers: [] };
+      const primaryTag = await marker.getPrimary_tag();
+      if (!primaryTag!.id) { throw Error("What?"); }
+      if (!tags.hasOwnProperty(primaryTag!.id!)) {
+        tags[primaryTag!.id!] = { tag: SceneMarkerController.tagModelToGraphQL(primaryTag!), scene_markers: [] };
       }
-      tags[primaryTag.id].scene_markers.push(marker as any); // TODO
+      tags[primaryTag!.id!].scene_markers.push(marker.toJSON() as any); // TODO
     }
 
     return Object.values(tags);

@@ -6,7 +6,7 @@ export class TagController {
   // #region GraphQL Resolvers
 
   public static findTag: QueryResolvers.FindTagResolver = async (root, args, context, info) => {
-    return getEntity(Database.Tag, args.id);
+    return getEntity(Database.Tag, { id: args.id });
   }
 
   public static tagCreate: MutationResolvers.TagCreateResolver = async (root, args, context, info) => {
@@ -14,7 +14,7 @@ export class TagController {
   }
 
   public static tagUpdate: MutationResolvers.TagUpdateResolver = async (root, args, context, info) => {
-    const tag = await getEntity(Database.Tag, args.input.id);
+    const tag = await getEntity(Database.Tag, { id: args.input.id });
     tag.name = args.input.name;
     return tag.save();
   }

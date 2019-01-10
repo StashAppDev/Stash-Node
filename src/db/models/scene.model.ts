@@ -2,7 +2,7 @@ import * as Sequelize from "sequelize";
 import { Database } from "../database";
 import { IGalleryAttributes, IGalleryInstance } from "./gallery.model";
 import { IPerformerAttributes, IPerformerInstance } from "./performer.model";
-import { ISceneMarkerAttributes, ISceneMarkerInstance } from "./scene-markers.model";
+import { ISceneMarkerAttributes, ISceneMarkerInstance } from "./scene-marker.model";
 import { IStudioAttributes, IStudioInstance } from "./studio.model";
 import { ITagAttributes, ITagInstance } from "./tag.model";
 

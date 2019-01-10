@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts" : {
     "start": "nodemon",
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "package": "yarn build && pkg package.json --out-path builds --options max_old_space_size=4096 && sh copy_native_modules.sh && yarn package:ffmpeg",
     "package:ffmpeg": "sh download_ffmpeg.sh",
     "schema": "gql-gen",
@@ -63,6 +63,7 @@
     "graphql-codegen-typescript-common": "0.15.2",
     "nodemon": "1.18.9",
     "pkg": "4.3.5",
+    "rimraf": "2.6.3",
     "ts-node": "7.0.1",
     "tsconfig-paths": "3.7.0",
     "tslint": "5.12.0",

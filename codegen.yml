@@ -5,8 +5,28 @@ generates:
     config:
       schemaNamespace: "GQL"
       contextType: ../server#IGraphQLContext
+      defaultMapper: FIXME-NOT-MAPPED-ADD-TYPE-TO-CODEGEN-YML
       mappers:
-        Scene: ../entities/scene.entity#SceneEntity
+        Gallery: ../db/models/gallery.model#IGalleryInstance
+        Performer: ../db/models/performer.model#IPerformerInstance
+        SceneMarker: ../db/models/scene-marker.model#ISceneMarkerInstance
+        Scene: ../db/models/scene.model#ISceneInstance
+        ScrapedItem: ../db/models/scraped-item.model#IScrapedItemInstance
+        Studio: ../db/models/studio.model#IStudioInstance
+        Tag: ../db/models/tag.model#ITagInstance
+
+        FindGalleriesResultType: GQL.FindGalleriesResultType
+        FindPerformersResultType: GQL.FindPerformersResultType
+        FindScenesResultType: GQL.FindScenesResultType
+        FindSceneMarkersResultType: GQL.FindSceneMarkersResultType
+        FindStudiosResultType: GQL.FindStudiosResultType
+        GalleryFilesType: GQL.GalleryFilesType
+        MarkerStringsResultType: GQL.MarkerStringsResultType
+        SceneFileType: GQL.SceneFileType
+        SceneMarkerTag: GQL.SceneMarkerTag
+        ScenePathsType: GQL.ScenePathsType
+        ScrapedPerformer: GQL.ScrapedPerformer
+        StatsResultType: GQL.StatsResultType
       optionalType: "undefined"
     plugins:
       - add: "/* tslint:disable */"

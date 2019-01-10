@@ -3,9 +3,9 @@ import { log } from "../logger";
 import { StashPaths } from "../stash/paths.stash";
 import { GalleryFactory, IGalleryAttributes, IGalleryInstance } from "./models/gallery.model";
 import { IPerformerAttributes, IPerformerInstance, PerformerFactory } from "./models/performer.model";
-import { ISceneMarkerAttributes, ISceneMarkerInstance, SceneMarkerFactory } from "./models/scene-markers.model";
+import { ISceneMarkerAttributes, ISceneMarkerInstance, SceneMarkerFactory } from "./models/scene-marker.model";
 import { AddSceneScopes, ISceneAttributes, ISceneInstance, SceneFactory } from "./models/scene.model";
-import { IScrapedItemAttributes, IScrapedItemInstance, ScrapedItemFactory } from "./models/scraped-item";
+import { IScrapedItemAttributes, IScrapedItemInstance, ScrapedItemFactory } from "./models/scraped-item.model";
 import { IStudioAttributes, IStudioInstance, StudioFactory } from "./models/studio.model";
 import { ITagAttributes, ITagInstance, TagFactory } from "./models/tag.model";
 

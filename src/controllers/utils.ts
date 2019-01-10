@@ -9,29 +9,17 @@ import { log } from "../logger";
  */
 export async function getEntity<TInstance, TAttributes>(
   model: Sequelize.Model<TInstance, TAttributes>,
-  id: string,
+  identifier: { id?: string, checksum?: string },
 ): Promise<TInstance> {
-  const entity = await model.findOne({ where: { id } } as any);
-  if (!entity) {
-    const message = `Unable to find entity with id ${id}`;
-    log.warn(message);
-    throw new HttpError(404, message);
+  let entity: TInstance | null = null;
+  if (!!identifier.id) {
+    entity = await model.findOne({ where: { id: identifier.id } } as any);
+  } else if (!!identifier.checksum) {
+    entity = await model.findOne({ where: { checksum: identifier.checksum } } as any);
   }
-  return entity;
-}
 
-/**
- * Fetch an entity of the given type.
- *
- * @param checksum The checksum of the entity
- */
-export async function getEntityByChecksum<TInstance, TAttributes>(
-  model: Sequelize.Model<TInstance, TAttributes>,
-  checksum: string,
-): Promise<TInstance> {
-  const entity = await model.findOne({ where: { checksum } } as any);
   if (!entity) {
-    const message = `Unable to find entity with checksum ${checksum}`;
+    const message = `Unable to find ${model.name} with identifer ${identifier}`;
     log.warn(message);
     throw new HttpError(404, message);
   }

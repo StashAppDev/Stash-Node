@@ -1,11 +1,22 @@
 /* tslint:disable */
-// Generated in 2019-01-08T18:32:42-08:00
+// Generated in 2019-01-09T16:32:54-08:00
 export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
+  /** Filter by rating */
   rating?: Maybe<number>;
-
+  /** Filter by resolution */
   resolution?: Maybe<ResolutionEnum>;
+  /** Filter to only include scenes which have markers. `true` or `false` */
+  has_markers?: Maybe<string>;
+  /** Filter to only include scenes missing this property */
+  is_missing?: Maybe<string>;
+  /** Filter to only include scenes with this studio */
+  studio_id?: Maybe<string>;
+  /** Filter to only include scenes with these tags */
+  tags?: Maybe<(Maybe<string>)[]>;
+  /** Filter to only include scenes with this performer */
+  performer_id?: Maybe<string>;
 }
 
 export interface FindFilterType {
@@ -20,11 +31,146 @@ export interface FindFilterType {
   direction?: Maybe<SortDirectionEnum>;
 }
 
+export interface SceneMarkerFilterType {
+  /** Filter to only include scene markers with this tag */
+  tag_id?: Maybe<string>;
+  /** Filter to only include scene markers with these tags */
+  tags?: Maybe<(Maybe<string>)[]>;
+  /** Filter to only include scene markers attached to a scene with these tags */
+  scene_tags?: Maybe<(Maybe<string>)[]>;
+  /** Filter to only include scene markers with these performers */
+  performers?: Maybe<(Maybe<string>)[]>;
+}
+
+export interface SceneUpdateInput {
+  clientMutationId?: Maybe<string>;
+
+  id: string;
+
+  title?: Maybe<string>;
+
+  details?: Maybe<string>;
+
+  url?: Maybe<string>;
+
+  date?: Maybe<string>;
+
+  rating?: Maybe<number>;
+
+  studio_id?: Maybe<string>;
+
+  gallery_id?: Maybe<string>;
+
+  performer_ids?: Maybe<(Maybe<string>)[]>;
+
+  tag_ids?: Maybe<(Maybe<string>)[]>;
+}
+
+export interface SceneMarkerCreateInput {
+  title: string;
+
+  seconds: number;
+
+  scene_id: string;
+
+  primary_tag_id: string;
+
+  tag_ids?: Maybe<(Maybe<string>)[]>;
+}
+
+export interface SceneMarkerUpdateInput {
+  id: string;
+
+  title: string;
+
+  seconds: number;
+
+  scene_id: string;
+
+  primary_tag_id: string;
+
+  tag_ids?: Maybe<(Maybe<string>)[]>;
+}
+
+export interface PerformerCreateInput {
+  name?: Maybe<string>;
+
+  url?: Maybe<string>;
+
+  birthdate?: Maybe<string>;
+
+  ethnicity?: Maybe<string>;
+
+  country?: Maybe<string>;
+
+  eye_color?: Maybe<string>;
+
+  height?: Maybe<string>;
+
+  measurements?: Maybe<string>;
+
+  fake_tits?: Maybe<string>;
+
+  career_length?: Maybe<string>;
+
+  tattoos?: Maybe<string>;
+
+  piercings?: Maybe<string>;
+
+  aliases?: Maybe<string>;
+
+  twitter?: Maybe<string>;
+
+  instagram?: Maybe<string>;
+
+  favorite?: Maybe<boolean>;
+  /** This should be base64 encoded */
+  image: string;
+}
+
+export interface PerformerUpdateInput {
+  id: string;
+
+  name?: Maybe<string>;
+
+  url?: Maybe<string>;
+
+  birthdate?: Maybe<string>;
+
+  ethnicity?: Maybe<string>;
+
+  country?: Maybe<string>;
+
+  eye_color?: Maybe<string>;
+
+  height?: Maybe<string>;
+
+  measurements?: Maybe<string>;
+
+  fake_tits?: Maybe<string>;
+
+  career_length?: Maybe<string>;
+
+  tattoos?: Maybe<string>;
+
+  piercings?: Maybe<string>;
+
+  aliases?: Maybe<string>;
+
+  twitter?: Maybe<string>;
+
+  instagram?: Maybe<string>;
+
+  favorite?: Maybe<boolean>;
+  /** This should be base64 encoded */
+  image?: Maybe<string>;
+}
+
 export interface StudioCreateInput {
   name: string;
 
   url?: Maybe<string>;
-
+  /** This should be base64 encoded */
   image: string;
 }
 
@@ -34,7 +180,7 @@ export interface StudioUpdateInput {
   name?: Maybe<string>;
 
   url?: Maybe<string>;
-
+  /** This should be base64 encoded */
   image?: Maybe<string>;
 }
 
@@ -46,6 +192,15 @@ export interface TagUpdateInput {
   id: string;
 
   name: string;
+}
+
+export interface TagDestroyInput {
+  id: string;
+}
+
+export interface PerformerFilterType {
+  /** Filter by favorite */
+  filter_favorites?: Maybe<boolean>;
 }
 
 export enum ResolutionEnum {
@@ -65,22 +220,58 @@ export namespace GQL {
   // Types
   // ====================================================
 
+  /** The query root for this schema */
   export interface Query {
+    /** Find a scene by ID or Checksum */
     findScene?: Maybe<Scene>;
-
+    /** A function which queries Scene objects */
     findScenes: FindScenesResultType;
-
+    /** A function which queries SceneMarker objects */
+    findSceneMarkers: FindSceneMarkersResultType;
+    /** Find a studio by ID */
     findStudio?: Maybe<Studio>;
-
+    /** A function which queries Studio objects */
     findStudios: FindStudiosResultType;
 
     findGallery?: Maybe<Gallery>;
 
-    findTag?: Maybe<Tag>;
+    findGalleries: FindGalleriesResultType;
 
+    findTag?: Maybe<Tag>;
+    /** Retrieve random scene markers for the wall */
+    markerWall: (Maybe<SceneMarker>)[];
+    /** Retrieve random scenes for the wall */
+    sceneWall: (Maybe<Scene>)[];
+    /** Get marker strings */
+    markerStrings: (Maybe<MarkerStringsResultType>)[];
+    /** Get the list of valid galleries for a given scene ID */
+    validGalleriesForScene: (Maybe<Gallery>)[];
+    /** Get stats */
     stats: StatsResultType;
     /** Organize scene markers by tag for a given scene ID */
     sceneMarkerTags: (Maybe<SceneMarkerTag>)[];
+    /** Scrape a performer using Freeones */
+    scrapeFreeones?: Maybe<ScrapedPerformer>;
+    /** Scrape a list of performers from a query */
+    scrapeFreeonesPerformerList: (Maybe<string>)[];
+    /** Start an import. Returns the job ID */
+    metadataImport: string;
+    /** Start an export. Returns the job ID */
+    metadataExport: string;
+    /** Start a scan. Returns the job ID */
+    metadataScan: string;
+    /** Start generating content. Returns the job ID */
+    metadataGenerate: string;
+    /** Clean metadata. Returns the job ID */
+    metadataClean: string;
+
+    allPerformers: (Maybe<Performer>)[];
+
+    allStudios: (Maybe<Studio>)[];
+
+    allTags: (Maybe<Tag>)[];
+
+    allSceneMarkers: (Maybe<SceneMarker>)[];
   }
 
   export interface Scene {
@@ -163,9 +354,9 @@ export namespace GQL {
     primary_tag: Tag;
 
     tags: (Maybe<Tag>)[];
-
+    /** The path to stream this marker */
     stream: string;
-
+    /** The path to the preview image for this marker */
     preview: string;
   }
 
@@ -270,10 +461,30 @@ export namespace GQL {
     scenes: (Maybe<Scene>)[];
   }
 
+  export interface FindSceneMarkersResultType {
+    count: number;
+
+    scene_markers: (Maybe<SceneMarker>)[];
+  }
+
   export interface FindStudiosResultType {
     count: number;
 
     studios: (Maybe<Studio>)[];
+  }
+
+  export interface FindGalleriesResultType {
+    count: number;
+
+    galleries: (Maybe<Gallery>)[];
+  }
+
+  export interface MarkerStringsResultType {
+    count: number;
+
+    id: string;
+
+    title: string;
   }
 
   export interface StatsResultType {
@@ -286,16 +497,6 @@ export namespace GQL {
     studio_count: number;
 
     tag_count: number;
-  }
-
-  export interface Mutation {
-    studioCreate?: Maybe<Studio>;
-
-    studioUpdate?: Maybe<Studio>;
-
-    tagCreate?: Maybe<Tag>;
-
-    tagUpdate?: Maybe<Tag>;
   }
 
   /** A performer from a scraping operation... */
@@ -331,6 +532,41 @@ export namespace GQL {
     aliases?: Maybe<string>;
   }
 
+  export interface Mutation {
+    sceneUpdate?: Maybe<Scene>;
+
+    sceneMarkerCreate?: Maybe<SceneMarker>;
+
+    sceneMarkerUpdate?: Maybe<SceneMarker>;
+
+    sceneMarkerDestroy: boolean;
+
+    performerCreate?: Maybe<Performer>;
+
+    performerUpdate?: Maybe<Performer>;
+
+    studioCreate?: Maybe<Studio>;
+
+    studioUpdate?: Maybe<Studio>;
+
+    tagCreate?: Maybe<Tag>;
+
+    tagUpdate?: Maybe<Tag>;
+
+    tagDestroy: boolean;
+  }
+
+  export interface Subscription {
+    /** Update from the meatadata manager */
+    metadataUpdate: string;
+  }
+
+  export interface FindPerformersResultType {
+    count: number;
+
+    performers: (Maybe<Performer>)[];
+  }
+
   // ====================================================
   // Arguments
   // ====================================================
@@ -347,6 +583,11 @@ export namespace GQL {
 
     filter?: Maybe<FindFilterType>;
   }
+  export interface FindSceneMarkersQueryArgs {
+    scene_marker_filter?: Maybe<SceneMarkerFilterType>;
+
+    filter?: Maybe<FindFilterType>;
+  }
   export interface FindStudioQueryArgs {
     id: string;
   }
@@ -356,11 +597,52 @@ export namespace GQL {
   export interface FindGalleryQueryArgs {
     id: string;
   }
+  export interface FindGalleriesQueryArgs {
+    filter?: Maybe<FindFilterType>;
+  }
   export interface FindTagQueryArgs {
     id: string;
   }
+  export interface MarkerWallQueryArgs {
+    q?: Maybe<string>;
+  }
+  export interface SceneWallQueryArgs {
+    q?: Maybe<string>;
+  }
+  export interface MarkerStringsQueryArgs {
+    q?: Maybe<string>;
+
+    sort?: Maybe<string>;
+  }
+  export interface ValidGalleriesForSceneQueryArgs {
+    scene_id?: Maybe<string>;
+  }
   export interface SceneMarkerTagsQueryArgs {
     scene_id?: Maybe<string>;
+  }
+  export interface ScrapeFreeonesQueryArgs {
+    performer_name: string;
+  }
+  export interface ScrapeFreeonesPerformerListQueryArgs {
+    query: string;
+  }
+  export interface SceneUpdateMutationArgs {
+    input: SceneUpdateInput;
+  }
+  export interface SceneMarkerCreateMutationArgs {
+    input: SceneMarkerCreateInput;
+  }
+  export interface SceneMarkerUpdateMutationArgs {
+    input: SceneMarkerUpdateInput;
+  }
+  export interface SceneMarkerDestroyMutationArgs {
+    id: string;
+  }
+  export interface PerformerCreateMutationArgs {
+    input: PerformerCreateInput;
+  }
+  export interface PerformerUpdateMutationArgs {
+    input: PerformerUpdateInput;
   }
   export interface StudioCreateMutationArgs {
     input: StudioCreateInput;
@@ -374,10 +656,23 @@ export namespace GQL {
   export interface TagUpdateMutationArgs {
     input: TagUpdateInput;
   }
+  export interface TagDestroyMutationArgs {
+    input: TagDestroyInput;
+  }
 }
 import { GraphQLResolveInfo } from "graphql";
 
-import { SceneEntity } from "../entities/scene.entity";
+import { IGalleryInstance } from "../db/models/gallery.model";
+
+import { IPerformerInstance } from "../db/models/performer.model";
+
+import { ISceneMarkerInstance } from "../db/models/scene-marker.model";
+
+import { ISceneInstance } from "../db/models/scene.model";
+
+import { IStudioInstance } from "../db/models/studio.model";
+
+import { ITagInstance } from "../db/models/tag.model";
 
 import { IGraphQLContext } from "../server";
 
@@ -430,35 +725,127 @@ export type DirectiveResolverFn<TResult, TArgs = {}, TContext = {}> = (
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+/** The query root for this schema */
 export namespace QueryResolvers {
   export interface Resolvers<Context = IGraphQLContext, TypeParent = {}> {
-    findScene?: FindSceneResolver<Maybe<SceneEntity>, TypeParent, Context>;
-
-    findScenes?: FindScenesResolver<FindScenesResultType, TypeParent, Context>;
-
-    findStudio?: FindStudioResolver<Maybe<Studio>, TypeParent, Context>;
-
+    /** Find a scene by ID or Checksum */
+    findScene?: FindSceneResolver<Maybe<ISceneInstance>, TypeParent, Context>;
+    /** A function which queries Scene objects */
+    findScenes?: FindScenesResolver<
+      GQL.FindScenesResultType,
+      TypeParent,
+      Context
+    >;
+    /** A function which queries SceneMarker objects */
+    findSceneMarkers?: FindSceneMarkersResolver<
+      GQL.FindSceneMarkersResultType,
+      TypeParent,
+      Context
+    >;
+    /** Find a studio by ID */
+    findStudio?: FindStudioResolver<
+      Maybe<IStudioInstance>,
+      TypeParent,
+      Context
+    >;
+    /** A function which queries Studio objects */
     findStudios?: FindStudiosResolver<
-      FindStudiosResultType,
+      GQL.FindStudiosResultType,
       TypeParent,
       Context
     >;
 
-    findGallery?: FindGalleryResolver<Maybe<Gallery>, TypeParent, Context>;
+    findGallery?: FindGalleryResolver<
+      Maybe<IGalleryInstance>,
+      TypeParent,
+      Context
+    >;
 
-    findTag?: FindTagResolver<Maybe<Tag>, TypeParent, Context>;
+    findGalleries?: FindGalleriesResolver<
+      GQL.FindGalleriesResultType,
+      TypeParent,
+      Context
+    >;
 
-    stats?: StatsResolver<StatsResultType, TypeParent, Context>;
+    findTag?: FindTagResolver<Maybe<ITagInstance>, TypeParent, Context>;
+    /** Retrieve random scene markers for the wall */
+    markerWall?: MarkerWallResolver<
+      (Maybe<ISceneMarkerInstance>)[],
+      TypeParent,
+      Context
+    >;
+    /** Retrieve random scenes for the wall */
+    sceneWall?: SceneWallResolver<
+      (Maybe<ISceneInstance>)[],
+      TypeParent,
+      Context
+    >;
+    /** Get marker strings */
+    markerStrings?: MarkerStringsResolver<
+      (Maybe<GQL.MarkerStringsResultType>)[],
+      TypeParent,
+      Context
+    >;
+    /** Get the list of valid galleries for a given scene ID */
+    validGalleriesForScene?: ValidGalleriesForSceneResolver<
+      (Maybe<IGalleryInstance>)[],
+      TypeParent,
+      Context
+    >;
+    /** Get stats */
+    stats?: StatsResolver<GQL.StatsResultType, TypeParent, Context>;
     /** Organize scene markers by tag for a given scene ID */
     sceneMarkerTags?: SceneMarkerTagsResolver<
-      (Maybe<SceneMarkerTag>)[],
+      (Maybe<GQL.SceneMarkerTag>)[],
+      TypeParent,
+      Context
+    >;
+    /** Scrape a performer using Freeones */
+    scrapeFreeones?: ScrapeFreeonesResolver<
+      Maybe<GQL.ScrapedPerformer>,
+      TypeParent,
+      Context
+    >;
+    /** Scrape a list of performers from a query */
+    scrapeFreeonesPerformerList?: ScrapeFreeonesPerformerListResolver<
+      (Maybe<string>)[],
+      TypeParent,
+      Context
+    >;
+    /** Start an import. Returns the job ID */
+    metadataImport?: MetadataImportResolver<string, TypeParent, Context>;
+    /** Start an export. Returns the job ID */
+    metadataExport?: MetadataExportResolver<string, TypeParent, Context>;
+    /** Start a scan. Returns the job ID */
+    metadataScan?: MetadataScanResolver<string, TypeParent, Context>;
+    /** Start generating content. Returns the job ID */
+    metadataGenerate?: MetadataGenerateResolver<string, TypeParent, Context>;
+    /** Clean metadata. Returns the job ID */
+    metadataClean?: MetadataCleanResolver<string, TypeParent, Context>;
+
+    allPerformers?: AllPerformersResolver<
+      (Maybe<IPerformerInstance>)[],
+      TypeParent,
+      Context
+    >;
+
+    allStudios?: AllStudiosResolver<
+      (Maybe<IStudioInstance>)[],
+      TypeParent,
+      Context
+    >;
+
+    allTags?: AllTagsResolver<(Maybe<ITagInstance>)[], TypeParent, Context>;
+
+    allSceneMarkers?: AllSceneMarkersResolver<
+      (Maybe<ISceneMarkerInstance>)[],
       TypeParent,
       Context
     >;
   }
 
   export type FindSceneResolver<
-    R = Maybe<SceneEntity>,
+    R = Maybe<ISceneInstance>,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, FindSceneArgs>;
@@ -469,7 +856,7 @@ export namespace QueryResolvers {
   }
 
   export type FindScenesResolver<
-    R = FindScenesResultType,
+    R = GQL.FindScenesResultType,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, FindScenesArgs>;
@@ -481,8 +868,19 @@ export namespace QueryResolvers {
     filter?: Maybe<FindFilterType>;
   }
 
+  export type FindSceneMarkersResolver<
+    R = GQL.FindSceneMarkersResultType,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, FindSceneMarkersArgs>;
+  export interface FindSceneMarkersArgs {
+    scene_marker_filter?: Maybe<SceneMarkerFilterType>;
+
+    filter?: Maybe<FindFilterType>;
+  }
+
   export type FindStudioResolver<
-    R = Maybe<Studio>,
+    R = Maybe<IStudioInstance>,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, FindStudioArgs>;
@@ -491,7 +889,7 @@ export namespace QueryResolvers {
   }
 
   export type FindStudiosResolver<
-    R = FindStudiosResultType,
+    R = GQL.FindStudiosResultType,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, FindStudiosArgs>;
@@ -500,7 +898,7 @@ export namespace QueryResolvers {
   }
 
   export type FindGalleryResolver<
-    R = Maybe<Gallery>,
+    R = Maybe<IGalleryInstance>,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, FindGalleryArgs>;
@@ -508,8 +906,17 @@ export namespace QueryResolvers {
     id: string;
   }
 
+  export type FindGalleriesResolver<
+    R = GQL.FindGalleriesResultType,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, FindGalleriesArgs>;
+  export interface FindGalleriesArgs {
+    filter?: Maybe<FindFilterType>;
+  }
+
   export type FindTagResolver<
-    R = Maybe<Tag>,
+    R = Maybe<ITagInstance>,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, FindTagArgs>;
@@ -517,25 +924,127 @@ export namespace QueryResolvers {
     id: string;
   }
 
+  export type MarkerWallResolver<
+    R = (Maybe<ISceneMarkerInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, MarkerWallArgs>;
+  export interface MarkerWallArgs {
+    q?: Maybe<string>;
+  }
+
+  export type SceneWallResolver<
+    R = (Maybe<ISceneInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, SceneWallArgs>;
+  export interface SceneWallArgs {
+    q?: Maybe<string>;
+  }
+
+  export type MarkerStringsResolver<
+    R = (Maybe<GQL.MarkerStringsResultType>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, MarkerStringsArgs>;
+  export interface MarkerStringsArgs {
+    q?: Maybe<string>;
+
+    sort?: Maybe<string>;
+  }
+
+  export type ValidGalleriesForSceneResolver<
+    R = (Maybe<IGalleryInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, ValidGalleriesForSceneArgs>;
+  export interface ValidGalleriesForSceneArgs {
+    scene_id?: Maybe<string>;
+  }
+
   export type StatsResolver<
-    R = StatsResultType,
+    R = GQL.StatsResultType,
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneMarkerTagsResolver<
-    R = (Maybe<SceneMarkerTag>)[],
+    R = (Maybe<GQL.SceneMarkerTag>)[],
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, SceneMarkerTagsArgs>;
   export interface SceneMarkerTagsArgs {
     scene_id?: Maybe<string>;
   }
+
+  export type ScrapeFreeonesResolver<
+    R = Maybe<GQL.ScrapedPerformer>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, ScrapeFreeonesArgs>;
+  export interface ScrapeFreeonesArgs {
+    performer_name: string;
+  }
+
+  export type ScrapeFreeonesPerformerListResolver<
+    R = (Maybe<string>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, ScrapeFreeonesPerformerListArgs>;
+  export interface ScrapeFreeonesPerformerListArgs {
+    query: string;
+  }
+
+  export type MetadataImportResolver<
+    R = string,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type MetadataExportResolver<
+    R = string,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type MetadataScanResolver<
+    R = string,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type MetadataGenerateResolver<
+    R = string,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type MetadataCleanResolver<
+    R = string,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type AllPerformersResolver<
+    R = (Maybe<IPerformerInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type AllStudiosResolver<
+    R = (Maybe<IStudioInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type AllTagsResolver<
+    R = (Maybe<ITagInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type AllSceneMarkersResolver<
+    R = (Maybe<ISceneMarkerInstance>)[],
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace SceneResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = SceneEntity
+    TypeParent = ISceneInstance
   > {
     id?: IdResolver<string, TypeParent, Context>;
 
@@ -553,28 +1062,32 @@ export namespace SceneResolvers {
 
     path?: PathResolver<string, TypeParent, Context>;
 
-    file?: FileResolver<SceneFileType, TypeParent, Context>;
+    file?: FileResolver<GQL.SceneFileType, TypeParent, Context>;
 
-    paths?: PathsResolver<ScenePathsType, TypeParent, Context>;
+    paths?: PathsResolver<GQL.ScenePathsType, TypeParent, Context>;
 
     is_streamable?: IsStreamableResolver<boolean, TypeParent, Context>;
 
     scene_markers?: SceneMarkersResolver<
-      (Maybe<SceneMarker>)[],
+      (Maybe<ISceneMarkerInstance>)[],
       TypeParent,
       Context
     >;
 
-    gallery?: GalleryResolver<Maybe<Gallery>, TypeParent, Context>;
+    gallery?: GalleryResolver<Maybe<IGalleryInstance>, TypeParent, Context>;
 
-    studio?: StudioResolver<Maybe<Studio>, TypeParent, Context>;
+    studio?: StudioResolver<Maybe<IStudioInstance>, TypeParent, Context>;
 
-    tags?: TagsResolver<(Maybe<Tag>)[], TypeParent, Context>;
+    tags?: TagsResolver<(Maybe<ITagInstance>)[], TypeParent, Context>;
 
-    performers?: PerformersResolver<(Maybe<Performer>)[], TypeParent, Context>;
+    performers?: PerformersResolver<
+      (Maybe<IPerformerInstance>)[],
+      TypeParent,
+      Context
+    >;
 
     scene_marker_tags?: SceneMarkerTagsResolver<
-      (Maybe<SceneMarkerTag>)[],
+      (Maybe<GQL.SceneMarkerTag>)[],
       TypeParent,
       Context
     >;
@@ -582,87 +1095,87 @@ export namespace SceneResolvers {
 
   export type IdResolver<
     R = string,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ChecksumResolver<
     R = string,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TitleResolver<
     R = Maybe<string>,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type DetailsResolver<
     R = Maybe<string>,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type UrlResolver<
     R = Maybe<string>,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type DateResolver<
     R = Maybe<string>,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type RatingResolver<
     R = Maybe<number>,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PathResolver<
     R = string,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type FileResolver<
-    R = SceneFileType,
-    Parent = SceneEntity,
+    R = GQL.SceneFileType,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PathsResolver<
-    R = ScenePathsType,
-    Parent = SceneEntity,
+    R = GQL.ScenePathsType,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type IsStreamableResolver<
     R = boolean,
-    Parent = SceneEntity,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneMarkersResolver<
-    R = (Maybe<SceneMarker>)[],
-    Parent = SceneEntity,
+    R = (Maybe<ISceneMarkerInstance>)[],
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type GalleryResolver<
-    R = Maybe<Gallery>,
-    Parent = SceneEntity,
+    R = Maybe<IGalleryInstance>,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type StudioResolver<
-    R = Maybe<Studio>,
-    Parent = SceneEntity,
+    R = Maybe<IStudioInstance>,
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TagsResolver<
-    R = (Maybe<Tag>)[],
-    Parent = SceneEntity,
+    R = (Maybe<ITagInstance>)[],
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PerformersResolver<
-    R = (Maybe<Performer>)[],
-    Parent = SceneEntity,
+    R = (Maybe<IPerformerInstance>)[],
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneMarkerTagsResolver<
-    R = (Maybe<SceneMarkerTag>)[],
-    Parent = SceneEntity,
+    R = (Maybe<GQL.SceneMarkerTag>)[],
+    Parent = ISceneInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -670,7 +1183,7 @@ export namespace SceneResolvers {
 export namespace SceneFileTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = SceneFileType
+    TypeParent = GQL.SceneFileType
   > {
     size?: SizeResolver<Maybe<string>, TypeParent, Context>;
 
@@ -691,42 +1204,42 @@ export namespace SceneFileTypeResolvers {
 
   export type SizeResolver<
     R = Maybe<string>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type DurationResolver<
     R = Maybe<number>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type VideoCodecResolver<
     R = Maybe<string>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type AudioCodecResolver<
     R = Maybe<string>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type WidthResolver<
     R = Maybe<number>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type HeightResolver<
     R = Maybe<number>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type FramerateResolver<
     R = Maybe<number>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type BitrateResolver<
     R = Maybe<number>,
-    Parent = SceneFileType,
+    Parent = GQL.SceneFileType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -734,7 +1247,7 @@ export namespace SceneFileTypeResolvers {
 export namespace ScenePathsTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = ScenePathsType
+    TypeParent = GQL.ScenePathsType
   > {
     screenshot?: ScreenshotResolver<Maybe<string>, TypeParent, Context>;
 
@@ -751,32 +1264,32 @@ export namespace ScenePathsTypeResolvers {
 
   export type ScreenshotResolver<
     R = Maybe<string>,
-    Parent = ScenePathsType,
+    Parent = GQL.ScenePathsType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PreviewResolver<
     R = Maybe<string>,
-    Parent = ScenePathsType,
+    Parent = GQL.ScenePathsType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type StreamResolver<
     R = Maybe<string>,
-    Parent = ScenePathsType,
+    Parent = GQL.ScenePathsType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type WebpResolver<
     R = Maybe<string>,
-    Parent = ScenePathsType,
+    Parent = GQL.ScenePathsType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type VttResolver<
     R = Maybe<string>,
-    Parent = ScenePathsType,
+    Parent = GQL.ScenePathsType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ChaptersVttResolver<
     R = Maybe<string>,
-    Parent = ScenePathsType,
+    Parent = GQL.ScenePathsType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -784,69 +1297,72 @@ export namespace ScenePathsTypeResolvers {
 export namespace SceneMarkerResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = SceneMarker
+    TypeParent = ISceneMarkerInstance
   > {
     id?: IdResolver<string, TypeParent, Context>;
 
-    scene?: SceneResolver<SceneEntity, TypeParent, Context>;
+    scene?: SceneResolver<ISceneInstance, TypeParent, Context>;
 
     title?: TitleResolver<string, TypeParent, Context>;
 
     seconds?: SecondsResolver<number, TypeParent, Context>;
 
-    primary_tag?: PrimaryTagResolver<Tag, TypeParent, Context>;
+    primary_tag?: PrimaryTagResolver<ITagInstance, TypeParent, Context>;
 
-    tags?: TagsResolver<(Maybe<Tag>)[], TypeParent, Context>;
-
+    tags?: TagsResolver<(Maybe<ITagInstance>)[], TypeParent, Context>;
+    /** The path to stream this marker */
     stream?: StreamResolver<string, TypeParent, Context>;
-
+    /** The path to the preview image for this marker */
     preview?: PreviewResolver<string, TypeParent, Context>;
   }
 
   export type IdResolver<
     R = string,
-    Parent = SceneMarker,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneResolver<
-    R = SceneEntity,
-    Parent = SceneMarker,
+    R = ISceneInstance,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TitleResolver<
     R = string,
-    Parent = SceneMarker,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SecondsResolver<
     R = number,
-    Parent = SceneMarker,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PrimaryTagResolver<
-    R = Tag,
-    Parent = SceneMarker,
+    R = ITagInstance,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TagsResolver<
-    R = (Maybe<Tag>)[],
-    Parent = SceneMarker,
+    R = (Maybe<ITagInstance>)[],
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type StreamResolver<
     R = string,
-    Parent = SceneMarker,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PreviewResolver<
     R = string,
-    Parent = SceneMarker,
+    Parent = ISceneMarkerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace TagResolvers {
-  export interface Resolvers<Context = IGraphQLContext, TypeParent = Tag> {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = ITagInstance
+  > {
     id?: IdResolver<string, TypeParent, Context>;
 
     name?: NameResolver<string, TypeParent, Context>;
@@ -862,28 +1378,31 @@ export namespace TagResolvers {
 
   export type IdResolver<
     R = string,
-    Parent = Tag,
+    Parent = ITagInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type NameResolver<
     R = string,
-    Parent = Tag,
+    Parent = ITagInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneCountResolver<
     R = Maybe<number>,
-    Parent = Tag,
+    Parent = ITagInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneMarkerCountResolver<
     R = Maybe<number>,
-    Parent = Tag,
+    Parent = ITagInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
 /** Gallery type */
 export namespace GalleryResolvers {
-  export interface Resolvers<Context = IGraphQLContext, TypeParent = Gallery> {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = IGalleryInstance
+  > {
     id?: IdResolver<string, TypeParent, Context>;
 
     checksum?: ChecksumResolver<string, TypeParent, Context>;
@@ -892,32 +1411,32 @@ export namespace GalleryResolvers {
 
     title?: TitleResolver<Maybe<string>, TypeParent, Context>;
     /** The files in the gallery */
-    files?: FilesResolver<(Maybe<GalleryFilesType>)[], TypeParent, Context>;
+    files?: FilesResolver<(Maybe<GQL.GalleryFilesType>)[], TypeParent, Context>;
   }
 
   export type IdResolver<
     R = string,
-    Parent = Gallery,
+    Parent = IGalleryInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ChecksumResolver<
     R = string,
-    Parent = Gallery,
+    Parent = IGalleryInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PathResolver<
     R = string,
-    Parent = Gallery,
+    Parent = IGalleryInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TitleResolver<
     R = Maybe<string>,
-    Parent = Gallery,
+    Parent = IGalleryInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type FilesResolver<
-    R = (Maybe<GalleryFilesType>)[],
-    Parent = Gallery,
+    R = (Maybe<GQL.GalleryFilesType>)[],
+    Parent = IGalleryInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -925,7 +1444,7 @@ export namespace GalleryResolvers {
 export namespace GalleryFilesTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = GalleryFilesType
+    TypeParent = GQL.GalleryFilesType
   > {
     index?: IndexResolver<number, TypeParent, Context>;
 
@@ -936,23 +1455,26 @@ export namespace GalleryFilesTypeResolvers {
 
   export type IndexResolver<
     R = number,
-    Parent = GalleryFilesType,
+    Parent = GQL.GalleryFilesType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type NameResolver<
     R = Maybe<string>,
-    Parent = GalleryFilesType,
+    Parent = GQL.GalleryFilesType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PathResolver<
     R = Maybe<string>,
-    Parent = GalleryFilesType,
+    Parent = GQL.GalleryFilesType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace StudioResolvers {
-  export interface Resolvers<Context = IGraphQLContext, TypeParent = Studio> {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = IStudioInstance
+  > {
     id?: IdResolver<string, TypeParent, Context>;
 
     checksum?: ChecksumResolver<string, TypeParent, Context>;
@@ -968,32 +1490,32 @@ export namespace StudioResolvers {
 
   export type IdResolver<
     R = string,
-    Parent = Studio,
+    Parent = IStudioInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ChecksumResolver<
     R = string,
-    Parent = Studio,
+    Parent = IStudioInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type NameResolver<
     R = string,
-    Parent = Studio,
+    Parent = IStudioInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type UrlResolver<
     R = Maybe<string>,
-    Parent = Studio,
+    Parent = IStudioInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ImagePathResolver<
     R = Maybe<string>,
-    Parent = Studio,
+    Parent = IStudioInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneCountResolver<
     R = Maybe<number>,
-    Parent = Studio,
+    Parent = IStudioInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1001,7 +1523,7 @@ export namespace StudioResolvers {
 export namespace PerformerResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = Performer
+    TypeParent = IPerformerInstance
   > {
     id?: IdResolver<string, TypeParent, Context>;
 
@@ -1043,112 +1565,112 @@ export namespace PerformerResolvers {
 
     scene_count?: SceneCountResolver<Maybe<number>, TypeParent, Context>;
 
-    scenes?: ScenesResolver<(Maybe<SceneEntity>)[], TypeParent, Context>;
+    scenes?: ScenesResolver<(Maybe<ISceneInstance>)[], TypeParent, Context>;
   }
 
   export type IdResolver<
     R = string,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ChecksumResolver<
     R = string,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type NameResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type UrlResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TwitterResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type InstagramResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type BirthdateResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type EthnicityResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type CountryResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type EyeColorResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type HeightResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type MeasurementsResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type FakeTitsResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type CareerLengthResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TattoosResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PiercingsResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type AliasesResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type FavoriteResolver<
     R = boolean,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ImagePathResolver<
     R = Maybe<string>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneCountResolver<
     R = Maybe<number>,
-    Parent = Performer,
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ScenesResolver<
-    R = (Maybe<SceneEntity>)[],
-    Parent = Performer,
+    R = (Maybe<ISceneInstance>)[],
+    Parent = IPerformerInstance,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1156,25 +1678,25 @@ export namespace PerformerResolvers {
 export namespace SceneMarkerTagResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = SceneMarkerTag
+    TypeParent = GQL.SceneMarkerTag
   > {
-    tag?: TagResolver<Tag, TypeParent, Context>;
+    tag?: TagResolver<ITagInstance, TypeParent, Context>;
 
     scene_markers?: SceneMarkersResolver<
-      (Maybe<SceneMarker>)[],
+      (Maybe<ISceneMarkerInstance>)[],
       TypeParent,
       Context
     >;
   }
 
   export type TagResolver<
-    R = Tag,
-    Parent = SceneMarkerTag,
+    R = ITagInstance,
+    Parent = GQL.SceneMarkerTag,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type SceneMarkersResolver<
-    R = (Maybe<SceneMarker>)[],
-    Parent = SceneMarkerTag,
+    R = (Maybe<ISceneMarkerInstance>)[],
+    Parent = GQL.SceneMarkerTag,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1182,21 +1704,47 @@ export namespace SceneMarkerTagResolvers {
 export namespace FindScenesResultTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = FindScenesResultType
+    TypeParent = GQL.FindScenesResultType
   > {
     count?: CountResolver<number, TypeParent, Context>;
 
-    scenes?: ScenesResolver<(Maybe<SceneEntity>)[], TypeParent, Context>;
+    scenes?: ScenesResolver<(Maybe<ISceneInstance>)[], TypeParent, Context>;
   }
 
   export type CountResolver<
     R = number,
-    Parent = FindScenesResultType,
+    Parent = GQL.FindScenesResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type ScenesResolver<
-    R = (Maybe<SceneEntity>)[],
-    Parent = FindScenesResultType,
+    R = (Maybe<ISceneInstance>)[],
+    Parent = GQL.FindScenesResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace FindSceneMarkersResultTypeResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = GQL.FindSceneMarkersResultType
+  > {
+    count?: CountResolver<number, TypeParent, Context>;
+
+    scene_markers?: SceneMarkersResolver<
+      (Maybe<ISceneMarkerInstance>)[],
+      TypeParent,
+      Context
+    >;
+  }
+
+  export type CountResolver<
+    R = number,
+    Parent = GQL.FindSceneMarkersResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type SceneMarkersResolver<
+    R = (Maybe<ISceneMarkerInstance>)[],
+    Parent = GQL.FindSceneMarkersResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1204,21 +1752,76 @@ export namespace FindScenesResultTypeResolvers {
 export namespace FindStudiosResultTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = FindStudiosResultType
+    TypeParent = GQL.FindStudiosResultType
   > {
     count?: CountResolver<number, TypeParent, Context>;
 
-    studios?: StudiosResolver<(Maybe<Studio>)[], TypeParent, Context>;
+    studios?: StudiosResolver<(Maybe<IStudioInstance>)[], TypeParent, Context>;
   }
 
   export type CountResolver<
     R = number,
-    Parent = FindStudiosResultType,
+    Parent = GQL.FindStudiosResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type StudiosResolver<
-    R = (Maybe<Studio>)[],
-    Parent = FindStudiosResultType,
+    R = (Maybe<IStudioInstance>)[],
+    Parent = GQL.FindStudiosResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace FindGalleriesResultTypeResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = GQL.FindGalleriesResultType
+  > {
+    count?: CountResolver<number, TypeParent, Context>;
+
+    galleries?: GalleriesResolver<
+      (Maybe<IGalleryInstance>)[],
+      TypeParent,
+      Context
+    >;
+  }
+
+  export type CountResolver<
+    R = number,
+    Parent = GQL.FindGalleriesResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type GalleriesResolver<
+    R = (Maybe<IGalleryInstance>)[],
+    Parent = GQL.FindGalleriesResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace MarkerStringsResultTypeResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = GQL.MarkerStringsResultType
+  > {
+    count?: CountResolver<number, TypeParent, Context>;
+
+    id?: IdResolver<string, TypeParent, Context>;
+
+    title?: TitleResolver<string, TypeParent, Context>;
+  }
+
+  export type CountResolver<
+    R = number,
+    Parent = GQL.MarkerStringsResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type IdResolver<
+    R = string,
+    Parent = GQL.MarkerStringsResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type TitleResolver<
+    R = string,
+    Parent = GQL.MarkerStringsResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1226,7 +1829,7 @@ export namespace FindStudiosResultTypeResolvers {
 export namespace StatsResultTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = StatsResultType
+    TypeParent = GQL.StatsResultType
   > {
     scene_count?: SceneCountResolver<number, TypeParent, Context>;
 
@@ -1241,83 +1844,35 @@ export namespace StatsResultTypeResolvers {
 
   export type SceneCountResolver<
     R = number,
-    Parent = StatsResultType,
+    Parent = GQL.StatsResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type GalleryCountResolver<
     R = number,
-    Parent = StatsResultType,
+    Parent = GQL.StatsResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PerformerCountResolver<
     R = number,
-    Parent = StatsResultType,
+    Parent = GQL.StatsResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type StudioCountResolver<
     R = number,
-    Parent = StatsResultType,
+    Parent = GQL.StatsResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TagCountResolver<
     R = number,
-    Parent = StatsResultType,
+    Parent = GQL.StatsResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
-}
-
-export namespace MutationResolvers {
-  export interface Resolvers<Context = IGraphQLContext, TypeParent = {}> {
-    studioCreate?: StudioCreateResolver<Maybe<Studio>, TypeParent, Context>;
-
-    studioUpdate?: StudioUpdateResolver<Maybe<Studio>, TypeParent, Context>;
-
-    tagCreate?: TagCreateResolver<Maybe<Tag>, TypeParent, Context>;
-
-    tagUpdate?: TagUpdateResolver<Maybe<Tag>, TypeParent, Context>;
-  }
-
-  export type StudioCreateResolver<
-    R = Maybe<Studio>,
-    Parent = {},
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context, StudioCreateArgs>;
-  export interface StudioCreateArgs {
-    input: StudioCreateInput;
-  }
-
-  export type StudioUpdateResolver<
-    R = Maybe<Studio>,
-    Parent = {},
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context, StudioUpdateArgs>;
-  export interface StudioUpdateArgs {
-    input: StudioUpdateInput;
-  }
-
-  export type TagCreateResolver<
-    R = Maybe<Tag>,
-    Parent = {},
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context, TagCreateArgs>;
-  export interface TagCreateArgs {
-    input: TagCreateInput;
-  }
-
-  export type TagUpdateResolver<
-    R = Maybe<Tag>,
-    Parent = {},
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context, TagUpdateArgs>;
-  export interface TagUpdateArgs {
-    input: TagUpdateInput;
-  }
 }
 /** A performer from a scraping operation... */
 export namespace ScrapedPerformerResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
-    TypeParent = ScrapedPerformer
+    TypeParent = GQL.ScrapedPerformer
   > {
     name?: NameResolver<Maybe<string>, TypeParent, Context>;
 
@@ -1352,77 +1907,273 @@ export namespace ScrapedPerformerResolvers {
 
   export type NameResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type UrlResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TwitterResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type InstagramResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type BirthdateResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type EthnicityResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type CountryResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type EyeColorResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type HeightResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type MeasurementsResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type FakeTitsResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type CareerLengthResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type TattoosResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type PiercingsResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
   export type AliasesResolver<
     R = Maybe<string>,
-    Parent = ScrapedPerformer,
+    Parent = GQL.ScrapedPerformer,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace MutationResolvers {
+  export interface Resolvers<Context = IGraphQLContext, TypeParent = {}> {
+    sceneUpdate?: SceneUpdateResolver<
+      Maybe<ISceneInstance>,
+      TypeParent,
+      Context
+    >;
+
+    sceneMarkerCreate?: SceneMarkerCreateResolver<
+      Maybe<ISceneMarkerInstance>,
+      TypeParent,
+      Context
+    >;
+
+    sceneMarkerUpdate?: SceneMarkerUpdateResolver<
+      Maybe<ISceneMarkerInstance>,
+      TypeParent,
+      Context
+    >;
+
+    sceneMarkerDestroy?: SceneMarkerDestroyResolver<
+      boolean,
+      TypeParent,
+      Context
+    >;
+
+    performerCreate?: PerformerCreateResolver<
+      Maybe<IPerformerInstance>,
+      TypeParent,
+      Context
+    >;
+
+    performerUpdate?: PerformerUpdateResolver<
+      Maybe<IPerformerInstance>,
+      TypeParent,
+      Context
+    >;
+
+    studioCreate?: StudioCreateResolver<
+      Maybe<IStudioInstance>,
+      TypeParent,
+      Context
+    >;
+
+    studioUpdate?: StudioUpdateResolver<
+      Maybe<IStudioInstance>,
+      TypeParent,
+      Context
+    >;
+
+    tagCreate?: TagCreateResolver<Maybe<ITagInstance>, TypeParent, Context>;
+
+    tagUpdate?: TagUpdateResolver<Maybe<ITagInstance>, TypeParent, Context>;
+
+    tagDestroy?: TagDestroyResolver<boolean, TypeParent, Context>;
+  }
+
+  export type SceneUpdateResolver<
+    R = Maybe<ISceneInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, SceneUpdateArgs>;
+  export interface SceneUpdateArgs {
+    input: SceneUpdateInput;
+  }
+
+  export type SceneMarkerCreateResolver<
+    R = Maybe<ISceneMarkerInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, SceneMarkerCreateArgs>;
+  export interface SceneMarkerCreateArgs {
+    input: SceneMarkerCreateInput;
+  }
+
+  export type SceneMarkerUpdateResolver<
+    R = Maybe<ISceneMarkerInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, SceneMarkerUpdateArgs>;
+  export interface SceneMarkerUpdateArgs {
+    input: SceneMarkerUpdateInput;
+  }
+
+  export type SceneMarkerDestroyResolver<
+    R = boolean,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, SceneMarkerDestroyArgs>;
+  export interface SceneMarkerDestroyArgs {
+    id: string;
+  }
+
+  export type PerformerCreateResolver<
+    R = Maybe<IPerformerInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, PerformerCreateArgs>;
+  export interface PerformerCreateArgs {
+    input: PerformerCreateInput;
+  }
+
+  export type PerformerUpdateResolver<
+    R = Maybe<IPerformerInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, PerformerUpdateArgs>;
+  export interface PerformerUpdateArgs {
+    input: PerformerUpdateInput;
+  }
+
+  export type StudioCreateResolver<
+    R = Maybe<IStudioInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, StudioCreateArgs>;
+  export interface StudioCreateArgs {
+    input: StudioCreateInput;
+  }
+
+  export type StudioUpdateResolver<
+    R = Maybe<IStudioInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, StudioUpdateArgs>;
+  export interface StudioUpdateArgs {
+    input: StudioUpdateInput;
+  }
+
+  export type TagCreateResolver<
+    R = Maybe<ITagInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, TagCreateArgs>;
+  export interface TagCreateArgs {
+    input: TagCreateInput;
+  }
+
+  export type TagUpdateResolver<
+    R = Maybe<ITagInstance>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, TagUpdateArgs>;
+  export interface TagUpdateArgs {
+    input: TagUpdateInput;
+  }
+
+  export type TagDestroyResolver<
+    R = boolean,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, TagDestroyArgs>;
+  export interface TagDestroyArgs {
+    input: TagDestroyInput;
+  }
+}
+
+export namespace SubscriptionResolvers {
+  export interface Resolvers<Context = IGraphQLContext, TypeParent = {}> {
+    /** Update from the meatadata manager */
+    metadataUpdate?: MetadataUpdateResolver<string, TypeParent, Context>;
+  }
+
+  export type MetadataUpdateResolver<
+    R = string,
+    Parent = {},
+    Context = IGraphQLContext
+  > = SubscriptionResolver<R, Parent, Context>;
+}
+
+export namespace FindPerformersResultTypeResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = GQL.FindPerformersResultType
+  > {
+    count?: CountResolver<number, TypeParent, Context>;
+
+    performers?: PerformersResolver<
+      (Maybe<IPerformerInstance>)[],
+      TypeParent,
+      Context
+    >;
+  }
+
+  export type CountResolver<
+    R = number,
+    Parent = GQL.FindPerformersResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type PerformersResolver<
+    R = (Maybe<IPerformerInstance>)[],
+    Parent = GQL.FindPerformersResultType,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -1473,10 +2224,15 @@ export interface IResolvers {
   Performer?: PerformerResolvers.Resolvers;
   SceneMarkerTag?: SceneMarkerTagResolvers.Resolvers;
   FindScenesResultType?: FindScenesResultTypeResolvers.Resolvers;
+  FindSceneMarkersResultType?: FindSceneMarkersResultTypeResolvers.Resolvers;
   FindStudiosResultType?: FindStudiosResultTypeResolvers.Resolvers;
+  FindGalleriesResultType?: FindGalleriesResultTypeResolvers.Resolvers;
+  MarkerStringsResultType?: MarkerStringsResultTypeResolvers.Resolvers;
   StatsResultType?: StatsResultTypeResolvers.Resolvers;
-  Mutation?: MutationResolvers.Resolvers;
   ScrapedPerformer?: ScrapedPerformerResolvers.Resolvers;
+  Mutation?: MutationResolvers.Resolvers;
+  Subscription?: SubscriptionResolvers.Resolvers;
+  FindPerformersResultType?: FindPerformersResultTypeResolvers.Resolvers;
 }
 
 export interface IDirectiveResolvers<Result> {

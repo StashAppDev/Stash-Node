@@ -1,7 +1,7 @@
 import * as Sequelize from "sequelize";
 import { Database } from "../database";
 import { ISceneAttributes, ISceneInstance } from "./scene.model";
-import { IScrapedItemAttributes, IScrapedItemInstance } from "./scraped-item";
+import { IScrapedItemAttributes, IScrapedItemInstance } from "./scraped-item.model";
 
 export interface IStudioAttributes {
   id?: number;

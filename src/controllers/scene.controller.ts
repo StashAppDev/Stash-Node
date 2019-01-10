@@ -4,16 +4,16 @@ import { Database } from "../db/database";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { StashPaths } from "../stash/paths.stash";
 import { QueryResolvers } from "../typings/graphql";
-import { getEntity, getEntityByChecksum } from "./utils";
+import { getEntity } from "./utils";
 
 export class SceneController {
   public static findScene: QueryResolvers.FindSceneResolver = async (root, args, context, info) => {
     if (!!args.id) {
-      return getEntity(Database.Scene, args.id);
+      return await getEntity(Database.Scene, { id: args.id });
     } else if (!!args.checksum) {
-      return getEntityByChecksum(Database.Scene, args.checksum);
+      return await getEntity(Database.Scene, { checksum: args.checksum });
     } else {
-      return;
+      throw new Error("Invalid arguments");
     }
   }
 
@@ -26,12 +26,13 @@ export class SceneController {
 
     const results = await Database.Scene.findAndCountAll(helper.opts);
 
-    return { scenes: results.rows, count: results.count };
+    // TODO: Model instance doesn't match the GQL interface... remove any?
+    return { scenes: results.rows, count: results.count } as any;
   }
 
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Database.Scene, req.params.id);
+      const scene = await getEntity(Database.Scene, { id: req.params.id });
       res.sendFile(scene.path!);
     } catch (e) {
       next(e);
@@ -40,7 +41,7 @@ export class SceneController {
 
   public static async screenshot(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Database.Scene, req.params.id);
+      const scene = await getEntity(Database.Scene, { id: req.params.id });
 
       const screenshotPath = StashPaths.screenshotPath(scene.checksum!);
       const thumbnailPath = StashPaths.thumbnailScreenshotPath(scene.checksum!);
@@ -68,7 +69,7 @@ export class SceneController {
 
   public static async preview(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Database.Scene, req.params.id);
+      const scene = await getEntity(Database.Scene, { id: req.params.id });
       const previewPath = StashPaths.previewPath(scene.checksum!);
 
       const sendFileOptions = {
@@ -83,7 +84,7 @@ export class SceneController {
 
   public static async webp(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Database.Scene, req.params.id);
+      const scene = await getEntity(Database.Scene, { id: req.params.id });
       const webpPath = StashPaths.previewPath(scene.checksum!);
 
       const sendFileOptions = {

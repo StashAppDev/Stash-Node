@@ -10,7 +10,7 @@ export class StudioController {
   // #region GraphQL Resolvers
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
-    return getEntity(Database.Studio, args.id);
+    return getEntity(Database.Studio, { id: args.id });
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {
@@ -25,7 +25,7 @@ export class StudioController {
   }
 
   public static studioUpdate: MutationResolvers.StudioUpdateResolver = async (root, args, context, info) => {
-    const studio = await getEntity(Database.Studio, args.input.id);
+    const studio = await getEntity(Database.Studio, { id: args.input.id });
     studio.name = args.input.name;
     studio.url = args.input.url;
     if (!!args.input.image) {
@@ -40,7 +40,7 @@ export class StudioController {
     try {
       // if (req.fresh) { return; } // TODO
 
-      const studio = await getEntity(Database.Studio, req.params.id);
+      const studio = await getEntity(Database.Studio, { id: req.params.id });
 
       const fileType = FileType(studio.image!);
       if (fileType == null) { throw Error(`Unable to find file type for studio image ${studio.id}`); }
