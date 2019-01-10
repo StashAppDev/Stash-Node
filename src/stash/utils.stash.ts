@@ -1,6 +1,8 @@
 import childProcess from "child_process";
 import crypto from "crypto";
+import FileType from "file-type";
 import fs from "fs";
+import ReadChunk from "read-chunk";
 import tempy from "tempy";
 import { IJsonObject } from "./json.stash";
 import { StashManager } from "./manager.stash";
@@ -63,6 +65,17 @@ export function writeJsonFile(filePath: string, json: IJsonObject) {
     fs.writeFileSync(filePath, jsonString, "utf8");
   } catch (e) {
     StashManager.warn(`Failed to write json file ${filePath}! Error: ${e}`);
+  }
+}
+
+export function getFileInfo(filePath: string) {
+  try {
+    const buffer = ReadChunk.sync(filePath, 0, FileType.minimumBytes);
+    const fileType = FileType(buffer);
+    return (!!fileType) ? fileType : undefined;
+  } catch (e) {
+    StashManager.warn(`Failed to get file info for ${filePath}`);
+    return;
   }
 }
 

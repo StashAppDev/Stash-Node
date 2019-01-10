@@ -3,6 +3,7 @@ import fse from "fs-extra";
 import inquirer from "inquirer";
 import os from "os";
 import path from "path";
+import { Maybe } from "../typings/stash";
 import { parseJsonFile, writeJsonFile } from "./utils.stash";
 
 class Paths {
@@ -101,6 +102,27 @@ class Paths {
 
   public thumbnailScreenshotPath(checksum: string): string {
     return path.join(this.screenshots, `${checksum}.thumb.jpg`);
+  }
+
+  public getTranscodePath(checksum: Maybe<string>): string {
+    return path.join(this.transcode, `${checksum}.mp4`);
+  }
+
+  public sceneStreamFilePath(scenePath: Maybe<string>, checksum: Maybe<string>) {
+    const transcodePath = this.getTranscodePath(checksum);
+    if (fs.existsSync(transcodePath)) {
+      return transcodePath;
+    } else {
+      return scenePath;
+    }
+  }
+
+  public sceneVttSpriteFilePath(checksum: Maybe<string>) {
+    return path.join(this.vtt, `${checksum}_sprite.jpg`);
+  }
+
+  public sceneVttThumbsFilePath(checksum: Maybe<string>) {
+    return path.join(this.vtt, `${checksum}_thumbs.vtt`);
   }
 
   public previewPath(checksum: string): string {

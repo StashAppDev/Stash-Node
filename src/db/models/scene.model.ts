@@ -1,12 +1,15 @@
+import fs from "fs";
+import { Op } from "sequelize";
 import * as Sequelize from "sequelize";
+import { StashPaths } from "../../stash/paths.stash";
+import { getFileInfo } from "../../stash/utils.stash";
+import { ResolutionEnum } from "../../typings/graphql";
 import { Database } from "../database";
 import { IGalleryAttributes, IGalleryInstance } from "./gallery.model";
 import { IPerformerAttributes, IPerformerInstance } from "./performer.model";
 import { ISceneMarkerAttributes, ISceneMarkerInstance } from "./scene-marker.model";
 import { IStudioAttributes, IStudioInstance } from "./studio.model";
 import { ITagAttributes, ITagInstance } from "./tag.model";
-import { Op } from "sequelize";
-import { ResolutionEnum } from "../../typings/graphql";
 
 export interface ISceneAttributes {
   id?: number;
@@ -130,7 +133,31 @@ export const SceneFactory = (
 
 export const AddSceneScopes = () => {
   const fullScope: Sequelize.FindOptions<ISceneAttributes> = {
-    include: [{ model: Database.Studio, as: "studio" }],
+    // include: [
+    //   { model: Database.Studio, as: "studio" },
+    //   { model: Database.SceneMarker, as: "scene_markers" },
+    // ],
+    order: [["path", "DESC"]],
+  };
+
+  const search = (q: string): Sequelize.FindOptions<ISceneAttributes> => {
+    return {
+      include: [{ model: Database.SceneMarker, as: "scene_markers", attributes: ["title"] }],
+      subQuery: false,
+      where: {
+        [Op.or]: [
+          { title: { [Op.like]: `${q}%` } },
+          { details: { [Op.like]: `%${q}%` } },
+          { path: { [Op.like]: `%${q}%` } },
+          { checksum: { [Op.like]: `%${q}%` } },
+          // { "$scene_markers.title$": Database.sequelize.where(Database.sequelize.col("scene_markers.title"), {
+          //   [Op.like]: `%${q}%`,
+          //   }),
+          // },
+          { "$scene_markers.title$": {[Op.like]: `%${q}%`} }, // todo test
+        ],
+      },
+    };
   };
 
   const resolution = (value: ResolutionEnum): Sequelize.FindOptions<ISceneAttributes> => {
@@ -145,5 +172,40 @@ export const AddSceneScopes = () => {
   };
 
   Database.Scene.addScope("defaultScope", fullScope);
+  Database.Scene.addScope("search", search);
   Database.Scene.addScope("resolution", resolution);
 };
+
+export class SceneHelper {
+  public static getMimeType(scene: ISceneInstance) {
+    const fileInfo = getFileInfo(scene.path || "");
+    return (!!fileInfo) ? fileInfo.mime : undefined;
+  }
+
+  public static isStreamable(scene: ISceneInstance) {
+    const mimeType = this.getMimeType(scene);
+    const valid = mimeType === "video/quicktime" || mimeType === "video/mp4" || mimeType === "video/webm";
+    if (!valid) {
+      const transcodePath = StashPaths.getTranscodePath(scene.checksum || "");
+      return fs.existsSync(transcodePath);
+    } else {
+      return valid;
+    }
+  }
+
+  public static async makeChapterVtt(scene: ISceneInstance) {
+    const vtt = ["WEBVTT", ""];
+    const sceneMarkers = await scene.getScene_markers();
+    for (const marker of sceneMarkers) {
+      const time = this.getVttTime(marker.seconds);
+      vtt.push(`${time} --> ${time}`);
+      vtt.push(marker.title);
+      vtt.push("");
+    }
+    return vtt.join("\n");
+  }
+
+  private static getVttTime(seconds: number = 0) {
+    return new Date(seconds * 1000).toISOString().substr(11, 8);
+  }
+}

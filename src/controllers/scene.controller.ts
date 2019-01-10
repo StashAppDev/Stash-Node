@@ -1,6 +1,8 @@
 import express from "express";
 import fs from "fs";
 import { Database } from "../db/database";
+import { SceneHelper } from "../db/models/scene.model";
+import { HttpError } from "../errors/http.error";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { StashPaths } from "../stash/paths.stash";
 import { QueryResolvers } from "../typings/graphql";
@@ -21,6 +23,7 @@ export class SceneController {
     const helper = new SceneQueryBuilder(args);
     helper
       .filter()
+      .search()
       .sort("title")
       .paginate();
 
@@ -33,7 +36,8 @@ export class SceneController {
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
       const scene = await getEntity(Database.Scene, { id: req.params.id });
-      res.sendFile(scene.path!);
+      const filePath = StashPaths.sceneStreamFilePath(scene.path, scene.checksum);
+      if (!!filePath) { res.sendFile(filePath); } else { throw new HttpError(404, `No file ${filePath}`); }
     } catch (e) {
       next(e);
     }
@@ -92,6 +96,16 @@ export class SceneController {
       };
 
       res.sendFile(webpPath, sendFileOptions);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public static async chapterVtt(req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+      const scene = await getEntity(Database.Scene, { id: req.params.id });
+      res.type("text/vtt");
+      res.send(await SceneHelper.makeChapterVtt(scene));
     } catch (e) {
       next(e);
     }

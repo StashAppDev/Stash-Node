@@ -55,6 +55,12 @@ export class BaseQueryBuilder<TInstance, TAttributes> {
     return this;
   }
 
+  public search(): BaseQueryBuilder<TInstance, TAttributes> {
+    if (!this.findFilter.q) { return this; }
+    this.scopeOpts.push({ method: ["search", this.findFilter.q] });
+    return this;
+  }
+
   private getColumnNames(): string[] {
     return Object.keys(this.model.fieldRawAttributesMap);
   }

@@ -8,6 +8,7 @@ import { SceneController } from "./controllers/scene.controller";
 import { StudioController } from "./controllers/studio.controller";
 import { TagController } from "./controllers/tag.controller";
 import { Database } from "./db/database";
+import { SceneHelper } from "./db/models/scene.model";
 import { IResolvers } from "./typings/graphql";
 
 // NOTE: This path looks weird, but is required for pkg
@@ -72,15 +73,15 @@ export const resolvers: IResolvers = {
     paths(root, args, context, info) {
       return {
         // TODO:  Get these paths from the resolver?
+        chapters_vtt: new URL(`/scenes/${root.id}/vtt/chapter`, context.baseUrl).toString(),
         preview: new URL(`/scenes/${root.id}/preview`, context.baseUrl).toString(),
         screenshot: new URL(`/scenes/${root.id}/screenshot`, context.baseUrl).toString(),
         stream: new URL(`/scenes/${root.id}/stream.mp4`, context.baseUrl).toString(),
+        vtt: new URL(`/scenes/${root.id}_thumbs.vtt`, context.baseUrl).toString(),
         webp: new URL(`/scenes/${root.id}/webp`, context.baseUrl).toString(),
       };
     },
-    is_streamable(root, args, context, info): boolean {
-      return true; // TODO
-    },
+    is_streamable(scene, args, context, info): boolean { return SceneHelper.isStreamable(scene); },
 
     // TODO: remove these.  Don't need these resolvers
     async scene_markers(scene) {
