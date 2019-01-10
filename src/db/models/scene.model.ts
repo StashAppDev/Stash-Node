@@ -142,19 +142,16 @@ export const AddSceneScopes = () => {
 
   const search = (q: string): Sequelize.FindOptions<ISceneAttributes> => {
     return {
-      include: [{ model: Database.SceneMarker, as: "scene_markers", attributes: ["title"] }],
-      subQuery: false,
+      // TODO: Including from references is broken with sequelize: https://github.com/sequelize/sequelize/issues/7344
+      // include: [{ model: Database.SceneMarker, as: "scene_markers", attributes: ["title"] }],
+      // subQuery: false,
       where: {
         [Op.or]: [
           { title: { [Op.like]: `${q}%` } },
           { details: { [Op.like]: `%${q}%` } },
           { path: { [Op.like]: `%${q}%` } },
           { checksum: { [Op.like]: `%${q}%` } },
-          // { "$scene_markers.title$": Database.sequelize.where(Database.sequelize.col("scene_markers.title"), {
-          //   [Op.like]: `%${q}%`,
-          //   }),
-          // },
-          { "$scene_markers.title$": {[Op.like]: `%${q}%`} }, // todo test
+          // { "$scene_markers.title$": {[Op.like]: `%${q}%`} }, // todo test
         ],
       },
     };

@@ -110,6 +110,10 @@ export const resolvers: IResolvers = {
       return await SceneMarkerController.sceneMarkerTags(scene, {scene_id: scene!.id!.toString(10)}, context, info);
     },
   },
+  SceneMarker: {
+    preview() { return ""; }, // TODO
+    stream() { return ""; }, // TODO
+  },
   Studio: {
     image_path() {
       // TODO: ctx[:routes].studio_image_url(studio.id, host: ctx[:base_url])

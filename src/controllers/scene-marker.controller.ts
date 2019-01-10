@@ -18,7 +18,12 @@ export class SceneMarkerController {
       if (!tags.hasOwnProperty(primaryTag!.id!)) {
         tags[primaryTag!.id!] = { tag: SceneMarkerController.tagModelToGraphQL(primaryTag!), scene_markers: [] };
       }
-      tags[primaryTag!.id!].scene_markers.push(marker.toJSON() as any); // TODO
+      const m = marker.toJSON() as any;
+      m.scene = scene.toJSON();
+      m.primary_tag = primaryTag!.toJSON();
+      m.tags = [];
+      tags[primaryTag!.id!].scene_markers.push(m as any); // TODO
+
     }
 
     return Object.values(tags);
