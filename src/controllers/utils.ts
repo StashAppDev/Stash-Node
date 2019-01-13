@@ -12,12 +12,11 @@ export async function getEntity<T extends Model>(
   identifier: { id?: string, checksum?: string },
 ): Promise<T> {
   let entity: T | undefined;
-  const qb = QueryBuilder.forClass(type as any);
   if (!!identifier.id) {
-    entity = await qb.findById(identifier.id) as any;
+    entity = await (type as any).query().findById(identifier.id);
   }
   if (!entity && !!identifier.checksum) {
-    entity = await qb.findOne({ checksum: identifier.checksum }) as any;
+    entity = await (type as any).query().findOne({ checksum: identifier.checksum });
   }
 
   if (!entity) {

@@ -214,7 +214,6 @@ export class ImportTask extends BaseTask {
   }
 
   private async importScenes() {
-    const dateString = this.getDateString();
     const trx = await transaction.start(Database.knex);
     try {
       for (const [i, mappingJson] of this.mappings.scenes.entries()) {
@@ -224,7 +223,9 @@ export class ImportTask extends BaseTask {
           return;
         }
 
-        StashManager.info(`Importing scene ${index} of ${this.mappings.scenes.length}\r`);
+        if (i === 0 || index % 50 === 0) {
+          StashManager.info(`Importing scene ${index} of ${this.mappings.scenes.length}\r`);
+        }
 
         const sceneAttributes: Partial<Scene> = { checksum: mappingJson.checksum, path: mappingJson.path };
 
@@ -326,7 +327,7 @@ export class ImportTask extends BaseTask {
   private async bulkCreate<T>(type: new() => T, records: T[]) {
     try {
       const tableName = (type as any).tableName;
-      await Database.knex.batchInsert(tableName, records);
+      await Database.knex.batchInsert(tableName, records, 20);
     } catch (e) {
       StashManager.error(`Import of ${type.name} failed.`);
       if (!!e.stack) { StashManager.error(e.stack); }
