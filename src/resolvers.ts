@@ -115,7 +115,10 @@ export const resolvers: IResolvers = {
     },
   },
   SceneMarker: {
-    preview() { return ""; }, // TODO
+    preview(sceneMarker, args, context, info) {
+      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/scene_marker/${sceneMarker.id}/preview`;
+      return new URL(urlPath, context.baseUrl).toString();
+    },
     primary_tag(sceneMarker) {
       if (!!sceneMarker.primary_tag) {
         return sceneMarker.primary_tag;
@@ -123,7 +126,10 @@ export const resolvers: IResolvers = {
         return sceneMarker.$relatedQuery("primary_tag").first() as any;
       }
     },
-    stream() { return ""; }, // TODO
+    stream(sceneMarker, args, context, info) {
+      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/scene_marker/${sceneMarker.id}/stream`;
+      return new URL(urlPath, context.baseUrl).toString();
+    },
     scene(sceneMarker) {
       if (!!sceneMarker.scene) {
         return sceneMarker.scene;

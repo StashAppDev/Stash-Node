@@ -8,6 +8,9 @@ import { QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
 
 export class SceneController {
+
+  // #region GraphQL Resolvers
+
   public static findScene: QueryResolvers.FindSceneResolver = async (root, args, context, info) => {
     if (!!args.id) {
       return await getEntity(Scene, { id: args.id });
@@ -31,6 +34,8 @@ export class SceneController {
     // https://github.com/dotansimha/graphql-code-generator/issues/1041
     return { scenes: pages.results, count: totalSize } as any;
   }
+
+  // #endregion
 
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
@@ -105,6 +110,28 @@ export class SceneController {
       const scene = await getEntity(Scene, { id: req.params.id });
       res.type("text/vtt");
       res.send(await scene.makeChapterVtt());
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public static async vttThumbs(req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+      res.type("text/vtt");
+      const id = req.params.id_thumbs.replace("_thumbs", "");
+      const scene = await getEntity(Scene, { id, checksum: id });
+      res.sendFile(StashPaths.sceneVttThumbsFilePath(scene!.checksum));
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public static async vttSprite(req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+      res.type("image/jpeg");
+      const id = req.params.id_sprite.replace("_sprite", "");
+      const scene = await getEntity(Scene, { id, checksum: id });
+      res.sendFile(StashPaths.sceneVttSpriteFilePath(scene!.checksum));
     } catch (e) {
       next(e);
     }

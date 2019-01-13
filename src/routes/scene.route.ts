@@ -1,8 +1,6 @@
 import express from "express";
+import { SceneMarkerController } from "../controllers/scene-marker.controller";
 import { SceneController } from "../controllers/scene.controller";
-import { getEntity } from "../controllers/utils";
-import { Scene } from "../db/models/scene.model";
-import { StashPaths } from "../stash/paths.stash";
 
 const router = express.Router();
 
@@ -32,25 +30,19 @@ router.get("/:id/vtt/chapter", (req, res, next) => {
 });
 
 router.get("/:id_thumbs.vtt", async (req, res, next) => {
-  try {
-    res.type("text/vtt");
-    const id = req.params.id_thumbs.replace("_thumbs", "");
-    const scene = await getEntity(Scene, { id, checksum: id });
-    res.sendFile(StashPaths.sceneVttThumbsFilePath(scene!.checksum));
-  } catch (e) {
-    next(e);
-  }
+  SceneController.vttThumbs(req, res, next);
 });
 
 router.get("/:id_sprite.jpg", async (req, res, next) => {
-  try {
-    res.type("image/jpeg");
-    const id = req.params.id_sprite.replace("_sprite", "");
-    const scene = await getEntity(Scene, { id, checksum: id });
-    res.sendFile(StashPaths.sceneVttSpriteFilePath(scene!.checksum));
-  } catch (e) {
-    next(e);
-  }
+  SceneController.vttSprite(req, res, next);
+});
+
+router.get("/:scene_id/scene_markers/:id/stream", (req, res, next) => {
+  SceneMarkerController.stream(req, res, next);
+});
+
+router.get("/:scene_id/scene_markers/:id/preview", (req, res, next) => {
+  SceneMarkerController.preview(req, res, next);
 });
 
 export default router;
