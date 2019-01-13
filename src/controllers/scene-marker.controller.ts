@@ -2,13 +2,29 @@ import express from "express";
 import { SceneMarker } from "../db/models/scene-marker.model";
 import { Scene } from "../db/models/scene.model";
 import { Tag } from "../db/models/tag.model";
+import { SceneMarkerQueryBuilder } from "../querybuilders/scene-marker.querybuilder";
+import { StashPaths } from "../stash/paths.stash";
 import { GQL, QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
-import { StashPaths } from "../stash/paths.stash";
 
 export class SceneMarkerController {
 
   // #region GraphQL Resolvers
+
+  // TODO:  Missing rails logic
+  public static findSceneMarkers: QueryResolvers.FindSceneMarkersResolver = async (root, args, context, info) => {
+    const builder = new SceneMarkerQueryBuilder(args);
+    builder.filter();
+    builder.search();
+    builder.sort("title");
+
+    const pages = await builder.paginate();
+    const totalSize = await builder.resultSize();
+
+    // TODO: Model instance doesn't match the GQL interface... remove any?
+    // https://github.com/dotansimha/graphql-code-generator/issues/1041
+    return { scene_markers: pages.results, count: totalSize } as any;
+  }
 
   // TODO: test
   public static sceneMarkerTags: QueryResolvers.SceneMarkerTagsResolver = async (root, args, context, info) => {
@@ -40,7 +56,7 @@ export class SceneMarkerController {
       const scene = await getEntity(Scene, { id: req.params.scene_id });
       const sceneMarker = await getEntity(SceneMarker, { id: req.params.id! });
 
-      const streamPath = StashPaths.sceneMarkerStreamPath(scene.checksum!, sceneMarker.id!);
+      const streamPath = StashPaths.sceneMarkerStreamPath(scene.checksum!, sceneMarker.seconds!);
 
       const sendFileOptions = {
         maxAge: 604800000, // 1 Week
@@ -58,7 +74,7 @@ export class SceneMarkerController {
       const scene = await getEntity(Scene, { id: req.params.scene_id });
       const sceneMarker = await getEntity(SceneMarker, { id: req.params.id! });
 
-      const previewPath = StashPaths.sceneMarkerPreviewPath(scene.checksum!, sceneMarker.id!);
+      const previewPath = StashPaths.sceneMarkerPreviewPath(scene.checksum!, sceneMarker.seconds!);
 
       const sendFileOptions = {
         maxAge: 604800000, // 1 Week

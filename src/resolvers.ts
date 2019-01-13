@@ -41,6 +41,9 @@ export const resolvers: IResolvers = {
     findTag(root, args, context, info) { return TagController.findTag(root, args, context, info); },
     findScene(root, args, context, info) { return SceneController.findScene(root, args, context, info); },
     findScenes(root, args, context, info) { return SceneController.findScenes(root, args, context, info); },
+    findSceneMarkers(root, args, context, info) {
+      return SceneMarkerController.findSceneMarkers(root, args, context, info);
+    },
     findStudio(root, args, context, info) { return StudioController.findStudio(root, args, context, info); },
     sceneMarkerTags(root, args, context, info) {
       return SceneMarkerController.sceneMarkerTags(root, args, context, info);
@@ -116,7 +119,7 @@ export const resolvers: IResolvers = {
   },
   SceneMarker: {
     preview(sceneMarker, args, context, info) {
-      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/scene_marker/${sceneMarker.id}/preview`;
+      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/${sceneMarker.id}/preview`;
       return new URL(urlPath, context.baseUrl).toString();
     },
     primary_tag(sceneMarker) {
@@ -127,7 +130,7 @@ export const resolvers: IResolvers = {
       }
     },
     stream(sceneMarker, args, context, info) {
-      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/scene_marker/${sceneMarker.id}/stream`;
+      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/${sceneMarker.id}/stream`;
       return new URL(urlPath, context.baseUrl).toString();
     },
     scene(sceneMarker) {
