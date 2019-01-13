@@ -1,7 +1,9 @@
 import Knex from "knex";
 import { Model } from "objection";
+import path from "path";
 import { log } from "../logger";
 import { StashPaths } from "../stash/paths.stash";
+import { StashMigrationSource } from "./migration-source";
 import { Gallery } from "./models/gallery.model";
 import { Performer } from "./models/performer.model";
 import { SceneMarker } from "./models/scene-marker.model";
@@ -9,8 +11,6 @@ import { Scene } from "./models/scene.model";
 import { ScrapedItem } from "./models/scraped-item.model";
 import { Studio } from "./models/studio.model";
 import { Tag } from "./models/tag.model";
-
-// export const knex = Knex(config[env])
 
 class DatabaseImpl {
   public knex: Knex;
@@ -23,8 +23,9 @@ class DatabaseImpl {
         filename: StashPaths.databaseFile,
       },
       migrations: {
-        directory: "./src/db/migrations",
-      },
+        // directory: path.join(__dirname, "../db/migrations"),
+        migrationSource: new StashMigrationSource(),
+      } as any, // TODO: Knex typings is missing this config option.
       pool: {
         afterCreate: (conn: any, cb: any) => {
           conn.run("PRAGMA foreign_keys = ON", cb);
