@@ -1,67 +1,52 @@
-import * as Sequelize from "sequelize";
-import { Database } from "../database";
-import { IStudioAttributes, IStudioInstance } from "./studio.model";
+// tslint:disable:object-literal-sort-keys variable-name
+import { Model } from "objection";
+import path from "path";
+import BaseModel from "./base.model";
+import { Studio } from "./studio.model";
 
-export interface IScrapedItemAttributes {
-  id?: number;
-  title?: string;
-  description?: string;
-  url?: string;
-  date?: string; // TODO: date?
-  rating?: string;
-  tags?: string;
-  models?: string;
-  episode?: number;
-  galleryFilename?: string;
-  galleryUrl?: string;
-  videoFilename?: string;
-  videoUrl?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  studio?: IStudioAttributes | IStudioAttributes["id"];
+export class ScrapedItem extends BaseModel {
+  public static tableName = "scraped_items";
+
+  // public static jsonSchema = {
+  //   type: "object",
+  //   required: ["path", "checksum"],
+
+  //   properties: {
+  //     id: { type: "integer" },
+  //     path: { type: "string" },
+  //     checksum: { type: "string" },
+  //     scene_id: { type: ["integer", "null"] },
+  //     created_at: { type: "string" },
+  //     updated_at: { type: "string" },
+  //   },
+  // };
+
+  public static relationMappings = {
+    studio: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: path.join(__dirname, "studio.model"),
+      join: {
+        from: "scraped_items.studio_id",
+        to: "studios.id",
+      },
+    },
+  };
+
+  public id?: number;
+  public title?: string;
+  public description?: string;
+  public url?: string;
+  public date?: string; // TODO: date?
+  public rating?: string;
+  public tags?: string;
+  public models?: string;
+  public episode?: number;
+  public gallery_filename?: string;
+  public gallery_url?: string;
+  public video_filename?: string;
+  public video_url?: string;
+  public studio_id: number;
+
+  // Optional eager relations.
+  public studio?: Studio;
 }
-
-export interface IScrapedItemInstance extends Sequelize.Instance<IScrapedItemAttributes>, IScrapedItemAttributes {
-  getStudio: Sequelize.BelongsToGetAssociationMixin<IStudioInstance>;
-  setStudio: Sequelize.BelongsToSetAssociationMixin<IStudioInstance, IStudioInstance["id"]>;
-  createStudio: Sequelize.BelongsToCreateAssociationMixin<IStudioAttributes, IStudioInstance>;
-}
-
-export const ScrapedItemFactory = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes,
-): Sequelize.Model<IScrapedItemInstance, IScrapedItemAttributes> => {
-  // tslint:disable:object-literal-sort-keys
-  const attributes: Sequelize.DefineModelAttributes<IScrapedItemAttributes> = {
-    id:               { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true },
-    title:            { type: DataTypes.STRING },
-    description:      { type: DataTypes.STRING },
-    url:              { type: DataTypes.STRING },
-    date:             { type: DataTypes.STRING }, // TODO: date?
-    rating:           { type: DataTypes.STRING },
-    tags:             { type: DataTypes.STRING },
-    models:           { type: DataTypes.STRING },
-    episode:          { type: DataTypes.INTEGER },
-    galleryFilename:  { type: DataTypes.STRING },
-    galleryUrl:       { type: DataTypes.STRING },
-    videoFilename:    { type: DataTypes.STRING },
-    videoUrl:         { type: DataTypes.STRING },
-  };
-  // tslint:enable:object-literal-sort-keys
-
-  const options: Sequelize.DefineOptions<IScrapedItemInstance> = {
-    indexes: [
-      { name: "index_scraped_items_on_studio_id", fields: ["studio_id"] },
-    ],
-  };
-
-  const ScrapedItem = sequelize.define<IScrapedItemInstance, IScrapedItemAttributes>(
-    "scraped_items", attributes, options,
-  );
-
-  ScrapedItem.associate = () => {
-    ScrapedItem.belongsTo(Database.Studio, { as: "studio", foreignKey: "studio_id" });
-  };
-
-  return ScrapedItem;
-};

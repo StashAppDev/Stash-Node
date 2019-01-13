@@ -1,4 +1,4 @@
-import { Database } from "../db/database";
+import { Tag } from "../db/models/tag.model";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
 
@@ -6,17 +6,15 @@ export class TagController {
   // #region GraphQL Resolvers
 
   public static findTag: QueryResolvers.FindTagResolver = async (root, args, context, info) => {
-    return getEntity(Database.Tag, { id: args.id });
+    return getEntity(Tag, { id: args.id });
   }
 
   public static tagCreate: MutationResolvers.TagCreateResolver = async (root, args, context, info) => {
-    return Database.Tag.create(args.input);
+    return Tag.query().insert(args.input); // TODO: unsafe
   }
 
   public static tagUpdate: MutationResolvers.TagUpdateResolver = async (root, args, context, info) => {
-    const tag = await getEntity(Database.Tag, { id: args.input.id });
-    tag.name = args.input.name;
-    return tag.save();
+    return Tag.query().updateAndFetchById(args.input.id, { name: args.input.name });
   }
 
   // #endregion

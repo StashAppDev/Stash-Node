@@ -1,95 +1,75 @@
-import Sequelize from "sequelize";
+import Knex from "knex";
+import { Model } from "objection";
 import { log } from "../logger";
 import { StashPaths } from "../stash/paths.stash";
-import { GalleryFactory, IGalleryAttributes, IGalleryInstance } from "./models/gallery.model";
-import { IPerformerAttributes, IPerformerInstance, PerformerFactory } from "./models/performer.model";
-import { ISceneMarkerAttributes, ISceneMarkerInstance, SceneMarkerFactory } from "./models/scene-marker.model";
-import { AddSceneScopes, ISceneAttributes, ISceneInstance, SceneFactory } from "./models/scene.model";
-import { IScrapedItemAttributes, IScrapedItemInstance, ScrapedItemFactory } from "./models/scraped-item.model";
-import { IStudioAttributes, IStudioInstance, StudioFactory } from "./models/studio.model";
-import { ITagAttributes, ITagInstance, TagFactory } from "./models/tag.model";
+import { Gallery } from "./models/gallery.model";
+import { Performer } from "./models/performer.model";
+import { SceneMarker } from "./models/scene-marker.model";
+import { Scene } from "./models/scene.model";
+import { ScrapedItem } from "./models/scraped-item.model";
+import { Studio } from "./models/studio.model";
+import { Tag } from "./models/tag.model";
+
+// export const knex = Knex(config[env])
 
 class DatabaseImpl {
-  public sequelize: Sequelize.Sequelize;
-  public Sequelize: Sequelize.SequelizeStatic;
-
-  public Gallery: Sequelize.Model<IGalleryInstance, IGalleryAttributes>;
-  public Performer: Sequelize.Model<IPerformerInstance, IPerformerAttributes>;
-  public Scene: Sequelize.Model<ISceneInstance, ISceneAttributes>;
-  public SceneMarker: Sequelize.Model<ISceneMarkerInstance, ISceneMarkerAttributes>;
-  public ScrapedItem: Sequelize.Model<IScrapedItemInstance, IScrapedItemAttributes>;
-  public Studio: Sequelize.Model<IStudioInstance, IStudioAttributes>;
-  public Tag: Sequelize.Model<ITagInstance, ITagAttributes>;
+  public knex: Knex;
 
   public async initialize() {
-    // Sequelize
-    this.Sequelize = Sequelize;
-    this.sequelize = new Sequelize({
-      database: "stash",
-      define: {
-        timestamps: true,
-        underscored: true,
+    // Knex
+    const config: Knex.Config = {
+      client: "sqlite3",
+      connection: {
+        filename: StashPaths.databaseFile,
       },
-      dialect: "sqlite",
-      logging: false,
-      password: "",
-      storage: StashPaths.databaseFile,
-      // storage: ":memory:",
-      username: "root",
-    });
+      migrations: {
+        directory: "./src/db/migrations",
+      },
+      pool: {
+        afterCreate: (conn: any, cb: any) => {
+          conn.run("PRAGMA foreign_keys = ON", cb);
+        },
+      },
+      useNullAsDefault: true,
+    };
+    this.knex = Knex(config);
+    await this.knex.migrate.latest();
+    Model.knex(this.knex);
 
-    // Models
-    this.Gallery = GalleryFactory(this.sequelize, this.Sequelize);
-    this.Performer = PerformerFactory(this.sequelize, this.Sequelize);
-    this.Scene = SceneFactory(this.sequelize, this.Sequelize);
-    this.SceneMarker = SceneMarkerFactory(this.sequelize, this.Sequelize);
-    this.ScrapedItem = ScrapedItemFactory(this.sequelize, this.Sequelize);
-    this.Studio = StudioFactory(this.sequelize, this.Sequelize);
-    this.Tag = TagFactory(this.sequelize, this.Sequelize);
-
-    AddSceneScopes();
-
-    // TODO: Only do this if db is clear
-    // this.addIndexes();
-
-    // Model associations
-    Object.keys(this.sequelize.models).forEach((modelName) => {
-      const model = this.sequelize.models[modelName];
-      if (!!model.associate) {
-        model.associate(this.sequelize.models);
-      }
-    });
-
-    // Sync
-    // this.sequelize.sync({force: false});
-
-    await this.sequelize.authenticate().then(() => {
-      log.info("Database connection established");
-    });
+    // Prime the table metadata for each model
+    await Gallery.fetchTableMetadata();
+    await Performer.fetchTableMetadata();
+    await SceneMarker.fetchTableMetadata();
+    await Scene.fetchTableMetadata();
+    await ScrapedItem.fetchTableMetadata();
+    await Studio.fetchTableMetadata();
+    await Tag.fetchTableMetadata();
   }
 
   public async reset() {
-    const qi = this.sequelize.getQueryInterface();
-    await qi.dropAllTables();
-    await this.sequelize.sync({ force: true });
-    // const sql = fs.readFileSync(__dirname + "/development.sql", "utf8");
-    // await this.sequelize.query(sql, { raw: true });
-    // sequelize.query('SELECT...').spread((results, metadata) => {
-    //   // Raw query - use spread
-    // });
+    await this.knex.raw("PRAGMA foreign_keys = OFF;");
+    await this.knex.schema
+      .dropTableIfExists("galleries")
+      .dropTableIfExists("performers")
+      .dropTableIfExists("scene_markers")
+      .dropTableIfExists("scenes")
+      .dropTableIfExists("scraped_items")
+      .dropTableIfExists("studios")
+      .dropTableIfExists("tags")
+      .dropTableIfExists("performers_scenes")
+      .dropTableIfExists("scene_markers_tags")
+      .dropTableIfExists("scenes_tags")
+      .dropTableIfExists("knex_migrations")
+      .dropTableIfExists("knex_migations_lock");
+    await this.knex.raw("PRAGMA foreign_keys = ON;");
+
+    await this.knex.migrate.latest();
+
+    log.info("Database reset!");
   }
 
-  private async addIndexes() {
-    // TODO: Instead of sync manually create and migrate database via query interface.  Save a DB version.
-    const qi = this.sequelize.getQueryInterface();
-    await qi.addIndex("scenes_tags", ["scene_id"], { indexName: "index_scenes_tags_on_scene_id" });
-    await qi.addIndex("scenes_tags", ["tag_id"], { indexName: "index_scenes_tags_on_tag_id" });
-    await qi.addIndex("performers_scenes", ["scene_id"], { indexName: "index_scenes_tags_on_scene_id" });
-    await qi.addIndex("performers_scenes", ["performer_id"], { indexName: "index_performers_scenes_on_performer_id" });
-    await qi.addIndex("scene_markers_tags", ["scene_marker_id"], {
-      indexName: "index_scene_markers_tags_on_scene_marker_id",
-    });
-    await qi.addIndex("scene_markers_tags", ["tag_id"], { indexName: "index_scene_markers_tags_on_tag_id" });
+  public async shutdown() {
+    await this.knex.destroy();
   }
 }
 

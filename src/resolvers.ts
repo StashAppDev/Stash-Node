@@ -7,8 +7,12 @@ import { SceneMarkerController } from "./controllers/scene-marker.controller";
 import { SceneController } from "./controllers/scene.controller";
 import { StudioController } from "./controllers/studio.controller";
 import { TagController } from "./controllers/tag.controller";
-import { Database } from "./db/database";
-import { SceneHelper } from "./db/models/scene.model";
+import { Gallery } from "./db/models/gallery.model";
+import { Performer } from "./db/models/performer.model";
+import { SceneMarker } from "./db/models/scene-marker.model";
+import { Scene } from "./db/models/scene.model";
+import { Studio } from "./db/models/studio.model";
+import { Tag } from "./db/models/tag.model";
 import { IResolvers } from "./typings/graphql";
 
 // NOTE: This path looks weird, but is required for pkg
@@ -43,30 +47,30 @@ export const resolvers: IResolvers = {
     },
     async stats(root, args, context, info) {
       // tslint:disable:variable-name
-      const scene_count = await Database.Scene.count();
-      const gallery_count = await Database.Gallery.count();
-      const performer_count = await Database.Performer.count();
-      const studio_count = await Database.Studio.count();
-      const tag_count = await Database.Tag.count();
+      const scene_count = (await Scene.knexQuery().count())[0]["count(*)"];
+      const gallery_count = (await Gallery.knexQuery().count())[0]["count(*)"];
+      const performer_count = (await Performer.knexQuery().count())[0]["count(*)"];
+      const studio_count = (await Studio.knexQuery().count())[0]["count(*)"];
+      const tag_count = (await Tag.knexQuery().count())[0]["count(*)"];
       return { scene_count, gallery_count, performer_count, studio_count, tag_count };
       // tslint:enable:variable-name
     },
 
-    async allPerformers() { return await Database.Performer.findAll(); },
-    async allStudios() { return await Database.Studio.findAll(); },
-    async allTags() { return await Database.Tag.findAll(); },
-    async allSceneMarkers() { return await Database.SceneMarker.findAll(); },
+    async allPerformers() { return await Performer.query(); },
+    async allStudios() { return await Studio.query(); },
+    async allTags() { return await Tag.query(); },
+    async allSceneMarkers() { return await SceneMarker.query(); },
   },
   Scene: {
     file(scene, args, context, info) {
       return {
-        audio_codec: scene.audioCodec,
+        audio_codec: scene.audio_codec,
         bitrate: scene.bitrate,
         duration: scene.duration,
         framerate: scene.framerate,
         height: scene.height,
         size: scene.size,
-        video_codec: scene.videoCodec,
+        video_codec: scene.video_codec,
         width: scene.width,
       };
     },
@@ -81,27 +85,27 @@ export const resolvers: IResolvers = {
         webp: new URL(`/scenes/${root.id}/webp`, context.baseUrl).toString(),
       };
     },
-    is_streamable(scene, args, context, info): boolean { return SceneHelper.isStreamable(scene); },
+    is_streamable(scene, args, context, info): boolean { return scene.isStreamable(); },
 
     // TODO: remove these.  Don't need these resolvers
     async scene_markers(scene) {
-      const sceneMarkers =  await scene.getScene_markers();
+      const sceneMarkers = await scene.$relatedQuery<SceneMarker>("scene_markers");
       return !!sceneMarkers ? sceneMarkers : [];
     },
     async gallery(scene) {
-      const gallery = await scene.getGallery();
+      const gallery = await scene.$relatedQuery<Gallery>("gallery").first();
       return !!gallery ? gallery : undefined;
     },
     async studio(scene) {
-      const studio =  await scene.getStudio();
+      const studio = await scene.$relatedQuery<Studio>("studio").first();
       return !!studio ? studio : undefined;
     },
     async tags(scene) {
-      const tags = await scene.getTags();
+      const tags = await scene.$relatedQuery<Tag>("tags");
       return !!tags ? tags : [];
     },
     async performers(scene) {
-      const performers = await scene.getPerformers();
+      const performers = await scene.$relatedQuery<Performer>("performers");
       return !!performers ? performers : [];
     },
     async scene_marker_tags(scene, args, context, info) {
@@ -112,17 +116,46 @@ export const resolvers: IResolvers = {
   },
   SceneMarker: {
     preview() { return ""; }, // TODO
+    primary_tag(sceneMarker) {
+      if (!!sceneMarker.primary_tag) {
+        return sceneMarker.primary_tag;
+      } else {
+        return sceneMarker.$relatedQuery("primary_tag").first() as any;
+      }
+    },
     stream() { return ""; }, // TODO
+    scene(sceneMarker) {
+      if (!!sceneMarker.scene) {
+        return sceneMarker.scene;
+      } else {
+        return sceneMarker.$relatedQuery("scene").first() as any;
+      }
+    },
+    tags(sceneMarker) {
+      if (!!sceneMarker.tags) {
+        return sceneMarker.tags;
+      } else {
+        return sceneMarker.$relatedQuery("tags") as any;
+      }
+    },
   },
   Studio: {
     image_path() {
       // TODO: ctx[:routes].studio_image_url(studio.id, host: ctx[:base_url])
       return "";
     },
-    async scene_count(studio) { return await studio.countScenes(); },
+    async scene_count(studio) {
+      return (await studio.$relatedQuery<any>("scenes").count())[0]["count(*)"];
+    },
   },
   Tag: {
-    async scene_count(tag) { return await tag.countScenes(); },
-    async scene_marker_count(tag) { return await tag.countPrimary_scene_markers() + await tag.countScene_markers(); },
+    async scene_count(tag) {
+      return (await tag.$relatedQuery<any>("scenes").count())[0]["count(*)"];
+    },
+    async scene_marker_count(tag) {
+      const primarySceneMarkers = (await tag.$relatedQuery<any>("primary_scene_markers").count())[0]["count(*)"];
+      const sceneMarkers = (await tag.$relatedQuery<any>("scene_markers").count())[0]["count(*)"];
+      return primarySceneMarkers + sceneMarkers;
+    },
   },
 };

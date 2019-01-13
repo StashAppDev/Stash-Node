@@ -1,12 +1,12 @@
-import Sequelize from "sequelize";
+import { transaction, Transaction } from "objection";
 import { Database } from "../../db/database";
-import { IGalleryAttributes } from "../../db/models/gallery.model";
-import { IPerformerAttributes } from "../../db/models/performer.model";
-import { ISceneMarkerAttributes, ISceneMarkerInstance } from "../../db/models/scene-marker.model";
-import { ISceneAttributes, ISceneInstance } from "../../db/models/scene.model";
-import { IScrapedItemAttributes, IScrapedItemInstance } from "../../db/models/scraped-item.model";
-import { IStudioAttributes } from "../../db/models/studio.model";
-import { ITagAttributes } from "../../db/models/tag.model";
+import { Gallery } from "../../db/models/gallery.model";
+import { Performer } from "../../db/models/performer.model";
+import { SceneMarker } from "../../db/models/scene-marker.model";
+import { Scene } from "../../db/models/scene.model";
+import { ScrapedItem } from "../../db/models/scraped-item.model";
+import { Studio } from "../../db/models/studio.model";
+import { Tag } from "../../db/models/tag.model";
 import { IMappingJson, IScrapedJson, StashJson } from "../json.stash";
 import { StashManager } from "../manager.stash";
 import { BaseTask } from "./base.task";
@@ -33,7 +33,7 @@ export class ImportTask extends BaseTask {
   }
 
   public async importPerformers() {
-    const performers: IPerformerAttributes[] = [];
+    const performers: Array<Partial<Performer>> = [];
     for (const [i, mappingJson] of this.mappings.performers.entries()) {
       const index = i + 1;
       const performerJson = StashJson.getPerformer(mappingJson.checksum);
@@ -41,7 +41,8 @@ export class ImportTask extends BaseTask {
 
       StashManager.info(`Reading performer ${index} of ${this.mappings.performers.length}\r`);
 
-      const performer: IPerformerAttributes = {
+      const dateString = this.getDateString();
+      const performer: Partial<Performer> = {
         image: Buffer.from(performerJson.image!, "base64"),
         checksum: mappingJson.checksum,
         name: mappingJson.name,
@@ -51,27 +52,30 @@ export class ImportTask extends BaseTask {
         birthdate: performerJson.birthdate,
         ethnicity: performerJson.ethnicity,
         country: performerJson.country,
-        eyeColor: performerJson.eye_color,
+        eye_color: performerJson.eye_color,
         height: performerJson.height,
         measurements: performerJson.measurements,
-        fakeTits: performerJson.fake_tits,
-        careerLength: performerJson.career_length,
+        fake_tits: performerJson.fake_tits,
+        career_length: performerJson.career_length,
         tattoos: performerJson.tattoos,
         piercings: performerJson.piercings,
         aliases: performerJson.aliases,
         favorite: performerJson.favorite,
+
+        created_at: dateString,
+        updated_at: dateString,
       };
 
       performers.push(performer);
     }
 
     StashManager.info("Importing performers...");
-    await this.bulkCreate(Database.Performer, performers);
+    await this.bulkCreate(Performer, performers);
     StashManager.info("Performer import complete");
   }
 
   private async importStudios() {
-    const studios: IStudioAttributes[] = [];
+    const studios: Array<Partial<Studio>> = [];
     for (const [i, mappingJson] of this.mappings.studios.entries()) {
       const index = i + 1;
       const studioJson = StashJson.getStudio(mappingJson.checksum);
@@ -79,45 +83,53 @@ export class ImportTask extends BaseTask {
 
       StashManager.info(`Reading studio ${index} of ${this.mappings.studios.length}\r`);
 
-      const studio: IStudioAttributes = {
+      const dateString = this.getDateString();
+      const studio: Partial<Studio> = {
         checksum: mappingJson.checksum,
         image: Buffer.from(studioJson.image, "base64"),
         name: mappingJson.name,
         url: studioJson.url,
+
+        created_at: dateString,
+        updated_at: dateString,
       };
 
       studios.push(studio);
     }
 
     StashManager.info("Importing studios...");
-    await this.bulkCreate(Database.Studio, studios);
+    await this.bulkCreate(Studio, studios);
     StashManager.info("Studio import complete");
   }
 
   private async importGalleries() {
-    const galleries: IGalleryAttributes[] = [];
+    const galleries: Array<Partial<Gallery>> = [];
     for (const [i, mappingJson] of this.mappings.galleries.entries()) {
       const index = i + 1;
       if (!mappingJson.checksum || !mappingJson.path) { return; }
 
       StashManager.info(`Reading gallery ${index} of ${this.mappings.galleries.length}\r`);
 
-      const gallery: IGalleryAttributes = {
+      const dateString = this.getDateString();
+      const gallery: Partial<Gallery> = {
         checksum: mappingJson.checksum,
         path: mappingJson.path,
+
+        created_at: dateString,
+        updated_at: dateString,
       };
 
       galleries.push(gallery);
     }
 
     StashManager.info("Importing galleries...");
-    await this.bulkCreate(Database.Gallery, galleries);
+    await this.bulkCreate(Gallery, galleries);
     StashManager.info("Gallery import complete");
   }
 
   private async importTags() {
     const tagNames: string[] = [];
-    const tags: ITagAttributes[] = [];
+    const tags: Array<Partial<Tag>> = [];
 
     for (const [i, mappingJson] of this.mappings.scenes.entries()) {
       const index = i + 1;
@@ -143,25 +155,27 @@ export class ImportTask extends BaseTask {
       });
     }
 
+    const dateString = this.getDateString();
     const uniqueTagNames = [...new Set(tagNames)];
     uniqueTagNames.forEach((tagName) => {
-      tags.push({ name: tagName });
+      tags.push({ name: tagName, created_at: dateString, updated_at: dateString });
     });
 
     StashManager.info("Importing tags...");
-    await this.bulkCreate(Database.Tag, tags);
+    await this.bulkCreate(Tag, tags);
     StashManager.info("Tag import complete");
   }
 
   private async importScrapedItems() {
-    const transaction = await Database.sequelize.transaction();
-
+    const dateString = this.getDateString();
+    const trx = await transaction.start(Database.knex);
     try {
+      StashManager.info("Importing scraped sites...");
       for (const [i, mappingJson] of this.scraped.entries()) {
         const index = i + 1;
         StashManager.info(`Reading scraped site ${index} of ${this.scraped.length}\r`);
 
-        const scrapedItemAttributes: IScrapedItemAttributes = {
+        const scrapedItemAttributes: Partial<ScrapedItem> = {
           title: mappingJson.title,
           description: mappingJson.description,
           url: mappingJson.url,
@@ -170,38 +184,38 @@ export class ImportTask extends BaseTask {
           tags: mappingJson.tags,
           models: mappingJson.models,
           episode: mappingJson.episode,
-          galleryFilename: mappingJson.gallery_filename,
-          galleryUrl: mappingJson.gallery_url,
-          videoFilename: mappingJson.video_filename,
-          videoUrl: mappingJson.video_url,
+          gallery_filename: mappingJson.gallery_filename,
+          gallery_url: mappingJson.gallery_url,
+          video_filename: mappingJson.video_filename,
+          video_url: mappingJson.video_url,
+
+          created_at: dateString,
+          updated_at: new Date(mappingJson.updated_at).toISOString(), // TODO
         };
 
-        let scrapedItem: IScrapedItemInstance;
+        const studio = await this.getStudio(mappingJson.studio, trx);
+        if (!!studio) {
+          scrapedItemAttributes.studio_id = studio.id;
+        }
+
         try {
-          scrapedItem = await Database.ScrapedItem.create(scrapedItemAttributes, { transaction });
+          await ScrapedItem.query(trx).context({ silent: true }).insert(scrapedItemAttributes);
         } catch (e) {
           StashManager.error(`Failed to save scraped item <${scrapedItemAttributes.title}>`);
           throw e;
         }
-
-        const studio = await this.getStudio(mappingJson.studio, transaction);
-        await scrapedItem.setStudio(studio, { transaction });
-
-        // Force update the timestamp
-        const id = scrapedItem!.id!;
-        const updatedAt = new Date(mappingJson.updated_at);
-        await Database.ScrapedItem.update({ updatedAt }, { where: { id }, transaction, silent: true });
       }
 
-      await transaction.commit();
+      await trx.commit();
+      StashManager.info("Scraped site import complete");
     } catch (e) {
-      await transaction.rollback();
+      await trx.rollback();
     }
   }
 
   private async importScenes() {
-    const transaction = await Database.sequelize.transaction();
-
+    const dateString = this.getDateString();
+    const trx = await transaction.start(Database.knex);
     try {
       for (const [i, mappingJson] of this.mappings.scenes.entries()) {
         const index = i + 1;
@@ -212,7 +226,7 @@ export class ImportTask extends BaseTask {
 
         StashManager.info(`Importing scene ${index} of ${this.mappings.scenes.length}\r`);
 
-        const sceneAttributes: ISceneAttributes = { checksum: mappingJson.checksum, path: mappingJson.path };
+        const sceneAttributes: Partial<Scene> = { checksum: mappingJson.checksum, path: mappingJson.path };
 
         const sceneJson = StashJson.getScene(mappingJson.checksum);
         if (!!sceneJson) {
@@ -225,8 +239,8 @@ export class ImportTask extends BaseTask {
           if (!!sceneJson.file) {
             sceneAttributes.size = sceneJson.file.size;
             sceneAttributes.duration = sceneJson.file.duration;
-            sceneAttributes.videoCodec = sceneJson.file.video_codec;
-            sceneAttributes.audioCodec = sceneJson.file.audio_codec;
+            sceneAttributes.video_codec = sceneJson.file.video_codec;
+            sceneAttributes.audio_codec = sceneJson.file.audio_codec;
             sceneAttributes.width = sceneJson.file.width;
             sceneAttributes.height = sceneJson.file.height;
             sceneAttributes.framerate = sceneJson.file.framerate;
@@ -236,83 +250,93 @@ export class ImportTask extends BaseTask {
           }
         }
 
-        let scene: ISceneInstance;
+        if (!!sceneJson.studio) {
+          const studio = await this.getStudio(sceneJson.studio, trx);
+          if (!!studio) { sceneAttributes.studio_id = studio.id; }
+        }
+
+        let scene: Scene;
         try {
-          scene = await Database.Scene.create(sceneAttributes, { transaction });
+          scene = await Scene.query(trx).insertAndFetch(sceneAttributes);
         } catch (e) {
           StashManager.error(`Failed to save scene <${sceneAttributes.path}>`);
           throw e;
         }
 
-        if (!!sceneJson.studio) {
-          const studio = await this.getStudio(sceneJson.studio, transaction);
-          await scene.setStudio(studio, { transaction });
-        }
         if (!!sceneJson.gallery) {
-          const gallery = await this.getGallery(sceneJson.gallery, transaction);
-          await scene.setGallery(gallery, { transaction });
+          const gallery = await this.getGallery(sceneJson.gallery, trx);
+          if (!!gallery) { await scene.$relatedQuery("gallery", trx).relate(gallery.id); }
         }
         if (!!sceneJson.performers) {
-          const performers = await this.getPerformers(sceneJson.performers, transaction);
-          await scene.setPerformers(performers, { transaction });
+          const performers = await this.getPerformers(sceneJson.performers, trx);
+          if (!!performers) {
+            for (const performer of performers) {
+              await scene.$relatedQuery("performers", trx).relate(performer.id!);
+            }
+          }
         }
         if (!!sceneJson.tags) {
-          const tags = await this.getTags(sceneJson.tags, transaction);
-          await scene.setTags(tags, { transaction });
+          const tags = await this.getTags(sceneJson.tags, trx);
+          if (!!tags) {
+            for (const tag of tags) {
+              await scene.$relatedQuery("tags", trx).relate(tag.id!);
+            }
+          }
         }
         if (!!sceneJson.markers) {
-          const sceneMarkers: ISceneMarkerInstance[] = [];
+          const sceneMarkers: SceneMarker[] = [];
           for (const markerJson of sceneJson.markers) {
-            const markerAttributes: ISceneMarkerAttributes = {
+            const markerAttributes: Partial<SceneMarker> = {
               title: markerJson.title,
               seconds: markerJson.seconds,
             };
 
-            const marker = await Database.SceneMarker.create(markerAttributes, { transaction });
+            const marker = await SceneMarker.query(trx).insertAndFetch(markerAttributes);
 
-            const primaryTag = await this.getTag(markerJson.primary_tag, transaction);
-            if (!!primaryTag) { await marker.setPrimary_tag(primaryTag, { transaction }); }
+            const primaryTag = await this.getTag(markerJson.primary_tag, trx);
+            if (!!primaryTag) { await marker.$query(trx).update({ primary_tag_id: primaryTag.id }); }
 
-            const markerTags = await this.getTags(markerJson.tags, transaction);
-            if (!!markerTags) { await marker.setTags(markerTags, { transaction }); }
+            const markerTags = await this.getTags(markerJson.tags, trx);
+            if (!!markerTags) {
+              for (const markerTag of markerTags) {
+                await marker.$relatedQuery("tags", trx).relate(markerTag.id!);
+              }
+            }
 
             sceneMarkers.push(marker);
           }
 
           try {
-            await scene.setScene_markers(sceneMarkers, { transaction });
+            for (const sceneMarker of sceneMarkers) {
+              await scene.$relatedQuery("scene_markers", trx).relate(sceneMarker.id!);
+            }
           } catch (e) {
             StashManager.error(`Failed to save scene <${sceneAttributes.path}> due to invalid scene markers`);
             throw e;
           }
         }
       }
-      await transaction.commit();
+      await trx.commit();
     } catch (e) {
       StashManager.error(`Failed to save scenes!  Error: ${e}`);
-      transaction.rollback();
+      trx.rollback();
     }
   }
 
-  private async bulkCreate<TInstance, TAttributes>(
-    model: Sequelize.Model<TInstance, TAttributes>,
-    records: TAttributes[],
-  ) {
-    const transaction = await Database.sequelize.transaction();
+  private async bulkCreate<T>(type: new() => T, records: T[]) {
     try {
-      await model.bulkCreate(records, { transaction });
-      await transaction.commit();
+      const tableName = (type as any).tableName;
+      await Database.knex.batchInsert(tableName, records);
     } catch (e) {
-      transaction.rollback();
-      StashManager.error(`Import of ${model.name} failed.`);
-      if (!!e.original) { StashManager.error(e.original); }
+      StashManager.error(`Import of ${type.name} failed.`);
+      if (!!e.stack) { StashManager.error(e.stack); }
     }
   }
 
-  private async getStudio(studioName: string, transaction?: Sequelize.Transaction) {
+  private async getStudio(studioName: string, trx: Transaction) {
     if (studioName.length === 0) { return; }
 
-    const studio = await Database.Studio.findOne({ where: { name: studioName }, transaction });
+    const studio = await Studio.query(trx).findOne({ name: studioName });
     if (!!studio) {
       return studio;
     } else {
@@ -321,10 +345,10 @@ export class ImportTask extends BaseTask {
     }
   }
 
-  private async getGallery(checksum: string, transaction?: Sequelize.Transaction) {
+  private async getGallery(checksum: string, trx: Transaction) {
     if (checksum.length === 0) { return; }
 
-    const gallery = await Database.Gallery.findOne({ where: { checksum }, transaction });
+    const gallery = await Gallery.query(trx).findOne({ checksum });
     if (!!gallery) {
       return gallery;
     } else {
@@ -333,10 +357,10 @@ export class ImportTask extends BaseTask {
     }
   }
 
-  private async getPerformers(performerNames: string[], transaction?: Sequelize.Transaction) {
+  private async getPerformers(performerNames: string[], trx: Transaction) {
     if (performerNames.length === 0) { return; }
 
-    const performers = await Database.Performer.findAll({ where: { name: performerNames }, transaction });
+    const performers = await Performer.query(trx).whereIn("name", performerNames);
 
     const pluckedNames = performers.map((p) => p.name).filter((p) => p !== undefined) as string[];
     const missingPerformers = performerNames.filter((item) => pluckedNames.indexOf(item) < 0); // TODO test
@@ -345,10 +369,10 @@ export class ImportTask extends BaseTask {
     return performers;
   }
 
-  private async getTags(tagNames: string[], transaction?: Sequelize.Transaction) {
+  private async getTags(tagNames: string[], trx: Transaction) {
     if (tagNames.length === 0) { return; }
 
-    const tags = await Database.Tag.findAll({ where: { name: tagNames }, transaction });
+    const tags = await Tag.query(trx).whereIn("name", tagNames);
 
     const pluckedNames = tags.map((t) => t.name).filter((t) => t !== undefined) as string[];
     const missingTags = tagNames.filter((item) => pluckedNames.indexOf(item) < 0); // TODO test
@@ -357,15 +381,19 @@ export class ImportTask extends BaseTask {
     return tags;
   }
 
-  private async getTag(tagName: string, transaction?: Sequelize.Transaction) {
+  private async getTag(tagName: string, trx: Transaction) {
     if (tagName.length === 0) { return; }
 
-    const tag = await Database.Tag.findOne({ where: { name: tagName }, transaction });
+    const tag = await Tag.query(trx).findOne({ name: tagName });
     if (!!tag) {
       return tag;
     } else {
       StashManager.warn(`Tag <${tagName}> does not exist!`);
       return;
     }
+  }
+
+  private getDateString() {
+    return new Date().toISOString();
   }
 }

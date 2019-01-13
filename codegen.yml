@@ -8,13 +8,13 @@ generates:
       enumsAsTypes: true
       defaultMapper: FIXME-NOT-MAPPED-ADD-TYPE-TO-CODEGEN-YML
       mappers:
-        Gallery: ../db/models/gallery.model#IGalleryInstance
-        Performer: ../db/models/performer.model#IPerformerInstance
-        SceneMarker: ../db/models/scene-marker.model#ISceneMarkerInstance
-        Scene: ../db/models/scene.model#ISceneInstance
-        ScrapedItem: ../db/models/scraped-item.model#IScrapedItemInstance
-        Studio: ../db/models/studio.model#IStudioInstance
-        Tag: ../db/models/tag.model#ITagInstance
+        Gallery: ../db/models/gallery.model#Gallery
+        Performer: ../db/models/performer.model#Performer
+        SceneMarker: ../db/models/scene-marker.model#SceneMarker
+        Scene: ../db/models/scene.model#Scene
+        ScrapedItem: ../db/models/scraped-item.model#ScrapedItem
+        Studio: ../db/models/studio.model#Studio
+        Tag: ../db/models/tag.model#Tag
 
         FindGalleriesResultType: GQL.FindGalleriesResultType
         FindPerformersResultType: GQL.FindPerformersResultType

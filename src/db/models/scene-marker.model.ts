@@ -1,69 +1,66 @@
-import * as Sequelize from "sequelize";
-import { Database } from "../database";
-import { ISceneAttributes, ISceneInstance } from "./scene.model";
-import { ITagAttributes, ITagInstance } from "./tag.model";
+// tslint:disable:object-literal-sort-keys variable-name
+import { Model } from "objection";
+import path from "path";
+import BaseModel from "./base.model";
+import { Scene } from "./scene.model";
+import { Tag } from "./tag.model";
 
-export interface ISceneMarkerAttributes {
-  id?: number;
-  title: string;
-  seconds?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-  primaryTag?: ITagAttributes | ITagAttributes["id"];
-  tags?: ITagAttributes[] | Array<ITagAttributes["id"]>;
-  scene?: ISceneAttributes | ISceneAttributes["id"];
+export class SceneMarker extends BaseModel {
+  public static tableName = "scene_markers";
+
+  // public static jsonSchema = {
+  //   type: "object",
+  //   required: ["path", "checksum"],
+
+  //   properties: {
+  //     id: { type: "integer" },
+  //     path: { type: "string" },
+  //     checksum: { type: "string" },
+  //     scene_id: { type: ["integer", "null"] },
+  //     created_at: { type: "string" },
+  //     updated_at: { type: "string" },
+  //   },
+  // };
+
+  public static relationMappings = {
+    primary_tag: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: path.join(__dirname, "tag.model"),
+      join: {
+        from: "scene_markers.primary_tag_id",
+        to: "tags.id",
+      },
+    },
+    scene: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: path.join(__dirname, "scene.model"),
+      join: {
+        from: "scene_markers.scene_id",
+        to: "scenes.id",
+      },
+    },
+    tags: {
+      relation: Model.ManyToManyRelation,
+      modelClass: path.join(__dirname, "tag.model"),
+      join: {
+        from: "scene_markers.id",
+        through: {
+          from: "scene_markers_tags.scene_marker_id",
+          to: "scene_markers_tags.tag_id",
+        },
+        to: "tags.id",
+      },
+    },
+  };
+
+  public id?: number;
+  public title: string;
+  public seconds?: number;
+  public primary_tag_id?: number;
+  public scene_id: number;
+
+  // Optional eager relations.
+  public primary_tag?: Tag;
+  public tags?: Tag[];
+  public scene?: Scene;
 }
-
-export interface ISceneMarkerInstance extends Sequelize.Instance<ISceneMarkerAttributes>, ISceneMarkerAttributes {
-  getPrimary_tag: Sequelize.BelongsToGetAssociationMixin<ITagInstance>;
-  setPrimary_tag: Sequelize.BelongsToSetAssociationMixin<ITagInstance, ITagInstance["id"]>;
-  createPrimary_tag: Sequelize.BelongsToCreateAssociationMixin<ITagAttributes, ITagInstance>;
-
-  getTags: Sequelize.BelongsToManyGetAssociationsMixin<ITagInstance>;
-  setTags: Sequelize.BelongsToManySetAssociationsMixin<ITagInstance, ITagInstance["id"], "scene_markers_tags">;
-  addTags: Sequelize.BelongsToManyAddAssociationsMixin<ITagInstance, ITagInstance["id"], "scene_markers_tags">;
-  addTag: Sequelize.BelongsToManyAddAssociationMixin<ITagInstance, ITagInstance["id"], "scene_markers_tags">;
-  createTags: Sequelize.BelongsToManyCreateAssociationMixin<ITagAttributes, ITagInstance["id"], "scene_markers_tags">;
-  removeTag: Sequelize.BelongsToManyRemoveAssociationMixin<ITagInstance, ITagInstance["id"]>;
-  removeTags: Sequelize.BelongsToManyRemoveAssociationsMixin<ITagInstance, ITagInstance["id"]>;
-  hasTag: Sequelize.BelongsToManyHasAssociationMixin<ITagInstance, ITagInstance["id"]>;
-  hasTags: Sequelize.BelongsToManyHasAssociationsMixin<ITagInstance, ITagInstance["id"]>;
-  countTags: Sequelize.BelongsToManyCountAssociationsMixin;
-
-  getScene: Sequelize.BelongsToGetAssociationMixin<ISceneInstance>;
-  setScene: Sequelize.BelongsToSetAssociationMixin<ISceneInstance, ISceneInstance["id"]>;
-  createScene: Sequelize.BelongsToCreateAssociationMixin<ISceneAttributes, ISceneInstance>;
-}
-
-export const SceneMarkerFactory = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes,
-): Sequelize.Model<ISceneMarkerInstance, ISceneMarkerAttributes> => {
-  // tslint:disable:object-literal-sort-keys
-  const attributes: Sequelize.DefineModelAttributes<ISceneMarkerAttributes> = {
-    id:       { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true },
-    title:    { type: DataTypes.STRING, allowNull: false },
-    seconds:  { type: DataTypes.DECIMAL, allowNull: false},
-  };
-  // tslint:enable:object-literal-sort-keys
-
-  const options: Sequelize.DefineOptions<ISceneMarkerInstance> = {
-    indexes: [
-      { name: "index_scene_markers_on_primary_tag_id", fields: ["primary_tag_id"] },
-      { name: "index_scene_markers_on_scene_id", fields: ["scene_id"] },
-    ],
-  };
-
-  const SceneMarker =
-    sequelize.define<ISceneMarkerInstance, ISceneMarkerAttributes>("scene_markers", attributes, options);
-
-  SceneMarker.associate = () => {
-    SceneMarker.belongsTo(Database.Tag, { as: "primary_tag", foreignKey: "primary_tag_id" });
-    SceneMarker.belongsToMany(Database.Tag, {
-      as: "tags", foreignKey: "scene_marker_id", through: "scene_markers_tags",
-    });
-    SceneMarker.belongsTo(Database.Scene, { as: "scene", foreignKey: "scene_id" });
-  };
-
-  return SceneMarker;
-};

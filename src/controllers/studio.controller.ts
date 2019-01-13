@@ -1,6 +1,6 @@
 import express from "express";
 import FileType from "file-type";
-import { Database } from "../db/database";
+import { Studio } from "../db/models/studio.model";
 import { processImage } from "../stash/utils.stash";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
@@ -10,28 +10,30 @@ export class StudioController {
   // #region GraphQL Resolvers
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
-    return getEntity(Database.Studio, { id: args.id });
+    return getEntity(Studio, { id: args.id });
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {
-    const newStudio = Database.Studio.build({
+    const newStudio: Partial<Studio> = {
       name: args.input.name,
       url: args.input.url,
-    });
+    };
     if (!!args.input.image) {
       processImage(args.input, newStudio);
     }
-    return newStudio.save();
+    return Studio.query().insert(newStudio);
   }
 
   public static studioUpdate: MutationResolvers.StudioUpdateResolver = async (root, args, context, info) => {
-    const studio = await getEntity(Database.Studio, { id: args.input.id });
-    studio.name = args.input.name;
-    studio.url = args.input.url;
+    // TODO: check what happens if an input variable is undefined
+    const updatedStudio: Partial<Studio> = {
+      name: args.input.name,
+      url: args.input.url,
+    };
     if (!!args.input.image) {
-      processImage(args.input, studio);
+      processImage(args.input, updatedStudio);
     }
-    return studio.save();
+    return Studio.query().updateAndFetchById(args.input.id, updatedStudio);
   }
 
   // #endregion
@@ -40,7 +42,7 @@ export class StudioController {
     try {
       // if (req.fresh) { return; } // TODO
 
-      const studio = await getEntity(Database.Studio, { id: req.params.id });
+      const studio = await getEntity(Studio, { id: req.params.id });
 
       const fileType = FileType(studio.image!);
       if (fileType == null) { throw Error(`Unable to find file type for studio image ${studio.id}`); }

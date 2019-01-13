@@ -1,4 +1,4 @@
-import Sequelize from "sequelize";
+import { Model, QueryBuilder } from "objection";
 import { HttpError } from "../errors/http.error";
 import { log } from "../logger";
 
@@ -7,20 +7,21 @@ import { log } from "../logger";
  *
  * @param id The id of the entity
  */
-export async function getEntity<TInstance, TAttributes>(
-  model: Sequelize.Model<TInstance, TAttributes>,
+export async function getEntity<T extends Model>(
+  type: new() => T,
   identifier: { id?: string, checksum?: string },
-): Promise<TInstance> {
-  let entity: TInstance | null = null;
+): Promise<T> {
+  let entity: T | undefined;
+  const qb = QueryBuilder.forClass(type as any);
   if (!!identifier.id) {
-    entity = await model.findOne({ where: { id: identifier.id } } as any);
+    entity = await qb.findById(identifier.id) as any;
   }
   if (!entity && !!identifier.checksum) {
-    entity = await model.findOne({ where: { checksum: identifier.checksum } } as any);
+    entity = await qb.findOne({ checksum: identifier.checksum }) as any;
   }
 
   if (!entity) {
-    const message = `Unable to find ${model.name} with identifer ${identifier}`;
+    const message = `Unable to find ${type.name} with identifer ${identifier}`;
     log.warn(message);
     throw new HttpError(404, message);
   }

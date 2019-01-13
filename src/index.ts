@@ -19,6 +19,7 @@ function configureCommander() {
     .action(async () => {
       await Database.initialize();
       await StashManager.scan("");
+      await Database.shutdown();
     });
 
   program
@@ -26,6 +27,7 @@ function configureCommander() {
     .action(async () => {
       await Database.initialize();
       await StashManager.import("");
+      await Database.shutdown();
     });
 
   program

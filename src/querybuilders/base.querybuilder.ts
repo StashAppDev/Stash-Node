@@ -1,19 +1,16 @@
-import { AnyWhereOptions, FindOptions, ScopeOptions } from "sequelize";
-import { Database } from "../db/database";
+import { Model, QueryBuilder } from "objection";
 import { FindFilterType } from "../typings/graphql";
 
-export class BaseQueryBuilder<TInstance, TAttributes> {
-  public opts: FindOptions<TAttributes> = {};
-  public scopeOpts: Array<string | ScopeOptions | AnyWhereOptions> = [];
-  public model: any;
-  public findFilter: FindFilterType;
+export class BaseQueryBuilder<T extends Model> extends QueryBuilder<T> {
+  protected findFilter: FindFilterType;
 
-  constructor(model: any, findFilter?: FindFilterType | null) {
-    this.model = model;
+  constructor(type: new() => T, findFilter?: FindFilterType | null) {
+    // @ts-ignore
+    super(type); // https://github.com/Vincit/objection.js/blob/1.4.0/lib/queryBuilder/QueryBuilder.js#L42
     this.findFilter = !!findFilter ? findFilter : {};
   }
 
-  public paginate(): BaseQueryBuilder<TInstance, TAttributes> {
+  public paginate() {
     let page = !!this.findFilter.page ? this.findFilter.page : 1;
     if (page < 1) {
       page = 1;
@@ -26,13 +23,10 @@ export class BaseQueryBuilder<TInstance, TAttributes> {
       perPage = 1;
     }
 
-    this.opts.offset = (page - 1) * perPage;
-    this.opts.limit = perPage;
-
-    return this;
+    return this.page(page - 1, perPage);
   }
 
-  public sort(defaultSort: string): BaseQueryBuilder<TInstance, TAttributes> {
+  public sort(defaultSort: string) {
     const sort = !!this.findFilter.sort ? this.findFilter.sort : defaultSort;
     const findFilterDirection = !!this.findFilter.direction ? this.findFilter.direction : "ASC";
 
@@ -43,25 +37,22 @@ export class BaseQueryBuilder<TInstance, TAttributes> {
       // t_name = params[:sort].split('_').first.pluralize
       // const tableName = findFilter.sort.split('_')[0].pluralize // TODO
       // left_joins(t_name.to_sym).group(:id).reorder("COUNT(#{t_name}.id) #{sort_direction}")
+      return this;
     } else if (sort === "filesize") {
       // reorder("cast(#{table_name}.size as integer) #{sort_direction}") // TODO
+      return this;
     } else if (sort === "random") {
-      this.opts.order = Database.sequelize.random();
+      return this.orderByRaw("RANDOM()");
     } else {
-      // TODO make sure this continues to work
-      this.opts.order = Database.sequelize.literal(`${this.model!.name}.${sortColumn} ${sortDirection}`);
+      return this.orderByRaw(`${this.modelClass().tableName}.${sortColumn} ${sortDirection}`); // TODO
     }
-
-    return this;
   }
 
-  public search(): BaseQueryBuilder<TInstance, TAttributes> {
-    if (!this.findFilter.q) { return this; }
-    this.scopeOpts.push({ method: ["search", this.findFilter.q] });
-    return this;
+  public search() {
+    throw new Error("Override");
   }
 
   private getColumnNames(): string[] {
-    return Object.keys(this.model.fieldRawAttributesMap);
+    return this.modelClass().tableMetadata().columns;
   }
 }

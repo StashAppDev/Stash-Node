@@ -1,6 +1,8 @@
 import fse from "fs-extra";
+import { Model } from "objection";
 import path from "path";
-import { Database } from "../../db/database";
+import { Gallery } from "../../db/models/gallery.model";
+import { Scene } from "../../db/models/scene.model";
 import { FFMpeg } from "../ffmpeg.stash";
 import { FFProbe } from "../ffprobe.stash";
 import { md5FromPath } from "../utils.stash";
@@ -13,7 +15,7 @@ export class ScanTask extends BaseTask {
   constructor(filePath: string) {
     super();
     this.filePath = filePath;
-    if (this.getClass() === Database.Scene) {
+    if (this.getClass() === Scene) {
       this.movie = new FFProbe(this.filePath);
     }
   }
@@ -21,50 +23,41 @@ export class ScanTask extends BaseTask {
   public async start() {
     this.manager.verbose(this.filePath);
     this.createFolders();
-    const klass = this.getClass();
+    const klass = this.getClass() as typeof Model;
 
-    let entity;
-    if (klass === Database.Scene) {
-      entity = await klass.findOne({where: {path: this.filePath}});
-    } else if (klass === Database.Gallery) {
-      entity = await klass.findOne({where: {path: this.filePath}});
-    }
+    let entity = await klass.query().findOne({ path: this.filePath });
     if (!!entity) { return; } // We already have this item in the database, keep going
 
     const checksum = this.calculateChecksum();
 
     await this.makeScreenshots(checksum);
 
-    if (klass === Database.Scene) {
-      entity = await klass.findOne({where: { checksum }});
-    } else if (klass === Database.Gallery) {
-      entity = await klass.findOne({where: { checksum }});
-    }
+    entity = await klass.query().findOne({ checksum });
     if (!!entity) {
       this.manager.info(`${this.filePath} already exists.  Updating path...`);
-      entity.path = this.filePath;
-      await entity.save();
+      await (entity as any).$query().update({ path: this.filePath });
     } else {
       this.manager.info(`${this.filePath} doesn't exist.  Creating new item...`);
 
-      if (klass === Database.Scene) {
-        entity = await klass.build({ checksum, path: this.filePath });
-        entity.size        = this.movie!.size.toString();
-        entity.duration    = this.movie!.duration;
-        entity.videoCodec  = this.movie!.videoCodec;
-        entity.audioCodec  = this.movie!.audioCodec;
-        entity.width       = this.movie!.width;
-        entity.height      = this.movie!.height;
-        await entity.save();
-      } else if (klass === Database.Gallery) {
-        entity = await klass.build({ checksum, path: this.filePath });
-        await entity.save();
+      if (klass === Scene) {
+        await Scene.query().insert({
+          checksum,
+          path: this.filePath,
+          size: this.movie!.size.toString(),
+          duration: this.movie!.duration,
+          video_codec: this.movie!.videoCodec,
+          audio_codec: this.movie!.audioCodec,
+          width: this.movie!.width,
+          height: this.movie!.height,
+        });
+      } else if (klass === Gallery) {
+        await Gallery.query().insert({ checksum, path: this.filePath });
       }
     }
   }
 
   private async makeScreenshots(checksum: string) {
-    if (this.getClass() !== Database.Scene) { return; }
+    if (this.getClass() !== Scene) { return; }
 
     const thumbPath = this.paths.thumbnailScreenshotPath(checksum);
     const normalPath = this.paths.screenshotPath(checksum);
@@ -92,9 +85,9 @@ export class ScanTask extends BaseTask {
 
   private getClass() {
     if (path.extname(this.filePath) === ".zip") {
-      return Database.Gallery;
+      return Gallery;
     } else {
-      return Database.Scene;
+      return Scene;
     }
   }
 
