@@ -23,7 +23,7 @@ export class BaseQueryBuilder<T extends Model> extends QueryBuilder<T> {
       perPage = 1;
     }
 
-    return this.page(page - 1, perPage);
+    return this.page(page - 1, perPage).distinct(`${this.modelClass().tableName}.*`);
   }
 
   public sort(defaultSort: string) {
