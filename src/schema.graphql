@@ -388,6 +388,11 @@ type Query {
   """A function which queries SceneMarker objects"""
   findSceneMarkers(scene_marker_filter: SceneMarkerFilterType filter: FindFilterType): FindSceneMarkersResultType!
 
+  """Find a performer by ID"""
+  findPerformer(id: ID!): Performer
+  """A function which queries Performer objects"""
+  findPerformers(performer_filter: PerformerFilterType, filter: FindFilterType): FindPerformersResultType!
+
   """Find a studio by ID"""
   findStudio(id: ID!): Studio
   """A function which queries Studio objects"""

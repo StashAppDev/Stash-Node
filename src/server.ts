@@ -7,6 +7,7 @@ import { Database } from "./db/database";
 import { HttpError } from "./errors/http.error";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
+import performerRoutes from "./routes/performer.route";
 import sceneRoutes from "./routes/scene.route";
 import studioRoutes from "./routes/studio.route";
 
@@ -24,6 +25,7 @@ export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
+  app.use("/performers", performerRoutes);
   app.use("/scenes", sceneRoutes);
   app.use("/studios", studioRoutes);
   app.use(express.static(path.join(__dirname, "../dist-ui")));

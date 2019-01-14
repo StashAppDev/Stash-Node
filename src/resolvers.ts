@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import path from "path";
 import { URL } from "url";
 import { GalleryController } from "./controllers/gallery.controller";
+import { PerformerController } from "./controllers/performer.controller";
 import { SceneMarkerController } from "./controllers/scene-marker.controller";
 import { SceneController } from "./controllers/scene.controller";
 import { StudioController } from "./controllers/studio.controller";
@@ -36,8 +37,13 @@ export const resolvers: IResolvers = {
     tagCreate(root, args, context, info) { return TagController.tagCreate(root, args, context, info); },
     tagUpdate(root, args, context, info) { return TagController.tagUpdate(root, args, context, info); },
   },
+  Performer: {
+    image_path(root, args, context) { return new URL(`/performers/${root.id}/image`, context.baseUrl).toString(); },
+  },
   Query: {
     findGallery(root, args, context, info) { return GalleryController.findGallery(root, args, context, info); },
+    findPerformer(root, args, context, info) { return PerformerController.findPerformer(root, args, context, info); },
+    findPerformers(root, args, context, info) { return PerformerController.findPerformers(root, args, context, info); },
     findTag(root, args, context, info) { return TagController.findTag(root, args, context, info); },
     findScene(root, args, context, info) { return SceneController.findScene(root, args, context, info); },
     findScenes(root, args, context, info) { return SceneController.findScenes(root, args, context, info); },

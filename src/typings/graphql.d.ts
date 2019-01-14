@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-13T11:12:40-08:00
+// Generated in 2019-01-13T16:31:54-08:00
 export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
@@ -40,6 +40,11 @@ export interface SceneMarkerFilterType {
   scene_tags?: Maybe<(Maybe<string>)[]>;
   /** Filter to only include scene markers with these performers */
   performers?: Maybe<(Maybe<string>)[]>;
+}
+
+export interface PerformerFilterType {
+  /** Filter by favorite */
+  filter_favorites?: Maybe<boolean>;
 }
 
 export interface SceneUpdateInput {
@@ -198,11 +203,6 @@ export interface TagDestroyInput {
   id: string;
 }
 
-export interface PerformerFilterType {
-  /** Filter by favorite */
-  filter_favorites?: Maybe<boolean>;
-}
-
 export type ResolutionEnum =
   | "LOW"
   | "STANDARD"
@@ -224,6 +224,10 @@ export namespace GQL {
     findScenes: FindScenesResultType;
     /** A function which queries SceneMarker objects */
     findSceneMarkers: FindSceneMarkersResultType;
+    /** Find a performer by ID */
+    findPerformer?: Maybe<Performer>;
+    /** A function which queries Performer objects */
+    findPerformers: FindPerformersResultType;
     /** Find a studio by ID */
     findStudio?: Maybe<Studio>;
     /** A function which queries Studio objects */
@@ -463,6 +467,12 @@ export namespace GQL {
     scene_markers: (Maybe<SceneMarker>)[];
   }
 
+  export interface FindPerformersResultType {
+    count: number;
+
+    performers: (Maybe<Performer>)[];
+  }
+
   export interface FindStudiosResultType {
     count: number;
 
@@ -557,12 +567,6 @@ export namespace GQL {
     metadataUpdate: string;
   }
 
-  export interface FindPerformersResultType {
-    count: number;
-
-    performers: (Maybe<Performer>)[];
-  }
-
   // ====================================================
   // Arguments
   // ====================================================
@@ -581,6 +585,14 @@ export namespace GQL {
   }
   export interface FindSceneMarkersQueryArgs {
     scene_marker_filter?: Maybe<SceneMarkerFilterType>;
+
+    filter?: Maybe<FindFilterType>;
+  }
+  export interface FindPerformerQueryArgs {
+    id: string;
+  }
+  export interface FindPerformersQueryArgs {
+    performer_filter?: Maybe<PerformerFilterType>;
 
     filter?: Maybe<FindFilterType>;
   }
@@ -738,6 +750,18 @@ export namespace QueryResolvers {
       TypeParent,
       Context
     >;
+    /** Find a performer by ID */
+    findPerformer?: FindPerformerResolver<
+      Maybe<Performer>,
+      TypeParent,
+      Context
+    >;
+    /** A function which queries Performer objects */
+    findPerformers?: FindPerformersResolver<
+      GQL.FindPerformersResultType,
+      TypeParent,
+      Context
+    >;
     /** Find a studio by ID */
     findStudio?: FindStudioResolver<Maybe<Studio>, TypeParent, Context>;
     /** A function which queries Studio objects */
@@ -855,6 +879,26 @@ export namespace QueryResolvers {
   > = Resolver<R, Parent, Context, FindSceneMarkersArgs>;
   export interface FindSceneMarkersArgs {
     scene_marker_filter?: Maybe<SceneMarkerFilterType>;
+
+    filter?: Maybe<FindFilterType>;
+  }
+
+  export type FindPerformerResolver<
+    R = Maybe<Performer>,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, FindPerformerArgs>;
+  export interface FindPerformerArgs {
+    id: string;
+  }
+
+  export type FindPerformersResolver<
+    R = GQL.FindPerformersResultType,
+    Parent = {},
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context, FindPerformersArgs>;
+  export interface FindPerformersArgs {
+    performer_filter?: Maybe<PerformerFilterType>;
 
     filter?: Maybe<FindFilterType>;
   }
@@ -1713,6 +1757,28 @@ export namespace FindSceneMarkersResultTypeResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
+export namespace FindPerformersResultTypeResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = GQL.FindPerformersResultType
+  > {
+    count?: CountResolver<number, TypeParent, Context>;
+
+    performers?: PerformersResolver<(Maybe<Performer>)[], TypeParent, Context>;
+  }
+
+  export type CountResolver<
+    R = number,
+    Parent = GQL.FindPerformersResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type PerformersResolver<
+    R = (Maybe<Performer>)[],
+    Parent = GQL.FindPerformersResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
 export namespace FindStudiosResultTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
@@ -2100,28 +2166,6 @@ export namespace SubscriptionResolvers {
   > = SubscriptionResolver<R, Parent, Context>;
 }
 
-export namespace FindPerformersResultTypeResolvers {
-  export interface Resolvers<
-    Context = IGraphQLContext,
-    TypeParent = GQL.FindPerformersResultType
-  > {
-    count?: CountResolver<number, TypeParent, Context>;
-
-    performers?: PerformersResolver<(Maybe<Performer>)[], TypeParent, Context>;
-  }
-
-  export type CountResolver<
-    R = number,
-    Parent = GQL.FindPerformersResultType,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-  export type PerformersResolver<
-    R = (Maybe<Performer>)[],
-    Parent = GQL.FindPerformersResultType,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-}
-
 /** Directs the executor to skip this field or fragment when the `if` argument is true. */
 export type SkipDirectiveResolver<Result> = DirectiveResolverFn<
   Result,
@@ -2169,6 +2213,7 @@ export interface IResolvers {
   SceneMarkerTag?: SceneMarkerTagResolvers.Resolvers;
   FindScenesResultType?: FindScenesResultTypeResolvers.Resolvers;
   FindSceneMarkersResultType?: FindSceneMarkersResultTypeResolvers.Resolvers;
+  FindPerformersResultType?: FindPerformersResultTypeResolvers.Resolvers;
   FindStudiosResultType?: FindStudiosResultTypeResolvers.Resolvers;
   FindGalleriesResultType?: FindGalleriesResultTypeResolvers.Resolvers;
   MarkerStringsResultType?: MarkerStringsResultTypeResolvers.Resolvers;
@@ -2176,7 +2221,6 @@ export interface IResolvers {
   ScrapedPerformer?: ScrapedPerformerResolvers.Resolvers;
   Mutation?: MutationResolvers.Resolvers;
   Subscription?: SubscriptionResolvers.Resolvers;
-  FindPerformersResultType?: FindPerformersResultTypeResolvers.Resolvers;
 }
 
 export interface IDirectiveResolvers<Result> {
