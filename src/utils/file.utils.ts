@@ -1,7 +1,6 @@
 import childProcess from "child_process";
 import FileType from "file-type";
 import fse from "fs-extra";
-import getStream from "get-stream";
 import _glob from "glob";
 import path from "path";
 import ReadChunk from "read-chunk";
@@ -63,6 +62,15 @@ export class FileUtils {
     }
   }
 
+  public static async move(fromPath: string, toPath: string) {
+    try {
+      return fse.move(fromPath, toPath);
+    } catch (e) {
+      log.warn(`Failed to move file from <${fromPath}> to <${toPath}> due to ${e.message}!`);
+      return;
+    }
+  }
+
   public static async write(data: any, filePath?: string) {
     try {
       if (!filePath) { throw new Error("No file path given."); }
@@ -73,17 +81,32 @@ export class FileUtils {
     }
   }
 
-  public static spawn(command: string, args: ReadonlyArray<string> = []): Promise<ISpawnResult> {
+  public static spawn(
+    command: string,
+    args: ReadonlyArray<string> = [],
+    onStdOut?: (data: any) => void,
+    onStdErr?: (data: any) => void,
+  ): Promise<ISpawnResult> {
     return new Promise((resolve, reject) => {
       const process = childProcess.spawn(command, args);
+      let stdout = "";
+      let stderr = "";
+
+      process.stdout.on("data", (data) => {
+        stdout += data.toString();
+        if (!!onStdOut) { onStdOut(data); }
+      });
+
+      process.stderr.on("data", (data) => {
+        stderr += data.toString();
+        if (!!onStdErr) { onStdErr(data); }
+      });
 
       process.on("error", (err) => {
         reject(new Error(`${command} ${args.join(" ")} encountered error ${err.message}`));
       });
 
       process.once("exit", async (code: number | null, signal: string | null) => {
-        const stdout = await getStream(process.stdout);
-        const stderr = await getStream(process.stderr);
         if (code === 0) {
           resolve({ stdout, stderr });
         } else {

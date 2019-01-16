@@ -5,6 +5,7 @@ import { FileUtils } from "../utils/file.utils";
 import { log } from "./../logger";
 import { StashPaths } from "./paths.stash";
 import { GenerateSpriteTask } from "./tasks/generate-sprite.task";
+import { GenerateTranscodeTask } from "./tasks/generate-transcode.task";
 import { ImportTask } from "./tasks/import.task";
 import { ScanTask } from "./tasks/scan.task";
 
@@ -92,6 +93,7 @@ class Manager {
   public async generate(
     jobId: string,
     sprites: boolean = true,
+    transcodes: boolean = true,
   ) {
     if (this.job.status !== Job.Status.Idle) { return; }
     this.job.id = jobId;
@@ -109,6 +111,15 @@ class Manager {
       if (sprites) {
         this.queue.add(async () => {
           const task = new GenerateSpriteTask(scene);
+          return task.start();
+        }).catch((reason: Error) => {
+          this.handleError(reason);
+        });
+      }
+
+      if (transcodes) {
+        this.queue.add(async () => {
+          const task = new GenerateTranscodeTask(scene);
           return task.start();
         }).catch((reason: Error) => {
           this.handleError(reason);

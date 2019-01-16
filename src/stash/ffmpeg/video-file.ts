@@ -30,6 +30,12 @@ interface IFFProbeData {
 }
 
 export class VideoFile implements IFFProbeData {
+  private static readonly VALID_HTML5_CODECS = ["h264", "h265", "vp8", "vp9"];
+
+  public static isValidVideoCodec(videoCodec: string) {
+    return VideoFile.VALID_HTML5_CODECS.includes(videoCodec);
+  }
+
   public readonly json: any;
 
   public readonly path: string;
