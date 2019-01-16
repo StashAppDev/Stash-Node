@@ -1,8 +1,10 @@
-import glob from "glob";
 import PQueue from "p-queue";
 import { Database } from "../db/database";
+import { Scene } from "../db/models/scene.model";
+import { FileUtils } from "../utils/file.utils";
 import { log } from "./../logger";
 import { StashPaths } from "./paths.stash";
+import { GenerateSpriteTask } from "./tasks/generate-sprite.task";
 import { ImportTask } from "./tasks/import.task";
 import { ScanTask } from "./tasks/scan.task";
 
@@ -68,7 +70,7 @@ class Manager {
     this.job.message = "Scanning...";
     this.job.logs = [];
 
-    const scanPaths = glob.sync("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: StashPaths.stash, realpath: true});
+    const scanPaths = await FileUtils.glob("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: StashPaths.stash, realpath: true});
     this.job.currentItem = 0;
     this.job.total = scanPaths.length;
     log.info(`Starting scan of ${scanPaths.length} files`);
@@ -80,11 +82,43 @@ class Manager {
         return scanTask.start();
       }).catch((reason: Error) => {
         this.handleError(reason);
-      });
+      }); // TODO: finally remove tmp dir and also use the tmp dir for this task
     });
 
-    // TODO check this
-    await this.queue.onEmpty();
+    await this.queue.onIdle();
+    this.idle();
+  }
+
+  public async generate(
+    jobId: string,
+    sprites: boolean = true,
+  ) {
+    if (this.job.status !== Job.Status.Idle) { return; }
+    this.job.id = jobId;
+    this.job.status = Job.Status.Generate;
+    this.job.message = "Generating content...";
+    this.job.logs = [];
+
+    this.job.total = (await Scene.knexQuery().count())[0]["count(*)"];
+    await StashPaths.ensureTmpDir();
+
+    const scenes = await Scene.query();
+    for (const scene of scenes) {
+      this.job.currentItem += 1;
+
+      if (sprites) {
+        this.queue.add(async () => {
+          const task = new GenerateSpriteTask(scene);
+          return task.start();
+        }).catch((reason: Error) => {
+          this.handleError(reason);
+        });
+      }
+
+      await this.queue.onIdle();
+    }
+
+    await StashPaths.removeTmpDir();
     this.idle();
   }
 

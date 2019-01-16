@@ -94,7 +94,7 @@ export const resolvers: IResolvers = {
         webp: new URL(`/scenes/${root.id}/webp`, context.baseUrl).toString(),
       };
     },
-    is_streamable(scene, args, context, info): boolean { return scene.isStreamable(); },
+    async is_streamable(scene, args, context, info) { return await scene.isStreamable(); },
 
     // TODO: remove these.  Don't need these resolvers
     async scene_markers(scene) {

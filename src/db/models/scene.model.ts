@@ -3,7 +3,8 @@ import fs from "fs";
 import { Model } from "objection";
 import path from "path";
 import { StashPaths } from "../../stash/paths.stash";
-import { getFileInfo } from "../../stash/utils.stash";
+import { FileUtils } from "../../utils/file.utils";
+import { VttUtils } from "../../utils/vtt.utils";
 import BaseModel from "./base.model";
 import { Gallery } from "./gallery.model";
 import { Performer } from "./performer.model";
@@ -105,13 +106,13 @@ export class Scene extends BaseModel {
   public gallery?: Gallery;
   public tags?: Tag[];
 
-  public getMimeType() {
-    const fileInfo = getFileInfo(this.path || "");
-    return (!!fileInfo) ? fileInfo.mime : undefined;
+  public async getMimeType() {
+    const fileType = await FileUtils.getFileType(this.path);
+    return (!!fileType) ? fileType.mime : undefined;
   }
 
-  public isStreamable() {
-    const mimeType = this.getMimeType();
+  public async isStreamable() {
+    const mimeType = await this.getMimeType();
     const valid = mimeType === "video/quicktime" || mimeType === "video/mp4" || mimeType === "video/webm";
     if (!valid) {
       const transcodePath = StashPaths.getTranscodePath(this.checksum || "");
@@ -122,18 +123,7 @@ export class Scene extends BaseModel {
   }
 
   public async makeChapterVtt() {
-    const vtt = ["WEBVTT", ""];
     const sceneMarkers = await this.$relatedQuery<SceneMarker>("scene_markers");
-    for (const marker of sceneMarkers) {
-      const time = this.getVttTime(marker.seconds);
-      vtt.push(`${time} --> ${time}`);
-      vtt.push(marker.title);
-      vtt.push("");
-    }
-    return vtt.join("\n");
-  }
-
-  private getVttTime(seconds: number = 0) {
-    return new Date(seconds * 1000).toISOString().substr(11, 8);
+    return VttUtils.makeChapterVtt(sceneMarkers);
   }
 }

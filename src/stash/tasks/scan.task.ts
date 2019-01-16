@@ -3,24 +3,24 @@ import { Model } from "objection";
 import path from "path";
 import { Gallery } from "../../db/models/gallery.model";
 import { Scene } from "../../db/models/scene.model";
-import { FFMpeg } from "../ffmpeg.stash";
-import { FFProbe } from "../ffprobe.stash";
-import { md5FromPath } from "../utils.stash";
+import { CryptoUtils } from "../../utils/crypto.utils";
+import { FFMpeg, IScreenshotOptions } from "../ffmpeg/ffmpeg";
+import { VideoFile } from "../ffmpeg/video-file";
 import { BaseTask } from "./base.task";
 
 export class ScanTask extends BaseTask {
   private filePath: string;
-  private movie?: FFProbe;
+  private videoFile?: VideoFile;
 
   constructor(filePath: string) {
     super();
     this.filePath = filePath;
-    if (this.getClass() === Scene) {
-      this.movie = new FFProbe(this.filePath);
-    }
   }
 
   public async start() {
+    if (this.getClass() === Scene) {
+      this.videoFile = await VideoFile.create(this.filePath);
+    }
     this.manager.verbose(this.filePath);
     this.createFolders();
     const klass = this.getClass() as typeof Model;
@@ -28,7 +28,7 @@ export class ScanTask extends BaseTask {
     let entity = await klass.query().findOne({ path: this.filePath });
     if (!!entity) { return; } // We already have this item in the database, keep going
 
-    const checksum = this.calculateChecksum();
+    const checksum = await this.calculateChecksum();
 
     await this.makeScreenshots(checksum);
 
@@ -39,16 +39,16 @@ export class ScanTask extends BaseTask {
     } else {
       this.manager.info(`${this.filePath} doesn't exist.  Creating new item...`);
 
-      if (klass === Scene) {
+      if (!!this.videoFile) {
         await Scene.query().insert({
           checksum,
           path: this.filePath,
-          size: this.movie!.size.toString(),
-          duration: this.movie!.duration,
-          video_codec: this.movie!.videoCodec,
-          audio_codec: this.movie!.audioCodec,
-          width: this.movie!.width,
-          height: this.movie!.height,
+          size: this.videoFile.size!.toString(),
+          duration: this.videoFile.duration,
+          video_codec: this.videoFile.videoCodec,
+          audio_codec: this.videoFile.audioCodec,
+          width: this.videoFile.width,
+          height: this.videoFile.height,
         });
       } else if (klass === Gallery) {
         await Gallery.query().insert({ checksum, path: this.filePath });
@@ -67,18 +67,26 @@ export class ScanTask extends BaseTask {
       return;
     }
 
-    await this.makeScreenshot(this.movie!, thumbPath, 5, 320);
-    await this.makeScreenshot(this.movie!, normalPath, 2, this.movie!.width);
+    await this.makeScreenshot(thumbPath, 5, 320);
+    await this.makeScreenshot(normalPath, 2, this.videoFile!.width!);
   }
 
-  private async makeScreenshot(movie: FFProbe, outputPath: string, quality: number, width: number) {
-    const ffmpeg = new FFMpeg(movie.path);
-    await ffmpeg.screenshot(movie, outputPath, quality, width);
+  private async makeScreenshot(outputPath: string, quality: number, width: number) {
+    if (!this.videoFile) { return; }
+    const ffmpeg = new FFMpeg(this.videoFile);
+    const duration = this.videoFile.duration || 0;
+    const options: IScreenshotOptions = {
+      outputPath,
+      quality,
+      time: duration * 0.2,
+      width,
+    };
+    await ffmpeg.screenshot(options);
   }
 
-  private calculateChecksum() {
+  private async calculateChecksum() {
     this.manager.info(`${this.filePath} not found.  Calculating checksum...`);
-    const checksum = md5FromPath(this.filePath);
+    const checksum = await CryptoUtils.md5FromPath(this.filePath);
     this.manager.debug(`Checksum calculated: ${checksum}`);
     return checksum;
   }

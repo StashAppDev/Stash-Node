@@ -31,6 +31,14 @@ function configureCommander() {
     });
 
   program
+    .command("generate")
+    .action(async () => {
+      await Database.initialize();
+      await StashManager.generate("");
+      await Database.shutdown();
+    });
+
+  program
     .command("start")
     .description("start the server")
     .option("-p, --port <port>", "choose the port", "4000")

@@ -120,7 +120,7 @@ export class SceneController {
       res.type("text/vtt");
       const id = req.params.id_thumbs.replace("_thumbs", "");
       const scene = await getEntity(Scene, { id, checksum: id });
-      res.sendFile(StashPaths.sceneVttThumbsFilePath(scene!.checksum));
+      res.sendFile(StashPaths.sceneSpriteVttFilePath(scene!.checksum));
     } catch (e) {
       next(e);
     }
@@ -131,7 +131,7 @@ export class SceneController {
       res.type("image/jpeg");
       const id = req.params.id_sprite.replace("_sprite", "");
       const scene = await getEntity(Scene, { id, checksum: id });
-      res.sendFile(StashPaths.sceneVttSpriteFilePath(scene!.checksum));
+      res.sendFile(StashPaths.sceneSpriteImageFilePath(scene!.checksum));
     } catch (e) {
       next(e);
     }

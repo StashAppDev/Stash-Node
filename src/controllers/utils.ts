@@ -1,4 +1,4 @@
-import { Model, QueryBuilder } from "objection";
+import { Model } from "objection";
 import { HttpError } from "../errors/http.error";
 import { log } from "../logger";
 

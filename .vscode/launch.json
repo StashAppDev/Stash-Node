@@ -40,6 +40,17 @@
             "cwd": "${workspaceRoot}",
             "protocol": "inspector",
             "outputCapture": "std"
+        },
+        {
+            "name": "Run Generate",
+            "type": "node",
+            "request": "launch",
+            "args": ["${workspaceRoot}/src/index.ts", "generate"],
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+            "sourceMaps": true,
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector",
+            "outputCapture": "std"
         }
     ]
 }

@@ -28,6 +28,8 @@ class Paths {
   public readonly mappings: string;
   public readonly scraped: string;
 
+  public readonly tmp: string;
+
   public readonly ffmpeg: string;
   public readonly ffprobe: string;
 
@@ -64,6 +66,8 @@ class Paths {
     this.transcode   = path.join(this.metadata, "transcodes");
     this.mappings    = path.join(this.metadata, "mappings.json");
     this.scraped     = path.join(this.metadata, "scraped.json");
+
+    this.tmp         = path.join(this.metadata, "tmp");
 
     fse.ensureDirSync(this.performers);
     fse.ensureDirSync(this.scenes);
@@ -117,11 +121,11 @@ class Paths {
     }
   }
 
-  public sceneVttSpriteFilePath(checksum: Maybe<string>) {
+  public sceneSpriteImageFilePath(checksum: Maybe<string>) {
     return path.join(this.vtt, `${checksum}_sprite.jpg`);
   }
 
-  public sceneVttThumbsFilePath(checksum: Maybe<string>) {
+  public sceneSpriteVttFilePath(checksum: Maybe<string>) {
     return path.join(this.vtt, `${checksum}_thumbs.vtt`);
   }
 
@@ -144,6 +148,11 @@ class Paths {
   public performerJsonPath(checksum: string) { return path.join(StashPaths.performers, `${checksum}.json`); }
   public sceneJsonPath(checksum: string) { return path.join(StashPaths.scenes, `${checksum}.json`); }
   public studioJsonPath(checksum: string) { return path.join(StashPaths.studios, `${checksum}.json`); }
+
+  public tmpPath(filename: string) { return path.join(this.tmp, filename); }
+  public async ensureTmpDir() { await fse.ensureDir(this.tmp); }
+  public async emptyTmpDir() { await fse.emptyDir(this.tmp); }
+  public async removeTmpDir() { await fse.remove(this.tmp); }
 }
 
 export const StashPaths = new Paths();

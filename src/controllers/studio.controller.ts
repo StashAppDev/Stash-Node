@@ -19,7 +19,7 @@ export class StudioController {
       url: args.input.url,
     };
     if (!!args.input.image) {
-      processImage(args.input, newStudio);
+      await processImage(args.input, newStudio);
     }
     return Studio.query().insert(newStudio);
   }
@@ -31,7 +31,7 @@ export class StudioController {
       url: args.input.url,
     };
     if (!!args.input.image) {
-      processImage(args.input, updatedStudio);
+      await processImage(args.input, updatedStudio);
     }
     return Studio.query().updateAndFetchById(args.input.id, updatedStudio);
   }
