@@ -3,7 +3,7 @@ import { log } from "../../logger";
 import { FileUtils } from "../../utils/file.utils";
 import { FFMpeg, ITranscodeOptions } from "../ffmpeg/ffmpeg";
 import { VideoFile } from "../ffmpeg/video-file";
-import { StashPaths } from "../paths.stash";
+import { Stash } from "../stash";
 import { BaseTask } from "./base.task";
 
 export class GenerateTranscodeTask extends BaseTask {
@@ -13,7 +13,7 @@ export class GenerateTranscodeTask extends BaseTask {
   constructor(scene: Scene) {
     super();
     this.scene = scene;
-    this.transcodePath = StashPaths.getTranscodePath(this.scene.checksum);
+    this.transcodePath = Stash.paths.scene.getTranscodePath(this.scene.checksum);
   }
 
   public async start() {
@@ -23,10 +23,10 @@ export class GenerateTranscodeTask extends BaseTask {
     if (!this.scene.path) { throw new Error(`Missing scene path`); }
 
     log.info(`${this.scene.checksum} - Generating transcode for ${this.scene.path}...`);
-    await StashPaths.emptyTmpDir();
+    await Stash.paths.generated.emptyTmpDir();
     const videoFile = await VideoFile.create(this.scene.path);
     const ffmpeg = new FFMpeg(videoFile);
-    const tmpOutputPath = StashPaths.tmpPath(`${this.scene.checksum}.mp4`);
+    const tmpOutputPath = Stash.paths.generated.getTmpPath(`${this.scene.checksum}.mp4`);
     const transcodeOptions: ITranscodeOptions = {
       outputPath: tmpOutputPath,
     };

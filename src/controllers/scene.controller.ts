@@ -3,7 +3,7 @@ import fs from "fs";
 import { Scene } from "../db/models/scene.model";
 import { HttpError } from "../errors/http.error";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
-import { StashPaths } from "../stash/paths.stash";
+import { Stash } from "../stash/stash";
 import { QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
 
@@ -40,7 +40,7 @@ export class SceneController {
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
       const scene = await getEntity(Scene, { id: req.params.id });
-      const filePath = StashPaths.sceneStreamFilePath(scene.path, scene.checksum);
+      const filePath = Stash.paths.scene.getStreamPath(scene.path, scene.checksum);
       if (!!filePath) { res.sendFile(filePath); } else { throw new HttpError(404, `No file ${filePath}`); }
     } catch (e) {
       next(e);
@@ -51,8 +51,8 @@ export class SceneController {
     try {
       const scene = await getEntity(Scene, { id: req.params.id });
 
-      const screenshotPath = StashPaths.screenshotPath(scene.checksum!);
-      const thumbnailPath = StashPaths.thumbnailScreenshotPath(scene.checksum!);
+      const screenshotPath = Stash.paths.scene.getScreenshotPath(scene.checksum!);
+      const thumbnailPath = Stash.paths.scene.getThumbnailScreenshotPath(scene.checksum!);
 
       const seconds = parseInt(req.query.seconds, 10);
       const width = parseInt(req.query.width, 10);
@@ -78,7 +78,7 @@ export class SceneController {
   public static async preview(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
       const scene = await getEntity(Scene, { id: req.params.id });
-      const previewPath = StashPaths.previewPath(scene.checksum!);
+      const previewPath = Stash.paths.scene.getStreamPreviewPath(scene.checksum!);
 
       const sendFileOptions = {
         maxAge: 604800000, // 1 Week
@@ -93,7 +93,7 @@ export class SceneController {
   public static async webp(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
       const scene = await getEntity(Scene, { id: req.params.id });
-      const webpPath = StashPaths.previewPath(scene.checksum!);
+      const webpPath = Stash.paths.scene.getStreamPreviewImagePath(scene.checksum!);
 
       const sendFileOptions = {
         maxAge: 604800000, // 1 Week
@@ -120,7 +120,7 @@ export class SceneController {
       res.type("text/vtt");
       const id = req.params.id_thumbs.replace("_thumbs", "");
       const scene = await getEntity(Scene, { id, checksum: id });
-      res.sendFile(StashPaths.sceneSpriteVttFilePath(scene!.checksum));
+      res.sendFile(Stash.paths.scene.getSpriteVttFilePath(scene!.checksum));
     } catch (e) {
       next(e);
     }
@@ -131,7 +131,7 @@ export class SceneController {
       res.type("image/jpeg");
       const id = req.params.id_sprite.replace("_sprite", "");
       const scene = await getEntity(Scene, { id, checksum: id });
-      res.sendFile(StashPaths.sceneSpriteImageFilePath(scene!.checksum));
+      res.sendFile(Stash.paths.scene.getSpriteImageFilePath(scene!.checksum));
     } catch (e) {
       next(e);
     }

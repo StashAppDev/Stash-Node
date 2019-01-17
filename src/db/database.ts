@@ -2,7 +2,7 @@ import Knex from "knex";
 import { Model } from "objection";
 import path from "path";
 import { log } from "../logger";
-import { StashPaths } from "../stash/paths.stash";
+import { Stash } from "../stash/stash";
 import { StashMigrationSource } from "./migration-source";
 import { Gallery } from "./models/gallery.model";
 import { Performer } from "./models/performer.model";
@@ -20,7 +20,7 @@ class DatabaseImpl {
     const config: Knex.Config = {
       client: "sqlite3",
       connection: {
-        filename: StashPaths.databaseFile,
+        filename: Stash.paths.fixed.databaseFile,
       },
       migrations: {
         // directory: path.join(__dirname, "../db/migrations"),

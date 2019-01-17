@@ -4,7 +4,7 @@ import { FileUtils } from "../../utils/file.utils";
 import { VttUtils } from "../../utils/vtt.utils";
 import { FFMpeg, IScreenshotOptions } from "../ffmpeg/ffmpeg";
 import { VideoFile } from "../ffmpeg/video-file";
-import { StashPaths } from "../paths.stash";
+import { Stash } from "../stash";
 import { BaseGenerator } from "./base.generator";
 
 export class SpriteGenerator extends BaseGenerator {
@@ -23,7 +23,7 @@ export class SpriteGenerator extends BaseGenerator {
 
   public async generate() {
     await this.configure();
-    await StashPaths.emptyTmpDir();
+    await Stash.paths.generated.emptyTmpDir();
     await this.generateSprite();
     await this.generateVtt();
   }
@@ -41,7 +41,7 @@ export class SpriteGenerator extends BaseGenerator {
       const fileName = `thumbnail${num}.jpg`;
       const ffmpeg = new FFMpeg(this.videoFile);
       const screenshotOptions: IScreenshotOptions = {
-        outputPath: StashPaths.tmpPath(fileName),
+        outputPath: Stash.paths.generated.getTmpPath(fileName),
         time,
         width: this.thumbWidth,
       };
@@ -50,7 +50,7 @@ export class SpriteGenerator extends BaseGenerator {
 
     // Combine all of the thumbnails into a sprite image
 
-    const imagePaths = await FileUtils.glob("thumbnail*.jpg", { cwd: StashPaths.tmp, realpath: true });
+    const imagePaths = await FileUtils.glob("thumbnail*.jpg", { cwd: Stash.paths.generated.tmp, realpath: true });
     const images: Jimp[] = [];
     for (const imagePath of imagePaths) {
       images.push(await Jimp.read(imagePath));

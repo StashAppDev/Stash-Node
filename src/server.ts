@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import express from "express";
 import path from "path";
 import { URL } from "url";
-import { Database } from "./db/database";
 import { HttpError } from "./errors/http.error";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
@@ -44,8 +43,6 @@ export async function run(options: IStashServerOptions) {
 
   // Allow requests up to 2 megabytes
   app.use(bodyParser({ limit: "2mb" }));
-
-  await Database.initialize();
 
   const server = new ApolloServer({
     context: (msg: {req: express.Request, res: express.Response}): IGraphQLContext => ({

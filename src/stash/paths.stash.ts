@@ -1,34 +1,15 @@
 import fs from "fs";
 import fse from "fs-extra";
-import inquirer from "inquirer";
 import os from "os";
 import path from "path";
 import { Maybe } from "../typings/stash";
-import { parseJsonFile, writeJsonFile } from "./utils.stash";
+import { parseJsonFile } from "./utils.stash";
 
-class Paths {
+export class FixedPaths {
   public readonly executionDirectory: string = path.dirname(process.execPath);
   public readonly configDirectory: string = path.join(os.homedir(), ".stash");
   public readonly configFile: string = path.join(this.configDirectory, "config.json");
   public readonly databaseFile: string = path.join(this.configDirectory, "stash.sqlite");
-
-  public readonly stash: string;
-  public readonly metadata: string;
-  public readonly cache: string;
-  public readonly downloads: string;
-
-  public readonly performers: string;
-  public readonly scenes: string;
-  public readonly galleries: string;
-  public readonly studios: string;
-  public readonly screenshots: string;
-  public readonly vtt: string;
-  public readonly markers: string;
-  public readonly transcode: string;
-  public readonly mappings: string;
-  public readonly scraped: string;
-
-  public readonly tmp: string;
 
   public readonly ffmpeg: string;
   public readonly ffprobe: string;
@@ -44,75 +25,89 @@ class Paths {
       if (fs.existsSync(ffprobePath)) { this.ffprobe = ffprobePath; }
     }
 
-    if (!fs.existsSync(this.configFile)) { throw new Error(`config.json not found at ${this.configFile}`); }
     const ffmpegErrorText = `\nPlace it in one of the following folders:\n\n${ffmpegDirectories.join("\n")}\n`;
     if (!fs.existsSync(this.ffmpeg)) { throw new Error(`FFMPEG not found. ${ffmpegErrorText}`); }
     if (!fs.existsSync(this.ffprobe)) { throw new Error(`FFProbe not found. ${ffmpegErrorText}`); }
+  }
+}
 
-    const jsonConfig = parseJsonFile(this.configFile);
+class JsonPaths {
+  public readonly mappingsFile: string;
+  public readonly scrapedFile: string;
 
-    this.stash       = jsonConfig.stash;
-    this.metadata    = jsonConfig.metadata;
-    this.cache       = jsonConfig.cache;
-    this.downloads   = jsonConfig.downloads;
+  public readonly performers: string;
+  public readonly scenes: string;
+  public readonly galleries: string;
+  public readonly studios: string;
 
-    this.performers  = path.join(this.metadata, "performers");
-    this.scenes      = path.join(this.metadata, "scenes");
-    this.galleries   = path.join(this.metadata, "galleries");
-    this.studios     = path.join(this.metadata, "studios");
-    this.screenshots = path.join(this.metadata, "screenshots");
-    this.vtt         = path.join(this.metadata, "vtt");
-    this.markers     = path.join(this.metadata, "markers");
-    this.transcode   = path.join(this.metadata, "transcodes");
-    this.mappings    = path.join(this.metadata, "mappings.json");
-    this.scraped     = path.join(this.metadata, "scraped.json");
+  constructor(paths: Paths) {
+    this.mappingsFile = path.join(paths.metadata, "mappings.json");
+    this.scrapedFile  = path.join(paths.metadata, "scraped.json");
+    this.performers   = path.join(paths.metadata, "performers");
+    this.scenes       = path.join(paths.metadata, "scenes");
+    this.galleries    = path.join(paths.metadata, "galleries");
+    this.studios      = path.join(paths.metadata, "studios");
 
-    this.tmp         = path.join(this.metadata, "tmp");
-
+    // TODO async
     fse.ensureDirSync(this.performers);
     fse.ensureDirSync(this.scenes);
     fse.ensureDirSync(this.galleries);
     fse.ensureDirSync(this.studios);
+  }
+
+  public performerJsonPath(checksum: string) { return path.join(this.performers, `${checksum}.json`); }
+  public sceneJsonPath(checksum: string) { return path.join(this.scenes, `${checksum}.json`); }
+  public studioJsonPath(checksum: string) { return path.join(this.studios, `${checksum}.json`); }
+}
+
+class GeneratedPaths {
+  public readonly screenshots: string;
+  public readonly vtt: string;
+  public readonly markers: string;
+  public readonly transcode: string;
+
+  public readonly tmp: string;
+
+  constructor(paths: Paths) {
+    this.screenshots = path.join(paths.metadata, "screenshots");
+    this.vtt         = path.join(paths.metadata, "vtt");
+    this.markers     = path.join(paths.metadata, "markers");
+    this.transcode   = path.join(paths.metadata, "transcodes");
+    this.tmp         = path.join(paths.metadata, "tmp");
+
+    // TODO async
     fse.ensureDirSync(this.screenshots);
     fse.ensureDirSync(this.vtt);
     fse.ensureDirSync(this.markers);
     fse.ensureDirSync(this.transcode);
   }
 
-  public async ensureConfigFile() {
-    if (fs.existsSync(this.configFile)) { return; }
+  public getTmpPath(fileName: string) { return path.join(this.tmp, fileName); }
+  public async ensureTmpDir() { await fse.ensureDir(this.tmp); }
+  public async emptyTmpDir() { await fse.emptyDir(this.tmp); }
+  public async removeTmpDir() { await fse.remove(this.tmp); }
+}
 
-    const validation = (value: string) => {
-      if (fse.existsSync(value)) {
-        return true;
-      } else {
-        return "Not a valid folder";
-      }
-    };
+class ScenePaths {
+  private generatedPaths: GeneratedPaths;
 
-    return inquirer.prompt([
-      { message: "Media folder path", name: "stash", type: "input", validate: validation },
-      { message: "Metadata folder path", name: "metadata", type: "input", validate: validation },
-      { message: "Cache folder path", name: "cache", type: "input", validate: validation },
-      { message: "Downloads folder path", name: "downloads", type: "input", validate: validation },
-    ]).then((answers: any) => {
-      writeJsonFile(this.configFile, answers);
-    });
+  constructor(generatedPaths: GeneratedPaths) {
+    this.generatedPaths = generatedPaths;
   }
 
-  public screenshotPath(checksum: string): string {
-    return path.join(this.screenshots, `${checksum}.jpg`);
+  public getScreenshotPath(checksum: string): string {
+    return path.join(this.generatedPaths.screenshots, `${checksum}.jpg`);
   }
 
-  public thumbnailScreenshotPath(checksum: string): string {
-    return path.join(this.screenshots, `${checksum}.thumb.jpg`);
+  public getThumbnailScreenshotPath(checksum: string): string {
+    return path.join(this.generatedPaths.screenshots, `${checksum}.thumb.jpg`);
   }
 
   public getTranscodePath(checksum: Maybe<string>): string {
-    return path.join(this.transcode, `${checksum}.mp4`);
+    return path.join(this.generatedPaths.transcode, `${checksum}.mp4`);
   }
 
-  public sceneStreamFilePath(scenePath: Maybe<string>, checksum: Maybe<string>) {
+  public getStreamPath(scenePath: Maybe<string>, checksum: Maybe<string>) {
     const transcodePath = this.getTranscodePath(checksum);
     if (fs.existsSync(transcodePath)) {
       return transcodePath;
@@ -121,38 +116,65 @@ class Paths {
     }
   }
 
-  public sceneSpriteImageFilePath(checksum: Maybe<string>) {
-    return path.join(this.vtt, `${checksum}_sprite.jpg`);
+  public getStreamPreviewPath(checksum: string): string {
+    return path.join(this.generatedPaths.screenshots, `${checksum}.mp4`);
   }
 
-  public sceneSpriteVttFilePath(checksum: Maybe<string>) {
-    return path.join(this.vtt, `${checksum}_thumbs.vtt`);
+  public getStreamPreviewImagePath(checksum: string): string {
+    return path.join(this.generatedPaths.screenshots, `${checksum}.webp`);
   }
 
-  public previewPath(checksum: string): string {
-    return path.join(this.screenshots, `${checksum}.mp4`);
+  public getSpriteImageFilePath(checksum: Maybe<string>) {
+    return path.join(this.generatedPaths.vtt, `${checksum}_sprite.jpg`);
   }
 
-  public webpPath(checksum: string): string {
-    return path.join(this.screenshots, `${checksum}.webp`);
+  public getSpriteVttFilePath(checksum: Maybe<string>) {
+    return path.join(this.generatedPaths.vtt, `${checksum}_thumbs.vtt`);
   }
-
-  public sceneMarkerStreamPath(checksum: string, seconds: number): string {
-    return path.join(this.markers, checksum, `${seconds}.mp4`);
-  }
-
-  public sceneMarkerPreviewPath(checksum: string, seconds: number): string {
-    return path.join(this.markers, checksum, `${seconds}.webp`);
-  }
-
-  public performerJsonPath(checksum: string) { return path.join(StashPaths.performers, `${checksum}.json`); }
-  public sceneJsonPath(checksum: string) { return path.join(StashPaths.scenes, `${checksum}.json`); }
-  public studioJsonPath(checksum: string) { return path.join(StashPaths.studios, `${checksum}.json`); }
-
-  public tmpPath(filename: string) { return path.join(this.tmp, filename); }
-  public async ensureTmpDir() { await fse.ensureDir(this.tmp); }
-  public async emptyTmpDir() { await fse.emptyDir(this.tmp); }
-  public async removeTmpDir() { await fse.remove(this.tmp); }
 }
 
-export const StashPaths = new Paths();
+class SceneMarkerPaths {
+  private generatedPaths: GeneratedPaths;
+
+  constructor(generatedPaths: GeneratedPaths) {
+    this.generatedPaths = generatedPaths;
+  }
+
+  public getStreamPath(checksum: string, seconds: number): string {
+    return path.join(this.generatedPaths.markers, checksum, `${seconds}.mp4`);
+  }
+
+  public getStreamPreviewImagePath(checksum: string, seconds: number): string {
+    return path.join(this.generatedPaths.markers, checksum, `${seconds}.webp`);
+  }
+}
+
+export class Paths {
+  public fixed: FixedPaths;
+  public generated: GeneratedPaths;
+  public json: JsonPaths;
+  public scene: ScenePaths;
+  public sceneMarker: SceneMarkerPaths;
+
+  public readonly stash: string;
+  public readonly metadata: string;
+  // public readonly generated: string; // TODO: Generated directory instead of metadata
+  public readonly cache: string;
+  public readonly downloads: string;
+
+  constructor(fixedPaths: FixedPaths) {
+    this.fixed = fixedPaths;
+
+    const jsonConfig = parseJsonFile(this.fixed.configFile);
+
+    this.stash       = jsonConfig.stash;
+    this.metadata    = jsonConfig.metadata;
+    this.cache       = jsonConfig.cache;
+    this.downloads   = jsonConfig.downloads;
+
+    this.generated = new GeneratedPaths(this);
+    this.json = new JsonPaths(this);
+    this.scene = new ScenePaths(this.generated);
+    this.sceneMarker = new SceneMarkerPaths(this.generated);
+  }
+}

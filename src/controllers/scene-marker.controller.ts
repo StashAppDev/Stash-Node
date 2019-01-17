@@ -3,7 +3,7 @@ import { SceneMarker } from "../db/models/scene-marker.model";
 import { Scene } from "../db/models/scene.model";
 import { Tag } from "../db/models/tag.model";
 import { SceneMarkerQueryBuilder } from "../querybuilders/scene-marker.querybuilder";
-import { StashPaths } from "../stash/paths.stash";
+import { Stash } from "../stash/stash";
 import { GQL, QueryResolvers } from "../typings/graphql";
 import { getEntity } from "./utils";
 
@@ -56,7 +56,7 @@ export class SceneMarkerController {
       const scene = await getEntity(Scene, { id: req.params.scene_id });
       const sceneMarker = await getEntity(SceneMarker, { id: req.params.id! });
 
-      const streamPath = StashPaths.sceneMarkerStreamPath(scene.checksum!, sceneMarker.seconds!);
+      const streamPath = Stash.paths.sceneMarker.getStreamPath(scene.checksum!, sceneMarker.seconds!);
 
       const sendFileOptions = {
         maxAge: 604800000, // 1 Week
@@ -74,7 +74,7 @@ export class SceneMarkerController {
       const scene = await getEntity(Scene, { id: req.params.scene_id });
       const sceneMarker = await getEntity(SceneMarker, { id: req.params.id! });
 
-      const previewPath = StashPaths.sceneMarkerPreviewPath(scene.checksum!, sceneMarker.seconds!);
+      const previewPath = Stash.paths.sceneMarker.getStreamPreviewImagePath(scene.checksum!, sceneMarker.seconds!);
 
       const sendFileOptions = {
         maxAge: 604800000, // 1 Week

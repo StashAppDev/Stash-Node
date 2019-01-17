@@ -1,5 +1,5 @@
 import { StashManager } from "./manager.stash";
-import { StashPaths } from "./paths.stash";
+import { Stash } from "./stash";
 import { parseJsonFile, writeJsonFile } from "./utils.stash";
 
 export type IJsonObject = any;
@@ -88,28 +88,28 @@ export interface IStudioJson extends IJsonObject {
 
 class Json {
   public getMappings(): IMappingJson {
-    return parseJsonFile(StashPaths.mappings);
+    return parseJsonFile(Stash.paths.json.mappingsFile);
   }
 
   public saveMappings(json: IMappingJson) {
     StashManager.info("Saving mapping file...");
-    writeJsonFile(StashPaths.mappings, json);
+    writeJsonFile(Stash.paths.json.mappingsFile, json);
   }
 
   public getScraped(): IScrapedJson {
-    return parseJsonFile(StashPaths.scraped);
+    return parseJsonFile(Stash.paths.json.scrapedFile);
   }
 
   public getPerformer(checksum: string): IPerformerJson {
-    return parseJsonFile(StashPaths.performerJsonPath(checksum));
+    return parseJsonFile(Stash.paths.json.performerJsonPath(checksum));
   }
 
   public getScene(checksum: string): ISceneJson {
-    return parseJsonFile(StashPaths.sceneJsonPath(checksum));
+    return parseJsonFile(Stash.paths.json.sceneJsonPath(checksum));
   }
 
   public getStudio(checksum: string): IStudioJson {
-    return parseJsonFile(StashPaths.studioJsonPath(checksum));
+    return parseJsonFile(Stash.paths.json.studioJsonPath(checksum));
   }
 
 }

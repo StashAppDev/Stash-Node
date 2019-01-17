@@ -1,7 +1,7 @@
 import program from "commander";
-import { Database } from "./db/database";
 import { IStashServerOptions, run } from "./server";
 import { StashManager } from "./stash/manager.stash";
+import { Stash } from "./stash/stash";
 
 function configureCommander() {
   program
@@ -17,25 +17,22 @@ function configureCommander() {
   program
     .command("scan")
     .action(async () => {
-      await Database.initialize();
       await StashManager.scan("");
-      await Database.shutdown();
+      await Stash.shutdown();
     });
 
   program
     .command("import")
     .action(async () => {
-      await Database.initialize();
       await StashManager.import("");
-      await Database.shutdown();
+      await Stash.shutdown();
     });
 
   program
     .command("generate")
     .action(async () => {
-      await Database.initialize();
       await StashManager.generate("");
-      await Database.shutdown();
+      await Stash.shutdown();
     });
 
   program
@@ -57,7 +54,7 @@ function configureCommander() {
 }
 
 async function bootstrap() {
-  await StashManager.bootstrap();
+  await Stash.initialize();
   configureCommander();
 }
 

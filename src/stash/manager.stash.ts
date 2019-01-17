@@ -3,7 +3,7 @@ import { Database } from "../db/database";
 import { Scene } from "../db/models/scene.model";
 import { FileUtils } from "../utils/file.utils";
 import { log } from "./../logger";
-import { StashPaths } from "./paths.stash";
+import { Stash } from "./stash";
 import { GenerateSpriteTask } from "./tasks/generate-sprite.task";
 import { GenerateTranscodeTask } from "./tasks/generate-transcode.task";
 import { ImportTask } from "./tasks/import.task";
@@ -37,12 +37,6 @@ class Manager {
   public job: Job = new Job();
   public queue: PQueue = new PQueue({concurrency: 1});
 
-  public async bootstrap() {
-    const promise = StashPaths.ensureConfigFile();
-    await promise;
-    return promise;
-  }
-
   //#region Jobs
 
   public async import(jobId: string) {
@@ -71,7 +65,7 @@ class Manager {
     this.job.message = "Scanning...";
     this.job.logs = [];
 
-    const scanPaths = await FileUtils.glob("**/*.{zip,m4v,mp4,mov,wmv}", {cwd: StashPaths.stash, realpath: true});
+    const scanPaths = await FileUtils.glob("**/*.{zip,m4v,mp4,mov,wmv}", { cwd: Stash.paths.stash, realpath: true });
     this.job.currentItem = 0;
     this.job.total = scanPaths.length;
     log.info(`Starting scan of ${scanPaths.length} files`);
@@ -102,7 +96,7 @@ class Manager {
     this.job.logs = [];
 
     this.job.total = (await Scene.knexQuery().count())[0]["count(*)"];
-    await StashPaths.ensureTmpDir();
+    await Stash.paths.generated.ensureTmpDir();
 
     const scenes = await Scene.query();
     for (const scene of scenes) {
@@ -129,7 +123,7 @@ class Manager {
       await this.queue.onIdle();
     }
 
-    await StashPaths.removeTmpDir();
+    await Stash.paths.generated.removeTmpDir();
     this.idle();
   }
 

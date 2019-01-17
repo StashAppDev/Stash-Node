@@ -1,5 +1,5 @@
 import { FileUtils } from "../../utils/file.utils";
-import { StashPaths } from "../paths.stash";
+import { Stash } from "../stash";
 import { VideoFile } from "./video-file";
 
 export interface IScreenshotOptions {
@@ -57,7 +57,7 @@ export class FFMpeg {
   }
 
   private run(args: string[], onProgress?: OnProgressCallback) {
-    const ffmpegPath = StashPaths.ffmpeg;
+    const ffmpegPath = Stash.paths.fixed.ffmpeg;
     return FileUtils.spawn(ffmpegPath, args, undefined, (data: any) => {
       const dataString = data.toString();
       const regexResult = FFMpeg.PROGRESS_REGEX.exec(dataString);

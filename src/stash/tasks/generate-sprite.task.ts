@@ -3,7 +3,7 @@ import { log } from "../../logger";
 import { FileUtils } from "../../utils/file.utils";
 import { VideoFile } from "../ffmpeg/video-file";
 import { SpriteGenerator } from "../generators/sprite.generator";
-import { StashPaths } from "../paths.stash";
+import { Stash } from "../stash";
 import { BaseTask } from "./base.task";
 
 export class GenerateSpriteTask extends BaseTask {
@@ -14,8 +14,8 @@ export class GenerateSpriteTask extends BaseTask {
   constructor(scene: Scene) {
     super();
     this.scene = scene;
-    this.spriteImagePath = StashPaths.sceneSpriteImageFilePath(this.scene.checksum);
-    this.spriteVttPath = StashPaths.sceneSpriteVttFilePath(this.scene.checksum);
+    this.spriteImagePath = Stash.paths.scene.getSpriteImageFilePath(this.scene.checksum);
+    this.spriteVttPath = Stash.paths.scene.getSpriteVttFilePath(this.scene.checksum);
   }
 
   public async start() {

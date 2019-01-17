@@ -3,9 +3,11 @@ import { Model } from "objection";
 import path from "path";
 import { Gallery } from "../../db/models/gallery.model";
 import { Scene } from "../../db/models/scene.model";
+import { log } from "../../logger";
 import { CryptoUtils } from "../../utils/crypto.utils";
 import { FFMpeg, IScreenshotOptions } from "../ffmpeg/ffmpeg";
 import { VideoFile } from "../ffmpeg/video-file";
+import { Stash } from "../stash";
 import { BaseTask } from "./base.task";
 
 export class ScanTask extends BaseTask {
@@ -21,8 +23,7 @@ export class ScanTask extends BaseTask {
     if (this.getClass() === Scene) {
       this.videoFile = await VideoFile.create(this.filePath);
     }
-    this.manager.verbose(this.filePath);
-    this.createFolders();
+    log.verbose(this.filePath);
     const klass = this.getClass() as typeof Model;
 
     let entity = await klass.query().findOne({ path: this.filePath });
@@ -34,10 +35,10 @@ export class ScanTask extends BaseTask {
 
     entity = await klass.query().findOne({ checksum });
     if (!!entity) {
-      this.manager.info(`${this.filePath} already exists.  Updating path...`);
+      log.info(`${this.filePath} already exists.  Updating path...`);
       await (entity as any).$query().update({ path: this.filePath });
     } else {
-      this.manager.info(`${this.filePath} doesn't exist.  Creating new item...`);
+      log.info(`${this.filePath} doesn't exist.  Creating new item...`);
 
       if (!!this.videoFile) {
         await Scene.query().insert({
@@ -59,11 +60,11 @@ export class ScanTask extends BaseTask {
   private async makeScreenshots(checksum: string) {
     if (this.getClass() !== Scene) { return; }
 
-    const thumbPath = this.paths.thumbnailScreenshotPath(checksum);
-    const normalPath = this.paths.screenshotPath(checksum);
+    const thumbPath = Stash.paths.scene.getThumbnailScreenshotPath(checksum);
+    const normalPath = Stash.paths.scene.getScreenshotPath(checksum);
 
     if (fse.existsSync(thumbPath) && fse.existsSync(normalPath)) {
-      this.manager.verbose("Screenshots already exist for this path... skipping");
+      log.verbose("Screenshots already exist for this path... skipping");
       return;
     }
 
@@ -85,9 +86,9 @@ export class ScanTask extends BaseTask {
   }
 
   private async calculateChecksum() {
-    this.manager.info(`${this.filePath} not found.  Calculating checksum...`);
+    log.info(`${this.filePath} not found.  Calculating checksum...`);
     const checksum = await CryptoUtils.md5FromPath(this.filePath);
-    this.manager.debug(`Checksum calculated: ${checksum}`);
+    log.debug(`Checksum calculated: ${checksum}`);
     return checksum;
   }
 
@@ -97,10 +98,5 @@ export class ScanTask extends BaseTask {
     } else {
       return Scene;
     }
-  }
-
-  private createFolders() {
-    const tmpPath = path.join(this.paths.screenshots, "tmp");
-    fse.ensureDirSync(tmpPath);
   }
 }

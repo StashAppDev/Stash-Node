@@ -2,7 +2,7 @@
 import fs from "fs";
 import { Model } from "objection";
 import path from "path";
-import { StashPaths } from "../../stash/paths.stash";
+import { Stash } from "../../stash/stash";
 import { FileUtils } from "../../utils/file.utils";
 import { VttUtils } from "../../utils/vtt.utils";
 import BaseModel from "./base.model";
@@ -115,7 +115,7 @@ export class Scene extends BaseModel {
     const mimeType = await this.getMimeType();
     const valid = mimeType === "video/quicktime" || mimeType === "video/mp4" || mimeType === "video/webm";
     if (!valid) {
-      const transcodePath = StashPaths.getTranscodePath(this.checksum || "");
+      const transcodePath = Stash.paths.scene.getTranscodePath(this.checksum || "");
       return fs.existsSync(transcodePath);
     } else {
       return valid;

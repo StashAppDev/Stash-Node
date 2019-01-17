@@ -3,7 +3,7 @@ import fse from "fs-extra";
 import mathjs from "mathjs";
 import os from "os";
 import { FileUtils } from "../../utils/file.utils";
-import { StashPaths } from "../paths.stash";
+import { Stash } from "../stash";
 
 // TODO: Schema base off this https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/ffprobe.xsd
 // https://github.com/streamio/streamio-ffmpeg/blob/master/lib/ffmpeg/movie.rb
@@ -96,7 +96,7 @@ export class VideoFile implements IFFProbeData {
     if (!fileExists) { throw new Error(`Video file does not exist at ${filePath}!`); }
     const params = ["-show_streams", "-show_format", "-show_error", "-print_format", "json", filePath];
     if (os.platform() !== "win32") { params.push("-count_frames"); }
-    const ffprobeResult = await FileUtils.spawn(StashPaths.ffprobe, params);
+    const ffprobeResult = await FileUtils.spawn(Stash.paths.fixed.ffprobe, params);
 
     const json = JSON.parse(ffprobeResult.stdout);
     if (!!json.error) {
