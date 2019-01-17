@@ -1,7 +1,6 @@
 import { importSchema } from "graphql-import";
 import gql from "graphql-tag";
 import path from "path";
-import { URL } from "url";
 import { GalleryController } from "./controllers/gallery.controller";
 import { PerformerController } from "./controllers/performer.controller";
 import { SceneMarkerController } from "./controllers/scene-marker.controller";
@@ -14,6 +13,9 @@ import { SceneMarker } from "./db/models/scene-marker.model";
 import { Scene } from "./db/models/scene.model";
 import { Studio } from "./db/models/studio.model";
 import { Tag } from "./db/models/tag.model";
+import { PerformerRoutes } from "./routes/performer.route";
+import { SceneRoutes } from "./routes/scene.route";
+import { StudioRoutes } from "./routes/studio.route";
 import { IResolvers } from "./typings/graphql";
 
 // NOTE: This path looks weird, but is required for pkg
@@ -38,7 +40,10 @@ export const resolvers: IResolvers = {
     tagUpdate(root, args, context, info) { return TagController.tagUpdate(root, args, context, info); },
   },
   Performer: {
-    image_path(root, args, context) { return new URL(`/performers/${root.id}/image`, context.baseUrl).toString(); },
+    image_path(performer, args, context) {
+      if (!performer.id) { throw new Error(`Missing performer id!`); }
+      return PerformerRoutes.getPerformerImageUrl(context.baseUrl, performer.id);
+    },
   },
   Query: {
     findGallery(root, args, context, info) { return GalleryController.findGallery(root, args, context, info); },
@@ -83,17 +88,7 @@ export const resolvers: IResolvers = {
         width: scene.width,
       };
     },
-    paths(root, args, context, info) {
-      return {
-        // TODO:  Get these paths from the resolver?
-        chapters_vtt: new URL(`/scenes/${root.id}/vtt/chapter`, context.baseUrl).toString(),
-        preview: new URL(`/scenes/${root.id}/preview`, context.baseUrl).toString(),
-        screenshot: new URL(`/scenes/${root.id}/screenshot`, context.baseUrl).toString(),
-        stream: new URL(`/scenes/${root.id}/stream.mp4`, context.baseUrl).toString(),
-        vtt: new URL(`/scenes/${root.id}_thumbs.vtt`, context.baseUrl).toString(),
-        webp: new URL(`/scenes/${root.id}/webp`, context.baseUrl).toString(),
-      };
-    },
+    paths(scene, args, context, info) { return SceneRoutes.buildScenePaths(scene, context); },
     async is_streamable(scene, args, context, info) { return await scene.isStreamable(); },
 
     // TODO: remove these.  Don't need these resolvers
@@ -125,8 +120,8 @@ export const resolvers: IResolvers = {
   },
   SceneMarker: {
     preview(sceneMarker, args, context, info) {
-      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/${sceneMarker.id}/preview`;
-      return new URL(urlPath, context.baseUrl).toString();
+      if (!sceneMarker.id) { throw new Error(`Missing scene marker id`); }
+      return SceneRoutes.getSceneMarkerStreamPreviewImageUrl(context.baseUrl, sceneMarker.scene_id, sceneMarker.id);
     },
     primary_tag(sceneMarker) {
       if (!!sceneMarker.primary_tag) {
@@ -136,8 +131,8 @@ export const resolvers: IResolvers = {
       }
     },
     stream(sceneMarker, args, context, info) {
-      const urlPath = `/scenes/${sceneMarker.scene_id}/scene_markers/${sceneMarker.id}/stream`;
-      return new URL(urlPath, context.baseUrl).toString();
+      if (!sceneMarker.id) { throw new Error(`Missing scene marker id`); }
+      return SceneRoutes.getSceneMarkerStreamUrl(context.baseUrl, sceneMarker.scene_id, sceneMarker.id);
     },
     scene(sceneMarker) {
       if (!!sceneMarker.scene) {
@@ -155,9 +150,9 @@ export const resolvers: IResolvers = {
     },
   },
   Studio: {
-    image_path() {
-      // TODO: ctx[:routes].studio_image_url(studio.id, host: ctx[:base_url])
-      return "";
+    image_path(studio, args, context, info) {
+      if (!studio.id) { throw new Error(`Missing studio id!`); }
+      return StudioRoutes.getStudioImageUrl(context.baseUrl, studio.id);
     },
     async scene_count(studio) {
       return (await studio.$relatedQuery<any>("scenes").count())[0]["count(*)"];

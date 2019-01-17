@@ -1,48 +1,71 @@
 import express from "express";
+import { URL } from "url";
 import { SceneMarkerController } from "../controllers/scene-marker.controller";
 import { SceneController } from "../controllers/scene.controller";
+import { Scene } from "../db/models/scene.model";
+import { IGraphQLContext } from "../server";
+import { GQL } from "../typings/graphql";
 
-const router = express.Router();
+export class SceneRoutes {
+  public static buildRouter(): express.Router {
+    const r = express.Router();
+    r.get("/:id/stream(.mp4)?", (req, res, next) => { SceneController.stream(req, res, next); });
+    r.get("/:id/screenshot", (req, res, next) => { SceneController.screenshot(req, res, next); });
+    r.get("/:id/preview", (req, res, next) => { SceneController.preview(req, res, next); });
+    r.get("/:id/webp", (req, res, next) => { SceneController.webp(req, res, next); });
+    r.get("/:id/vtt/chapter", (req, res, next) => { SceneController.chapterVtt(req, res, next); });
+    r.get("/:id_thumbs.vtt", (req, res, next) => { SceneController.vttThumbs(req, res, next); });
+    r.get("/:id_sprite.jpg", (req, res, next) => { SceneController.vttSprite(req, res, next); });
 
-// router.use(function timeLog(req, res, next) {
-//   log.info(`Time:  ${Date.now()}`);
-//   next();
-// });
+    r.get("/:scene_id/scene_markers/:id/stream", (req, res, next) => { SceneMarkerController.stream(req, res, next); });
+    r.get("/:scene_id/scene_markers/:id/preview", (req, res, next) => {
+      SceneMarkerController.preview(req, res, next);
+    });
 
-router.get("/:id/stream(.mp4)?", (req, res, next) => {
-  SceneController.stream(req, res, next);
-});
+    return r;
+  }
 
-router.get("/:id/screenshot", (req, res, next) => {
-  SceneController.screenshot(req, res, next);
-});
+  public static buildScenePaths(scene: Scene, context: IGraphQLContext): GQL.ScenePathsType {
+    if (!scene.id) { return {}; }
+    return {
+      chapters_vtt: this.getChaptersVttUrl(context.baseUrl, scene.id),
+      preview: this.getStreamPreviewUrl(context.baseUrl, scene.id),
+      screenshot: this.getScreenshotUrl(context.baseUrl, scene.id),
+      stream: this.getStreamUrl(context.baseUrl, scene.id),
+      vtt: this.getSpriteVttUrl(context.baseUrl, scene.id),
+      webp: this.getStreamPreviewImageUrl(context.baseUrl, scene.id),
+    };
+  }
 
-router.get("/:id/preview", (req, res, next) => {
-  SceneController.preview(req, res, next);
-});
+  public static getStreamUrl(baseUrl: URL, sceneId: number) {
+    return new URL(`/scenes/${sceneId}/stream.mp4`, baseUrl).toString();
+  }
 
-router.get("/:id/webp", (req, res, next) => {
-  SceneController.webp(req, res, next);
-});
+  public static getStreamPreviewUrl(baseUrl: URL, sceneId: number) {
+    return new URL(`/scenes/${sceneId}/preview`, baseUrl).toString();
+  }
 
-router.get("/:id/vtt/chapter", (req, res, next) => {
-  SceneController.chapterVtt(req, res, next);
-});
+  public static getStreamPreviewImageUrl(baseUrl: URL, sceneId: number) {
+    return new URL(`/scenes/${sceneId}/webp`, baseUrl).toString();
+  }
 
-router.get("/:id_thumbs.vtt", async (req, res, next) => {
-  SceneController.vttThumbs(req, res, next);
-});
+  public static getSpriteVttUrl(baseUrl: URL, sceneId: number) {
+    return new URL(`/scenes/${sceneId}_thumbs.vtt`, baseUrl).toString();
+  }
 
-router.get("/:id_sprite.jpg", async (req, res, next) => {
-  SceneController.vttSprite(req, res, next);
-});
+  public static getScreenshotUrl(baseUrl: URL, sceneId: number) {
+    return new URL(`/scenes/${sceneId}/screenshot`, baseUrl).toString();
+  }
 
-router.get("/:scene_id/scene_markers/:id/stream", (req, res, next) => {
-  SceneMarkerController.stream(req, res, next);
-});
+  public static getChaptersVttUrl(baseUrl: URL, sceneId: number) {
+    return new URL(`/scenes/${sceneId}/vtt/chapter`, baseUrl).toString();
+  }
 
-router.get("/:scene_id/scene_markers/:id/preview", (req, res, next) => {
-  SceneMarkerController.preview(req, res, next);
-});
+  public static getSceneMarkerStreamUrl(baseUrl: URL, sceneId: number, sceneMarkerId: number) {
+    return new URL(`/scenes/${sceneId}/scene_markers/${sceneMarkerId}/stream`, baseUrl).toString();
+  }
 
-export default router;
+  public static getSceneMarkerStreamPreviewImageUrl(baseUrl: URL, sceneId: number, sceneMarkerId: number) {
+    return new URL(`/scenes/${sceneId}/scene_markers/${sceneMarkerId}/preview`, baseUrl).toString();
+  }
+}

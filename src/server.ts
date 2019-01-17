@@ -6,9 +6,9 @@ import { URL } from "url";
 import { HttpError } from "./errors/http.error";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
-import performerRoutes from "./routes/performer.route";
-import sceneRoutes from "./routes/scene.route";
-import studioRoutes from "./routes/studio.route";
+import { PerformerRoutes } from "./routes/performer.route";
+import { SceneRoutes } from "./routes/scene.route";
+import { StudioRoutes } from "./routes/studio.route";
 
 export interface IStashServerOptions {
   port?: number;
@@ -24,9 +24,9 @@ export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
-  app.use("/performers", performerRoutes);
-  app.use("/scenes", sceneRoutes);
-  app.use("/studios", studioRoutes);
+  app.use("/performers", PerformerRoutes.buildRouter());
+  app.use("/scenes", SceneRoutes.buildRouter());
+  app.use("/studios", StudioRoutes.buildRouter());
   app.use(express.static(path.join(__dirname, "../dist-ui")));
   app.use("*", express.static(path.join(__dirname, "../dist-ui/index.html")));
 
