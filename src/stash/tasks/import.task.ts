@@ -17,11 +17,12 @@ export class ImportTask extends BaseTask {
 
   constructor() {
     super();
-    this.mappings = StashJson.getMappings();
-    this.scraped = StashJson.getScraped();
   }
 
   public async start() {
+    this.mappings = await StashJson.getMappings();
+    this.scraped = await StashJson.getScraped();
+
     await this.importPerformers();
     await this.importStudios();
     await this.importGalleries();
@@ -36,7 +37,7 @@ export class ImportTask extends BaseTask {
     const performers: Array<Partial<Performer>> = [];
     for (const [i, mappingJson] of this.mappings.performers.entries()) {
       const index = i + 1;
-      const performerJson = StashJson.getPerformer(mappingJson.checksum);
+      const performerJson = await StashJson.getPerformer(mappingJson.checksum);
       if (!mappingJson.checksum || !mappingJson.name || !performerJson) { return; }
 
       StashManager.info(`Reading performer ${index} of ${this.mappings.performers.length}\r`);
@@ -78,7 +79,7 @@ export class ImportTask extends BaseTask {
     const studios: Array<Partial<Studio>> = [];
     for (const [i, mappingJson] of this.mappings.studios.entries()) {
       const index = i + 1;
-      const studioJson = StashJson.getStudio(mappingJson.checksum);
+      const studioJson = await StashJson.getStudio(mappingJson.checksum);
       if (!mappingJson.checksum || !mappingJson.name || !studioJson) { return; }
 
       StashManager.info(`Reading studio ${index} of ${this.mappings.studios.length}\r`);
@@ -141,7 +142,7 @@ export class ImportTask extends BaseTask {
       StashManager.info(`Reading tags for scene ${index} of ${this.mappings.scenes.length}\r`);
 
       // Return early if we are missing a json file.
-      const sceneJson = StashJson.getScene(mappingJson.checksum);
+      const sceneJson = await StashJson.getScene(mappingJson.checksum);
       if (!sceneJson) { continue; }
 
       // Get the tags from the tags json if we have it
@@ -229,7 +230,7 @@ export class ImportTask extends BaseTask {
 
         const sceneAttributes: Partial<Scene> = { checksum: mappingJson.checksum, path: mappingJson.path };
 
-        const sceneJson = StashJson.getScene(mappingJson.checksum);
+        const sceneJson = await StashJson.getScene(mappingJson.checksum);
         if (!!sceneJson) {
           sceneAttributes.title = sceneJson.title;
           sceneAttributes.details = sceneJson.details;
