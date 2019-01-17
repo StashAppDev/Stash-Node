@@ -5,7 +5,7 @@ import { Tag } from "../db/models/tag.model";
 import { SceneMarkerQueryBuilder } from "../querybuilders/scene-marker.querybuilder";
 import { Stash } from "../stash/stash";
 import { GQL, QueryResolvers } from "../typings/graphql";
-import { getEntity } from "./utils";
+import { ObjectionUtils } from "../utils/objection.utils";
 
 export class SceneMarkerController {
 
@@ -29,7 +29,7 @@ export class SceneMarkerController {
   // TODO: test
   public static sceneMarkerTags: QueryResolvers.SceneMarkerTagsResolver = async (root, args, context, info) => {
     const tags: { [s: number]: GQL.SceneMarkerTag } = {};
-    const scene = await getEntity(Scene, { id: args.scene_id! });
+    const scene = await ObjectionUtils.getEntity(Scene, { id: args.scene_id! });
     const markers = await scene.$relatedQuery<SceneMarker>("scene_markers");
     for (const marker of markers) {
       const primaryTag = await marker.$relatedQuery<Tag>("primary_tag").first();
@@ -53,8 +53,8 @@ export class SceneMarkerController {
   // GET /scenes/:scene_id/scene_markers/:id/stream
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.scene_id });
-      const sceneMarker = await getEntity(SceneMarker, { id: req.params.id! });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.scene_id });
+      const sceneMarker = await ObjectionUtils.getEntity(SceneMarker, { id: req.params.id! });
 
       const streamPath = Stash.paths.sceneMarker.getStreamPath(scene.checksum!, sceneMarker.seconds!);
 
@@ -71,8 +71,8 @@ export class SceneMarkerController {
   // GET /scenes/:scene_id/scene_markers/:id/preview
   public static async preview(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.scene_id });
-      const sceneMarker = await getEntity(SceneMarker, { id: req.params.id! });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.scene_id });
+      const sceneMarker = await ObjectionUtils.getEntity(SceneMarker, { id: req.params.id! });
 
       const previewPath = Stash.paths.sceneMarker.getStreamPreviewImagePath(scene.checksum!, sceneMarker.seconds!);
 

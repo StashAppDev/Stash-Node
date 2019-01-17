@@ -3,14 +3,14 @@ import FileType from "file-type";
 import { Performer } from "../db/models/performer.model";
 import { PerformerQueryBuilder } from "../querybuilders/performer.querybuilder";
 import { QueryResolvers } from "../typings/graphql";
-import { getEntity } from "./utils";
+import { ObjectionUtils } from "../utils/objection.utils";
 
 export class PerformerController {
 
   // #region GraphQL Resolvers
 
   public static findPerformer: QueryResolvers.FindPerformerResolver = async (root, args, context, info) => {
-    return getEntity(Performer, { id: args.id });
+    return ObjectionUtils.getEntity(Performer, { id: args.id });
   }
 
   public static findPerformers: QueryResolvers.FindPerformersResolver = async (root, args, context, info) => {
@@ -33,7 +33,7 @@ export class PerformerController {
     try {
       // if (req.fresh) { return; } // TODO
 
-      const performer = await getEntity(Performer, { id: req.params.id });
+      const performer = await ObjectionUtils.getEntity(Performer, { id: req.params.id });
 
       const fileType = FileType(performer.image!);
       if (fileType == null) { throw Error(`Unable to find file type for performer image ${performer.id}`); }

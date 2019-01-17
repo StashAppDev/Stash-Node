@@ -1,14 +1,14 @@
 import express = require("express");
 import { Gallery } from "../db/models/gallery.model";
 import { QueryResolvers } from "../typings/graphql";
-import { getEntity } from "./utils";
+import { ObjectionUtils } from "../utils/objection.utils";
 
 export class GalleryController {
 
   // #region GraphQL Resolvers
 
   public static findGallery: QueryResolvers.FindGalleryResolver = async (root, args, context, info) => {
-    return getEntity(Gallery, { id: args.id });
+    return ObjectionUtils.getEntity(Gallery, { id: args.id });
   }
 
   // #endregion

@@ -5,7 +5,7 @@ import { HttpError } from "../errors/http.error";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
 import { Stash } from "../stash/stash";
 import { QueryResolvers } from "../typings/graphql";
-import { getEntity } from "./utils";
+import { ObjectionUtils } from "../utils/objection.utils";
 
 export class SceneController {
 
@@ -13,9 +13,9 @@ export class SceneController {
 
   public static findScene: QueryResolvers.FindSceneResolver = async (root, args, context, info) => {
     if (!!args.id) {
-      return await getEntity(Scene, { id: args.id });
+      return await ObjectionUtils.getEntity(Scene, { id: args.id });
     } else if (!!args.checksum) {
-      return await getEntity(Scene, { checksum: args.checksum });
+      return await ObjectionUtils.getEntity(Scene, { checksum: args.checksum });
     } else {
       throw new Error("Invalid arguments");
     }
@@ -39,7 +39,7 @@ export class SceneController {
 
   public static async stream(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.id });
       const filePath = Stash.paths.scene.getStreamPath(scene.path, scene.checksum);
       if (!!filePath) { res.sendFile(filePath); } else { throw new HttpError(404, `No file ${filePath}`); }
     } catch (e) {
@@ -49,7 +49,7 @@ export class SceneController {
 
   public static async screenshot(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.id });
 
       const screenshotPath = Stash.paths.scene.getScreenshotPath(scene.checksum!);
       const thumbnailPath = Stash.paths.scene.getThumbnailScreenshotPath(scene.checksum!);
@@ -77,7 +77,7 @@ export class SceneController {
 
   public static async preview(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.id });
       const previewPath = Stash.paths.scene.getStreamPreviewPath(scene.checksum!);
 
       const sendFileOptions = {
@@ -92,7 +92,7 @@ export class SceneController {
 
   public static async webp(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.id });
       const webpPath = Stash.paths.scene.getStreamPreviewImagePath(scene.checksum!);
 
       const sendFileOptions = {
@@ -107,7 +107,7 @@ export class SceneController {
 
   public static async chapterVtt(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-      const scene = await getEntity(Scene, { id: req.params.id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id: req.params.id });
       res.type("text/vtt");
       res.send(await scene.makeChapterVtt());
     } catch (e) {
@@ -119,7 +119,7 @@ export class SceneController {
     try {
       res.type("text/vtt");
       const id = req.params.id_thumbs.replace("_thumbs", "");
-      const scene = await getEntity(Scene, { id, checksum: id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id, checksum: id });
       res.sendFile(Stash.paths.scene.getSpriteVttFilePath(scene!.checksum));
     } catch (e) {
       next(e);
@@ -130,7 +130,7 @@ export class SceneController {
     try {
       res.type("image/jpeg");
       const id = req.params.id_sprite.replace("_sprite", "");
-      const scene = await getEntity(Scene, { id, checksum: id });
+      const scene = await ObjectionUtils.getEntity(Scene, { id, checksum: id });
       res.sendFile(Stash.paths.scene.getSpriteImageFilePath(scene!.checksum));
     } catch (e) {
       next(e);

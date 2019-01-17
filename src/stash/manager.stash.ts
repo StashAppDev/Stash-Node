@@ -2,6 +2,7 @@ import PQueue from "p-queue";
 import { Database } from "../db/database";
 import { Scene } from "../db/models/scene.model";
 import { FileUtils } from "../utils/file.utils";
+import { ObjectionUtils } from "../utils/objection.utils";
 import { log } from "./../logger";
 import { Stash } from "./stash";
 import { GenerateSpriteTask } from "./tasks/generate-sprite.task";
@@ -95,7 +96,7 @@ class Manager {
     this.job.message = "Generating content...";
     this.job.logs = [];
 
-    this.job.total = (await Scene.knexQuery().count())[0]["count(*)"];
+    this.job.total = await ObjectionUtils.getCount(Scene);
     await Stash.paths.generated.ensureTmpDir();
 
     const scenes = await Scene.query();

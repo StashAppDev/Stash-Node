@@ -3,14 +3,14 @@ import FileType from "file-type";
 import { Studio } from "../db/models/studio.model";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { ImageUtils } from "../utils/image.utils";
-import { getEntity } from "./utils";
+import { ObjectionUtils } from "../utils/objection.utils";
 
 export class StudioController {
 
   // #region GraphQL Resolvers
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
-    return getEntity(Studio, { id: args.id });
+    return ObjectionUtils.getEntity(Studio, { id: args.id });
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {
@@ -42,7 +42,7 @@ export class StudioController {
     try {
       // if (req.fresh) { return; } // TODO
 
-      const studio = await getEntity(Studio, { id: req.params.id });
+      const studio = await ObjectionUtils.getEntity(Studio, { id: req.params.id });
 
       const fileType = FileType(studio.image!);
       if (fileType == null) { throw Error(`Unable to find file type for studio image ${studio.id}`); }

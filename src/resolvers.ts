@@ -17,6 +17,7 @@ import { PerformerRoutes } from "./routes/performer.route";
 import { SceneRoutes } from "./routes/scene.route";
 import { StudioRoutes } from "./routes/studio.route";
 import { IResolvers } from "./typings/graphql";
+import { ObjectionUtils } from "./utils/objection.utils";
 
 // NOTE: This path looks weird, but is required for pkg
 const schemaPath = path.join(__dirname, "../src/schema.graphql");
@@ -61,11 +62,11 @@ export const resolvers: IResolvers = {
     },
     async stats(root, args, context, info) {
       // tslint:disable:variable-name
-      const scene_count = (await Scene.knexQuery().count())[0]["count(*)"];
-      const gallery_count = (await Gallery.knexQuery().count())[0]["count(*)"];
-      const performer_count = (await Performer.knexQuery().count())[0]["count(*)"];
-      const studio_count = (await Studio.knexQuery().count())[0]["count(*)"];
-      const tag_count = (await Tag.knexQuery().count())[0]["count(*)"];
+      const scene_count = await ObjectionUtils.getCount(Scene);
+      const gallery_count = await ObjectionUtils.getCount(Gallery);
+      const performer_count = await ObjectionUtils.getCount(Performer);
+      const studio_count = await ObjectionUtils.getCount(Studio);
+      const tag_count = await ObjectionUtils.getCount(Tag);
       return { scene_count, gallery_count, performer_count, studio_count, tag_count };
       // tslint:enable:variable-name
     },
@@ -154,18 +155,20 @@ export const resolvers: IResolvers = {
       if (!studio.id) { throw new Error(`Missing studio id!`); }
       return StudioRoutes.getStudioImageUrl(context.baseUrl, studio.id);
     },
-    async scene_count(studio) {
-      return (await studio.$relatedQuery<any>("scenes").count())[0]["count(*)"];
+    scene_count(studio) {
+      return ObjectionUtils.getCountFromQueryBuilder(studio.$relatedQuery<any>("scenes"));
     },
   },
   Tag: {
-    async scene_count(tag) {
-      return (await tag.$relatedQuery<any>("scenes").count())[0]["count(*)"];
+    scene_count(tag) {
+      return ObjectionUtils.getCountFromQueryBuilder(tag.$relatedQuery<any>("scenes"));
     },
     async scene_marker_count(tag) {
-      const primarySceneMarkers = (await tag.$relatedQuery<any>("primary_scene_markers").count())[0]["count(*)"];
-      const sceneMarkers = (await tag.$relatedQuery<any>("scene_markers").count())[0]["count(*)"];
-      return primarySceneMarkers + sceneMarkers;
+      const primarySceneMarkersCount =
+        await ObjectionUtils.getCountFromQueryBuilder(tag.$relatedQuery<any>("primary_scene_markers"));
+      const sceneMarkersCount =
+        await ObjectionUtils.getCountFromQueryBuilder(tag.$relatedQuery<any>("scene_markers"));
+      return primarySceneMarkersCount + sceneMarkersCount;
     },
   },
 };
