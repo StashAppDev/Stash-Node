@@ -3,7 +3,7 @@ import fse from "fs-extra";
 import os from "os";
 import path from "path";
 import { Maybe } from "../typings/stash";
-import { parseJsonFile } from "./utils.stash";
+import { FileUtils } from "../utils/file.utils";
 
 export class FixedPaths {
   public readonly executionDirectory: string = path.dirname(process.execPath);
@@ -165,7 +165,7 @@ export class Paths {
   constructor(fixedPaths: FixedPaths) {
     this.fixed = fixedPaths;
 
-    const jsonConfig = parseJsonFile(this.fixed.configFile);
+    const jsonConfig = FileUtils.readJsonSync(this.fixed.configFile);
 
     this.stash       = jsonConfig.stash;
     this.metadata    = jsonConfig.metadata;

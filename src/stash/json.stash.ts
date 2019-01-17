@@ -1,6 +1,6 @@
+import { FileUtils } from "../utils/file.utils";
 import { StashManager } from "./manager.stash";
 import { Stash } from "./stash";
-import { parseJsonFile, writeJsonFile } from "./utils.stash";
 
 export type IJsonObject = any;
 
@@ -87,31 +87,30 @@ export interface IStudioJson extends IJsonObject {
 }
 
 class Json {
-  public getMappings(): IMappingJson {
-    return parseJsonFile(Stash.paths.json.mappingsFile);
+  public getMappings(): Promise<IMappingJson> {
+    return FileUtils.readJson(Stash.paths.json.mappingsFile);
   }
 
-  public saveMappings(json: IMappingJson) {
+  public saveMappings(json: IMappingJson): Promise<void> {
     StashManager.info("Saving mapping file...");
-    writeJsonFile(Stash.paths.json.mappingsFile, json);
+    return FileUtils.writeJson(Stash.paths.json.mappingsFile, json);
   }
 
-  public getScraped(): IScrapedJson {
-    return parseJsonFile(Stash.paths.json.scrapedFile);
+  public getScraped(): Promise<IScrapedJson> {
+    return FileUtils.readJson(Stash.paths.json.scrapedFile);
   }
 
-  public getPerformer(checksum: string): IPerformerJson {
-    return parseJsonFile(Stash.paths.json.performerJsonPath(checksum));
+  public getPerformer(checksum: string): Promise<IPerformerJson> {
+    return FileUtils.readJson(Stash.paths.json.performerJsonPath(checksum));
   }
 
-  public getScene(checksum: string): ISceneJson {
-    return parseJsonFile(Stash.paths.json.sceneJsonPath(checksum));
+  public getScene(checksum: string): Promise<ISceneJson> {
+    return FileUtils.readJson(Stash.paths.json.sceneJsonPath(checksum));
   }
 
-  public getStudio(checksum: string): IStudioJson {
-    return parseJsonFile(Stash.paths.json.studioJsonPath(checksum));
+  public getStudio(checksum: string): Promise<IStudioJson> {
+    return FileUtils.readJson(Stash.paths.json.studioJsonPath(checksum));
   }
-
 }
 
 export const StashJson = new Json();

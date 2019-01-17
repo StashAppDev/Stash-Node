@@ -2,8 +2,8 @@ import fs from "fs";
 import fse from "fs-extra";
 import inquirer from "inquirer";
 import { Database } from "../db/database";
+import { FileUtils } from "../utils/file.utils";
 import { FixedPaths, Paths } from "./paths.stash";
-import { writeJsonFile } from "./utils.stash";
 
 class StashImpl {
   public paths: Paths;
@@ -34,14 +34,13 @@ class StashImpl {
       }
     };
 
-    return inquirer.prompt([
+    const answers = await inquirer.prompt([
       { message: "Media folder path", name: "stash", type: "input", validate: validation },
       { message: "Metadata folder path", name: "metadata", type: "input", validate: validation },
       { message: "Cache folder path", name: "cache", type: "input", validate: validation },
       { message: "Downloads folder path", name: "downloads", type: "input", validate: validation },
-    ]).then((answers: any) => {
-      writeJsonFile(fixedPaths.configFile, answers);
-    });
+    ]);
+    await FileUtils.writeJson(fixedPaths.configFile, answers);
   }
 }
 

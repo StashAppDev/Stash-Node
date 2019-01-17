@@ -81,6 +81,33 @@ export class FileUtils {
     }
   }
 
+  public static async readJson(filePath: string) {
+    try {
+      return fse.readJson(filePath, { encoding: "utf8" });
+    } catch (e) {
+      log.warn(`Failed to read JSON file ${filePath}  Error: ${e.message}`);
+      return;
+    }
+  }
+
+  public static readJsonSync(filePath: string) {
+    try {
+      return fse.readJsonSync(filePath, { encoding: "utf8" });
+    } catch (e) {
+      log.warn(`Failed to read JSON file ${filePath}.  Error: ${e.message}`);
+      return;
+    }
+  }
+
+  public static async writeJson(filePath: string, data: any) {
+    try {
+      return fse.writeJson(filePath, data, { spaces: 2, encoding: "utf8" });
+    } catch (e) {
+      log.warn(`Failed to write JSON file ${filePath}  Error: ${e.message}`);
+      return;
+    }
+  }
+
   public static spawn(
     command: string,
     args: ReadonlyArray<string> = [],

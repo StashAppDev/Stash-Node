@@ -1,8 +1,8 @@
 import express from "express";
 import FileType from "file-type";
 import { Studio } from "../db/models/studio.model";
-import { processImage } from "../stash/utils.stash";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
+import { ImageUtils } from "../utils/image.utils";
 import { getEntity } from "./utils";
 
 export class StudioController {
@@ -19,7 +19,7 @@ export class StudioController {
       url: args.input.url,
     };
     if (!!args.input.image) {
-      await processImage(args.input, newStudio);
+      await ImageUtils.processBase64Image(args.input, newStudio);
     }
     return Studio.query().insert(newStudio);
   }
@@ -31,7 +31,7 @@ export class StudioController {
       url: args.input.url,
     };
     if (!!args.input.image) {
-      await processImage(args.input, updatedStudio);
+      await ImageUtils.processBase64Image(args.input, updatedStudio);
     }
     return Studio.query().updateAndFetchById(args.input.id, updatedStudio);
   }
