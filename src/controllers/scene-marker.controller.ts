@@ -27,26 +27,26 @@ export class SceneMarkerController {
     return { scene_markers: pages.results, count: totalSize } as any;
   }
 
-  // TODO: test
+  /**
+   * Get scene marker tags which show up under the video.
+   */
   public static sceneMarkerTags: QueryResolvers.SceneMarkerTagsResolver = async (root, args, context, info) => {
     const tags: { [s: number]: GQL.SceneMarkerTag } = {};
     const scene = await ObjectionUtils.getEntity(Scene, { id: args.scene_id! });
     const markers = await scene.$relatedQuery<SceneMarker>("scene_markers");
     for (const marker of markers) {
-      const primaryTag = await marker.$relatedQuery<Tag>("primary_tag").first();
-      if (!primaryTag!.id) { throw Error("What?"); }
-      if (!tags.hasOwnProperty(primaryTag!.id!)) {
-        tags[primaryTag!.id!] = { tag: SceneMarkerController.tagModelToGraphQL(primaryTag!), scene_markers: [] };
+      const markerPrimaryTag = await marker.$relatedQuery<Tag>("primary_tag").first();
+      if (!markerPrimaryTag || !markerPrimaryTag.id) { throw Error("Missing primary tag"); }
+      if (!tags.hasOwnProperty(markerPrimaryTag.id)) {
+        tags[markerPrimaryTag.id] = { tag: markerPrimaryTag.toGraphQL(), scene_markers: [] };
       }
-      const m = marker.toJSON() as any;
-      m.scene = scene.toJSON();
-      m.primary_tag = primaryTag!.toJSON();
-      m.tags = [];
-      tags[primaryTag!.id!].scene_markers.push(m as any); // TODO
-
+      tags[markerPrimaryTag.id].scene_markers.push(marker as any);
     }
 
-    return Object.values(tags);
+    // Sort so that primary tags that show up earlier in the video are first.
+    return Object.values(tags).sort((a, b) => {
+      return a.scene_markers[0]!.seconds - b.scene_markers[0]!.seconds;
+    });
   }
 
   /**
@@ -113,13 +113,5 @@ export class SceneMarkerController {
     } catch (e) {
       next(e);
     }
-  }
-
-  // TODO
-  private static tagModelToGraphQL(t: Tag): GQL.Tag {
-    return {
-      id: t.id!.toString(),
-      name: t.name!,
-    };
   }
 }

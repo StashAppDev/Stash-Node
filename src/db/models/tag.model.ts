@@ -1,6 +1,7 @@
 // tslint:disable:object-literal-sort-keys variable-name
 import { Model } from "objection";
 import path from "path";
+import { GQL } from "../../typings/graphql";
 import BaseModel from "./base.model";
 import { SceneMarker } from "./scene-marker.model";
 import { Scene } from "./scene.model";
@@ -65,4 +66,11 @@ export class Tag extends BaseModel {
   public primary_scene_markers?: SceneMarker[];
   public scene_markers?: SceneMarker[];
   public scenes?: Scene[];
+
+  public toGraphQL(): GQL.Tag {
+    return {
+      id: this.id!.toString(),
+      name: this.name!,
+    };
+  }
 }

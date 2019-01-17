@@ -65,7 +65,9 @@ export const resolvers: IResolvers = {
 
     markerStrings(root, args, context, info) { return SceneMarkerController.markerStrings(root, args, context, info); },
     sceneMarkerTags(root, args, context, info) {
-      return SceneMarkerController.sceneMarkerTags(root, args, context, info);
+      // TODO: see Scene.scene_marker_tags
+      // return SceneMarkerController.sceneMarkerTags(root, args, context, info);
+      return [];
     },
     async stats(root, args, context, info) {
       // tslint:disable:variable-name
@@ -133,7 +135,8 @@ export const resolvers: IResolvers = {
     async scene_marker_tags(scene, args, context, info) {
       // TODO: Remove this.  Apollo has a bug where "scene_marker_tags" query wont work when updating markers.
       // https://github.com/apollographql/apollo-client/issues/1821
-      return await SceneMarkerController.sceneMarkerTags(scene, {scene_id: scene!.id!.toString(10)}, context, info);
+      // This should go away an `sceneMarkerTags` should return something, then the UI needs to use that instead of this
+      return await SceneMarkerController.sceneMarkerTags({}, {scene_id: scene!.id!.toString(10)}, context, info);
     },
   },
   SceneMarker: {
@@ -159,7 +162,7 @@ export const resolvers: IResolvers = {
         return sceneMarker.$relatedQuery("scene").first() as any;
       }
     },
-    tags(sceneMarker) {
+    tags(sceneMarker, args, context, info) {
       if (!!sceneMarker.tags) {
         return sceneMarker.tags;
       } else {
