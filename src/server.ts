@@ -42,7 +42,8 @@ export async function run(options: IStashServerOptions) {
   });
 
   // Allow requests up to 2 megabytes
-  app.use(bodyParser({ limit: "2mb" }));
+  app.use(bodyParser.json({ limit: "2mb" }));
+  app.use(bodyParser.urlencoded({ extended: true }));
 
   const server = new ApolloServer({
     context: (msg: {req: express.Request, res: express.Response}): IGraphQLContext => ({
