@@ -48,6 +48,7 @@ export const resolvers: IResolvers = {
   },
   Query: {
     findGallery(root, args, context, info) { return GalleryController.findGallery(root, args, context, info); },
+    // TODO findGalleries
     findPerformer(root, args, context, info) { return PerformerController.findPerformer(root, args, context, info); },
     findPerformers(root, args, context, info) { return PerformerController.findPerformers(root, args, context, info); },
     findTag(root, args, context, info) { return TagController.findTag(root, args, context, info); },
@@ -57,6 +58,12 @@ export const resolvers: IResolvers = {
       return SceneMarkerController.findSceneMarkers(root, args, context, info);
     },
     findStudio(root, args, context, info) { return StudioController.findStudio(root, args, context, info); },
+    // TODO findStudios
+
+    // TODO markerWall
+    // TODO sceneWall
+
+    markerStrings(root, args, context, info) { return SceneMarkerController.markerStrings(root, args, context, info); },
     sceneMarkerTags(root, args, context, info) {
       return SceneMarkerController.sceneMarkerTags(root, args, context, info);
     },
@@ -70,6 +77,16 @@ export const resolvers: IResolvers = {
       return { scene_count, gallery_count, performer_count, studio_count, tag_count };
       // tslint:enable:variable-name
     },
+    // TODO validGalleriesForScene(root, args, context, info) {},
+
+    // TODO: scrapeFreeones
+    // TODO: scrapeFreeonesPerformerList
+
+    // TODO: metadataImport
+    // TODO: metadataExport
+    // TODO: metadataScan
+    // TODO: metadataGenerate
+    // TODO: metadataClean
 
     async allPerformers() { return await Performer.query(); },
     async allStudios() { return await Studio.query(); },

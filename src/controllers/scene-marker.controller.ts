@@ -1,4 +1,5 @@
 import express from "express";
+import { raw } from "objection";
 import { SceneMarker } from "../db/models/scene-marker.model";
 import { Scene } from "../db/models/scene.model";
 import { Tag } from "../db/models/tag.model";
@@ -46,6 +47,34 @@ export class SceneMarkerController {
     }
 
     return Object.values(tags);
+  }
+
+  /**
+   * Returns an array of strings representing titles used for scene markers.  Includes a count value for each usage of
+   * that title.
+   */
+  public static markerStrings: QueryResolvers.MarkerStringsResolver = async (root, args, context, info) => {
+    const markerStringsQueryBuilder = SceneMarker.query()
+      .select(
+        raw("count(*) as count_all"),
+        "scene_markers.title",
+      );
+    if (!!args.q) { markerStringsQueryBuilder.where("scene_markers.title", "LIKE", `%${args.q}%`); }
+    markerStringsQueryBuilder
+      .orderBy("scene_markers.title")
+      .groupBy(["title"]);
+    const results = (await markerStringsQueryBuilder).map<GQL.MarkerStringsResultType>((marker) => {
+      return { id: marker.title, title: marker.title, count: (marker as any).count_all };
+    });
+    if (args.sort === "count") {
+      return results.sort((a, b) => {
+        if (a.count < b.count) { return -1; }
+        if (a.count > b.count) { return 1; }
+        return 0;
+      }).reverse();
+    } else {
+      return results;
+    }
   }
 
   // #endregion

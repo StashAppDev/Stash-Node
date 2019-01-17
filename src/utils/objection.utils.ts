@@ -29,7 +29,7 @@ export class ObjectionUtils {
   }
 
   public static async getCount<T extends Model>(type: new() => T): Promise<number> {
-    return this.getCountFromQueryBuilder(await (type as any).query());
+    return this.getCountFromQueryBuilder((type as any).query());
   }
   public static async getCountFromQueryBuilder(qb: QueryBuilder<any>): Promise<number> {
     const count = await qb.count();
