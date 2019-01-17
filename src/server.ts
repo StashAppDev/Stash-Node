@@ -1,5 +1,6 @@
 import { ApolloServer } from "apollo-server-express";
 import bodyParser from "body-parser";
+import compression from "compression";
 import express from "express";
 import path from "path";
 import { URL } from "url";
@@ -24,6 +25,14 @@ export async function run(options: IStashServerOptions) {
   if (!options.port) { options.port = 4000; }
 
   const app = express();
+
+  // Allow requests up to 2 megabytes
+  app.use(bodyParser.json({ limit: "2mb" }));
+  app.use(bodyParser.urlencoded({ extended: true }));
+
+  // Use gzip compression
+  app.use(compression());
+
   app.use("/performers", PerformerRoutes.buildRouter());
   app.use("/scenes", SceneRoutes.buildRouter());
   app.use("/studios", StudioRoutes.buildRouter());
@@ -40,10 +49,6 @@ export async function run(options: IStashServerOptions) {
       err instanceof HttpError ? err.message : `Internal Server Error<br/><br/>${err.message}<br/><br/>${err.stack}`;
     return res.status(code).send(message);
   });
-
-  // Allow requests up to 2 megabytes
-  app.use(bodyParser.json({ limit: "2mb" }));
-  app.use(bodyParser.urlencoded({ extended: true }));
 
   const server = new ApolloServer({
     context: (msg: {req: express.Request, res: express.Response}): IGraphQLContext => ({
