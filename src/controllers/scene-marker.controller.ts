@@ -19,12 +19,10 @@ export class SceneMarkerController {
     builder.search();
     builder.sort("title");
 
-    const pages = await builder.paginate();
-    const totalSize = await builder.resultSize();
-
+    const page = await builder.paginate();
     // TODO: Model instance doesn't match the GQL interface... remove any?
     // https://github.com/dotansimha/graphql-code-generator/issues/1041
-    return { scene_markers: pages.results, count: totalSize } as any;
+    return { scene_markers: page.results, count: page.total } as any;
   }
 
   /**

@@ -10,7 +10,7 @@ export class BaseQueryBuilder<T extends Model> extends QueryBuilder<T> {
     this.findFilter = !!findFilter ? findFilter : {};
   }
 
-  public paginate() {
+  public async paginate() {
     let page = !!this.findFilter.page ? this.findFilter.page : 1;
     if (page < 1) {
       page = 1;
@@ -23,7 +23,15 @@ export class BaseQueryBuilder<T extends Model> extends QueryBuilder<T> {
       perPage = 1;
     }
 
-    return this.page(page - 1, perPage).distinct(`${this.modelClass().tableName}.*`);
+    // Select only distinct id's to speed up the query...
+    const paginationResult = await this.page(page - 1, perPage).distinct(`${this.modelClass().tableName}.id`);
+    // ...then fetch each model in a seperate query.
+    for (let index = 0; index < paginationResult.results.length; index++) {
+      const model = paginationResult.results[index];
+      paginationResult.results[index] = await model.$query();
+    }
+
+    return paginationResult;
   }
 
   public sort(defaultSort: string) {
@@ -34,17 +42,16 @@ export class BaseQueryBuilder<T extends Model> extends QueryBuilder<T> {
     const sortColumn = this.getColumnNames().includes(sort) ? sort : defaultSort;
 
     if (sort.includes("_count")) {
-      // t_name = params[:sort].split('_').first.pluralize
-      // const tableName = findFilter.sort.split('_')[0].pluralize // TODO
-      // left_joins(t_name.to_sym).group(:id).reorder("COUNT(#{t_name}.id) #{sort_direction}")
-      return this;
+      const tableName = sort.split("_")[0]; // TODO: pluralize?
+      return this.leftJoinRelation(tableName)
+        .groupBy(`${this.modelClass().tableName}.id`)
+        .orderByRaw(`COUNT(${tableName}.id) ${sortDirection}`);
     } else if (sort === "filesize") {
-      // reorder("cast(#{table_name}.size as integer) #{sort_direction}") // TODO
-      return this;
+      return this.orderByRaw(`cast(${this.modelClass().tableName}.size as integer) ${sortDirection}`);
     } else if (sort === "random") {
       return this.orderByRaw("RANDOM()");
     } else {
-      return this.orderByRaw(`${this.modelClass().tableName}.${sortColumn} ${sortDirection}`); // TODO
+      return this.orderByRaw(`${this.modelClass().tableName}.${sortColumn} ${sortDirection}`);
     }
   }
 

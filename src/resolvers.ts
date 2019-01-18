@@ -45,6 +45,9 @@ export const resolvers: IResolvers = {
       if (!performer.id) { throw new Error(`Missing performer id!`); }
       return PerformerRoutes.getPerformerImageUrl(context.baseUrl, performer.id);
     },
+    scene_count(performer) {
+      return ObjectionUtils.getCountFromQueryBuilder(performer.$relatedQuery<any>("scenes"));
+    },
   },
   Query: {
     findGallery(root, args, context, info) { return GalleryController.findGallery(root, args, context, info); },
