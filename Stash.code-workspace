@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "server",
+      "path": "./packages/stash-server"
+    },
+    {
+      "name": "frontend",
+      "path": "./packages/stash-frontend",
+    }
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "editor.renderWhitespace": "boundary",
+    "editor.wordWrap": "bounded",
+    "javascript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "editor.wordWrapColumn": 120,
+    "editor.rulers": [
+      120
+    ]
+  }
+}

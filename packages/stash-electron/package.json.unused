@@ -1,0 +1,42 @@
+{
+  "name": "stash-electron",
+  "version": "0.0.0",
+  "license": "MIT",
+  "build": {
+    "appId": "com.github.stashapp",
+    "mac": {
+    },
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "snap",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": false
+    }
+  },
+  "scripts": {
+    "e:start": "electron .",
+    "e:compile": "cp -r ../stash-server/dist-ui ./dist-ui && cp -r ../stash-server/dist ./dist-server",
+    "e:dist": "yarn compile && electron-builder -mwl",
+    "e:dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
+    "e:postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "source-map-support": "0.5.10",
+    "sqlite3": "4.0.6"
+  },
+  "devDependencies": {
+    "electron": "4.0.1",
+    "electron-builder": "20.38.5"
+  }
+}

@@ -7,8 +7,7 @@
   "scripts" : {
     "start": "nodemon",
     "build": "rimraf dist && tsc",
-    "package": "yarn build && pkg package.json --out-path builds --options max_old_space_size=4096 && sh copy_native_modules.sh && yarn package:ffmpeg",
-    "package:ffmpeg": "sh download_ffmpeg.sh",
+    "package": "yarn build && pkg package.json --out-path builds --options max_old_space_size=4096",
     "schema": "gql-gen",
     "lint": "tslint -c ./tslint.json 'src/**/*.ts'",
     "lint:fix": "tslint --fix -c ./tslint.json 'src/**/*.ts'",
@@ -68,7 +67,7 @@
     "graphql-codegen-typescript-server": "0.15.2",
     "graphql-codegen-typescript-common": "0.15.2",
     "nodemon": "1.18.9",
-    "pkg": "4.3.5",
+    "pkg": "4.3.7",
     "rimraf": "2.6.3",
     "ts-node": "7.0.1",
     "tsconfig-paths": "3.7.0",

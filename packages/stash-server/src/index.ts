@@ -1,4 +1,5 @@
 import program from "commander";
+import os from "os";
 import { IStashServerOptions, run } from "./server";
 import { StashManager } from "./stash/manager.stash";
 import { Stash } from "./stash/stash";
@@ -49,7 +50,14 @@ function configureCommander() {
   program.parse(process.argv);
 
   if (!process.argv.slice(2).length) {
-    program.help();
+    if (os.platform() === "win32") {
+      const options: IStashServerOptions = {
+        port: 7000,
+      };
+      run(options);
+    } else {
+      program.help();
+    }
   }
 }
 

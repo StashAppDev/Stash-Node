@@ -7,3 +7,6 @@ database.db
 builds
 dist
 dist-ui
+dist-server
+ffmpeg_downloads
+yarn-error.log
