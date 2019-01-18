@@ -57,14 +57,14 @@ import * as GQL from './graphql-generated';
 
 @Injectable()
 export class StashService {
-  url = 'http://192.168.1.200:4000';
+  url = '';
 
   constructor(private platformLocation: PlatformLocation,
               private apollo: Apollo,
               private httpLink: HttpLink) {
     const platform: any = this.platformLocation;
     const url = new URL(platform.location.origin);
-    url.port = '4000';
+    url.port = '7000';
     this.url = url.toString().slice(0, -1);
 
     // http://graphql-ruby.org/javascript_client/apollo_subscriptions

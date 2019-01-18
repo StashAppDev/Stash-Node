@@ -38,7 +38,7 @@ function configureCommander() {
   program
     .command("start")
     .description("start the server")
-    .option("-p, --port <port>", "choose the port", "4000")
+    .option("-p, --port <port>", "choose the port", "7000")
     .action((cmd) => {
       const options: IStashServerOptions = {
         port: cmd.port,

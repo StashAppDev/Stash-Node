@@ -11,7 +11,8 @@
     "package:ffmpeg": "sh download_ffmpeg.sh",
     "schema": "gql-gen",
     "lint": "tslint -c ./tslint.json 'src/**/*.ts'",
-    "lint:fix": "tslint --fix -c ./tslint.json 'src/**/*.ts'"
+    "lint:fix": "tslint --fix -c ./tslint.json 'src/**/*.ts'",
+    "dev:server": "nodemon"
   },
   "pkg": {
     "scripts": [

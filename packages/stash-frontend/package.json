@@ -9,7 +9,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "update_schema": "./update_schema.sh"
+    "update_schema": "./update_schema.sh",
+    "dev:server": "ng serve --disableHostCheck --host=0.0.0.0 --port 7001"
   },
   "private": true,
   "dependencies": {
