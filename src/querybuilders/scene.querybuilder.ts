@@ -17,6 +17,7 @@ export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
 
     this.leftJoinRelation("scene_markers");
     this.leftJoinRelation("performers");
+    this.leftJoinRelation("studio");
 
     if (!!sceneFilter.rating) {
       this.rating(sceneFilter.rating);
@@ -29,6 +30,9 @@ export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
     }
     if (!!sceneFilter.performer_id) {
       this.performerId(sceneFilter.performer_id);
+    }
+    if (!!sceneFilter.studio_id) {
+      this.studioId(sceneFilter.studio_id);
     }
 
     return this;
@@ -89,5 +93,9 @@ export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
 
   private performerId(id: string) {
     return this.where("performers.id", id);
+  }
+
+  private studioId(id: string) {
+    return this.where("studio.id", id);
   }
 }

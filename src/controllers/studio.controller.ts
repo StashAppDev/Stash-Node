@@ -1,6 +1,7 @@
 import express from "express";
 import FileType from "file-type";
 import { Studio } from "../db/models/studio.model";
+import { StudioQueryBuilder } from "../querybuilders/studio.querybuilder";
 import { MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { ImageUtils } from "../utils/image.utils";
 import { ObjectionUtils } from "../utils/objection.utils";
@@ -11,6 +12,18 @@ export class StudioController {
 
   public static findStudio: QueryResolvers.FindStudioResolver = async (root, args, context, info) => {
     return ObjectionUtils.getEntity(Studio, { id: args.id });
+  }
+
+  public static findStudios: QueryResolvers.FindStudiosResolver = async (root, args, context, info) => {
+    const builder = new StudioQueryBuilder(args);
+    builder.filter();
+    builder.search();
+    builder.sort("name");
+
+    const page = await builder.paginate();
+    // TODO: Model instance doesn't match the GQL interface... remove any?
+    // https://github.com/dotansimha/graphql-code-generator/issues/1041
+    return { studios: page.results, count: page.total } as any;
   }
 
   public static studioCreate: MutationResolvers.StudioCreateResolver = async (root, args, context, info) => {

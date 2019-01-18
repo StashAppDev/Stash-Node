@@ -61,7 +61,7 @@ export const resolvers: IResolvers = {
       return SceneMarkerController.findSceneMarkers(root, args, context, info);
     },
     findStudio(root, args, context, info) { return StudioController.findStudio(root, args, context, info); },
-    // TODO findStudios
+    findStudios(root, args, context, info) { return StudioController.findStudios(root, args, context, info); },
 
     // TODO markerWall
     // TODO sceneWall
