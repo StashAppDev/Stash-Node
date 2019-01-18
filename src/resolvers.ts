@@ -51,7 +51,7 @@ export const resolvers: IResolvers = {
   },
   Query: {
     findGallery(root, args, context, info) { return GalleryController.findGallery(root, args, context, info); },
-    // TODO findGalleries
+    findGalleries(root, args, context, info) { return GalleryController.findGalleries(root, args, context, info); },
     findPerformer(root, args, context, info) { return PerformerController.findPerformer(root, args, context, info); },
     findPerformers(root, args, context, info) { return PerformerController.findPerformers(root, args, context, info); },
     findTag(root, args, context, info) { return TagController.findTag(root, args, context, info); },
