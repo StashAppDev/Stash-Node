@@ -1,7 +1,7 @@
-schema: ./src/schema.graphql
+schema: ./packages/stash-server/src/schema.graphql
 overwrite: true
 generates:
-  ./src/typings/graphql.d.ts:
+  ./packages/stash-server/src/typings/graphql.d.ts:
     config:
       schemaNamespace: "GQL"
       contextType: ../server#IGraphQLContext
@@ -35,3 +35,13 @@ generates:
       - typescript-common
       - typescript-server
       - typescript-resolvers
+  ./schema/schema.json:
+    - introspection
+  ./packages/stash-frontend/src/app/core/graphql-generated.ts:
+    documents: ./schema/**/*.graphql
+    plugins:
+      - add: "/* tslint:disable */"
+      - time
+      - typescript-common
+      - typescript-client
+      - typescript-apollo-angular

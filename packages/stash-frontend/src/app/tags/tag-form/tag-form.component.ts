@@ -53,7 +53,7 @@ export class TagFormComponent implements OnInit {
       this.stashService.tagCreate({
         name: this.name
       }).subscribe(result => {
-        this.router.navigate(['/tags', result.data.tagCreate.tag.id]);
+        this.router.navigate(['/tags', result.data.tagCreate.id]);
       });
     }
   }

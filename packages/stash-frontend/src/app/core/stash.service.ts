@@ -13,59 +13,38 @@ import { getMainDefinition } from 'apollo-utilities';
 import * as ActionCable from 'actioncable';
 import * as ActionCableLink from 'graphql-ruby-client/subscriptions/ActionCableLink';
 
-import {
-  FIND_SCENES,
-  FIND_SCENE,
-  MARKER_STRINGS,
-  MARKER_CREATE,
-  MARKER_UPDATE,
-  MARKER_DESTROY,
-  FIND_SCENE_FOR_EDITING,
-  FIND_PERFORMER,
-  SCENE_WALL,
-  MARKER_WALL,
-  ALL_TAGS,
-  FIND_PERFORMERS,
-  FIND_STUDIOS,
-  FIND_STUDIO,
-  FIND_GALLERIES,
-  FIND_GALLERY,
-  SCENE_UPDATE,
-  PERFORMER_UPDATE,
-  PERFORMER_CREATE,
-  ALL_PERFORMERS,
-  TAG_CREATE,
-  STUDIO_CREATE,
-  ALL_STUDIOS,
-  STUDIO_UPDATE,
-  STATS,
-  METADATA_UPDATE_SUBSCRIPTION,
-  METADATA_SCAN,
-  METADATA_EXPORT,
-  METADATA_IMPORT,
-  METADATA_GENERATE,
-  METADATA_CLEAN,
-  SCRAPE_FREEONES,
-  SCRAPE_FREEONES_PERFORMERS,
-  ALL_SCENE_MARKERS,
-  FIND_SCENE_MARKERS,
-  FIND_TAG,
-  TAG_UPDATE,
-  TAG_DESTROY
-} from './graphql';
 import * as GQL from './graphql-generated';
 
 @Injectable()
 export class StashService {
-  url = '';
+  private findScenesGQL = new GQL.FindScenesGQL(this.apollo);
+  private findSceneGQL = new GQL.FindSceneGQL(this.apollo);
+  private findSceneForEditingGQL = new GQL.FindSceneForEditingGQL(this.apollo);
+  private findSceneMarkersGQL = new GQL.FindSceneMarkersGQL(this.apollo);
+  private sceneWallGQL = new GQL.SceneWallGQL(this.apollo);
+  private markerWallGQL = new GQL.MarkerWallGQL(this.apollo);
+  private findPerformersGQL = new GQL.FindPerformersGQL(this.apollo);
+  private findPerformerGQL = new GQL.FindPerformerGQL(this.apollo);
+  private findStudiosGQL = new GQL.FindStudiosGQL(this.apollo);
+  private findStudioGQL = new GQL.FindStudioGQL(this.apollo);
+  private findGalleriesGQL = new GQL.FindGalleriesGQL(this.apollo);
+  private findGalleryGQL = new GQL.FindGalleryGQL(this.apollo);
+  private findTagGQL = new GQL.FindTagGQL(this.apollo);
+  private markerStringsGQL = new GQL.MarkerStringsGQL(this.apollo);
+  private scrapeFreeonesGQL = new GQL.ScrapeFreeonesGQL(this.apollo);
+  private scrapeFreeonesPerformersGQL = new GQL.ScrapeFreeonesPerformersGQL(this.apollo);
+  private allTagsGQL = new GQL.AllTagsGQL(this.apollo);
+  private allPerformersGQL = new GQL.AllPerformersGQL(this.apollo);
+  private statsGQL = new GQL.StatsGQL(this.apollo);
+  private sceneUpdateGQL = new GQL.SceneUpdateGQL(this.apollo);
+  // TODO
+  private tagUpdateGQL = new GQL.TagUpdateGQL(this.apollo);
 
-  constructor(private platformLocation: PlatformLocation,
-              private apollo: Apollo,
-              private httpLink: HttpLink) {
-    const platform: any = this.platformLocation;
-    const url = new URL(platform.location.origin);
-    url.port = '7000';
-    this.url = url.toString().slice(0, -1);
+  public static makeApolloClient(platformLocation: PlatformLocation, httpLink: HttpLink) {
+    const platform: any = platformLocation;
+    const platformUrl = new URL(platform.location.origin);
+    platformUrl.port = '7000';
+    const url = platformUrl.toString().slice(0, -1);
 
     // http://graphql-ruby.org/javascript_client/apollo_subscriptions
     const cable = ActionCable.createConsumer(`ws://${platform.location.hostname}:3000/subscriptions`);
@@ -85,7 +64,7 @@ export class StashService {
       }
     });
 
-    const httpLinkHandler = this.httpLink.create({uri: `${this.url}/graphql`});
+    const httpLinkHandler = httpLink.create({uri: `${url}/graphql`});
 
     const splitLink = ApolloLink.split(
       // split based on operation type
@@ -102,7 +81,7 @@ export class StashService {
       splitLink
     ]);
 
-    apollo.create({
+    return {
       link: link,
       cache: new InMemoryCache({
         // dataIdFromObject: o => {
@@ -121,10 +100,14 @@ export class StashService {
           }
         }
       })
-    });
+    };
   }
 
-  findScenes(page?: number, filter?: ListFilter): QueryRef<GQL.FindScenesQuery, Record<string, any>> {
+  constructor(private apollo: Apollo, private platformLocation: PlatformLocation, private httpLink: HttpLink) {
+    apollo.create(StashService.makeApolloClient(this.platformLocation, this.httpLink));
+  }
+
+  findScenes(page?: number, filter?: ListFilter): QueryRef<GQL.FindScenes.Query, Record<string, any>> {
     let scene_filter = {};
     if (filter.criteriaFilterOpen) {
       scene_filter = filter.makeSceneFilter();
@@ -135,37 +118,28 @@ export class StashService {
       });
     }
 
-    return this.apollo.watchQuery<GQL.FindScenesQuery, GQL.FindScenesQueryVariables>({
-      query: FIND_SCENES,
-      variables: {
-        filter: {
-          q: filter.searchTerm,
-          page: page,
-          per_page: filter.itemsPerPage,
-          sort: filter.sortBy,
-          direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.ASC : GQL.SortDirectionEnum.DESC
-        },
-        scene_filter: scene_filter
-      }
+    return this.findScenesGQL.watch({
+      filter: {
+        q: filter.searchTerm,
+        page: page,
+        per_page: filter.itemsPerPage,
+        sort: filter.sortBy,
+        direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.Asc : GQL.SortDirectionEnum.Desc
+      },
+      scene_filter: scene_filter
     });
   }
 
   findScene(id?: any, checksum?: string) {
-    return this.apollo.watchQuery<GQL.FindSceneQuery, GQL.FindSceneQueryVariables>({
-      query: FIND_SCENE,
-      variables: {
-        id: id,
-        checksum: checksum
-      }
+    return this.findSceneGQL.watch({
+      id: id,
+      checksum: checksum
     });
   }
 
   findSceneForEditing(id?: any) {
-    return this.apollo.watchQuery<GQL.FindSceneForEditingQuery, GQL.FindSceneForEditingQueryVariables>({
-      query: FIND_SCENE_FOR_EDITING,
-      variables: {
-        id: id
-      }
+    return this.findSceneForEditingGQL.watch({
+      id: id
     });
   }
 
@@ -180,38 +154,33 @@ export class StashService {
       });
     }
 
-    return this.apollo.watchQuery<GQL.FindSceneMarkersQuery, GQL.FindSceneMarkersQueryVariables>({
-      query: FIND_SCENE_MARKERS,
-      variables: {
-        filter: {
-          q: filter.searchTerm,
-          page: page,
-          per_page: filter.itemsPerPage,
-          sort: filter.sortBy,
-          direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.ASC : GQL.SortDirectionEnum.DESC
-        },
-        scene_marker_filter: scene_marker_filter
-      }
+    return this.findSceneMarkersGQL.watch({
+      filter: {
+        q: filter.searchTerm,
+        page: page,
+        per_page: filter.itemsPerPage,
+        sort: filter.sortBy,
+        direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.Asc : GQL.SortDirectionEnum.Desc
+      },
+      scene_marker_filter: scene_marker_filter
     });
   }
 
   sceneWall(q?: string) {
-    return this.apollo.watchQuery<GQL.SceneWallQuery, GQL.SceneWallQueryVariables>({
-      fetchPolicy: 'network-only',
-      query: SCENE_WALL,
-      variables: {
-        q: q
-      }
+    return this.sceneWallGQL.watch({
+      q: q
+    },
+    {
+      fetchPolicy: 'network-only'
     });
   }
 
   markerWall(q?: string) {
-    return this.apollo.watchQuery<GQL.MarkerWallQuery, GQL.MarkerWallQueryVariables>({
-      fetchPolicy: 'network-only',
-      query: MARKER_WALL,
-      variables: {
-        q: q
-      }
+    return this.markerWallGQL.watch({
+      q: q
+    },
+    {
+      fetchPolicy: 'network-only'
     });
   }
 
@@ -226,162 +195,125 @@ export class StashService {
     //   });
     // }
 
-    return this.apollo.watchQuery<GQL.FindPerformersQuery, GQL.FindPerformersQueryVariables>({
-      query: FIND_PERFORMERS,
-      variables: {
-        filter: {
-          q: filter.searchTerm,
-          page: page,
-          per_page: filter.itemsPerPage,
-          sort: filter.sortBy,
-          direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.ASC : GQL.SortDirectionEnum.DESC
-        },
-        performer_filter: performer_filter
-      }
+    return this.findPerformersGQL.watch({
+      filter: {
+        q: filter.searchTerm,
+        page: page,
+        per_page: filter.itemsPerPage,
+        sort: filter.sortBy,
+        direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.Asc : GQL.SortDirectionEnum.Desc
+      },
+      performer_filter: performer_filter
     });
   }
 
   findPerformer(id: any) {
-    return this.apollo.watchQuery<GQL.FindPerformerQuery, GQL.FindPerformerQueryVariables>({
-      query: FIND_PERFORMER,
-      variables: {
-        id: id
-      }
+    return this.findPerformerGQL.watch({
+      id: id
     });
   }
 
   findStudios(page?: number, filter?: ListFilter) {
-    return this.apollo.watchQuery<GQL.FindStudiosQuery, GQL.FindStudiosQueryVariables>({
-      query: FIND_STUDIOS,
-      variables: {
-        filter: {
-          q: filter.searchTerm,
-          page: page,
-          per_page: filter.itemsPerPage,
-          sort: filter.sortBy,
-          direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.ASC : GQL.SortDirectionEnum.DESC
-        }
+    return this.findStudiosGQL.watch({
+      filter: {
+        q: filter.searchTerm,
+        page: page,
+        per_page: filter.itemsPerPage,
+        sort: filter.sortBy,
+        direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.Asc : GQL.SortDirectionEnum.Desc
       }
     });
   }
 
   findStudio(id: any) {
-    return this.apollo.watchQuery<GQL.FindStudioQuery, GQL.FindStudioQueryVariables>({
-      query: FIND_STUDIO,
-      variables: {
-        id: id
-      }
+    return this.findStudioGQL.watch({
+      id: id
     });
   }
 
   findGalleries(page?: number, filter?: ListFilter) {
-    return this.apollo.watchQuery<GQL.FindGalleriesQuery, GQL.FindGalleriesQueryVariables>({
-      query: FIND_GALLERIES,
-      variables: {
-        filter: {
-          q: filter.searchTerm,
-          page: page,
-          per_page: filter.itemsPerPage,
-          sort: filter.sortBy,
-          direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.ASC : GQL.SortDirectionEnum.DESC
-        }
+    return this.findGalleriesGQL.watch({
+      filter: {
+        q: filter.searchTerm,
+        page: page,
+        per_page: filter.itemsPerPage,
+        sort: filter.sortBy,
+        direction: filter.sortDirection === 'asc' ? GQL.SortDirectionEnum.Asc : GQL.SortDirectionEnum.Desc
       }
     });
   }
 
   findGallery(id: any) {
-    return this.apollo.watchQuery<GQL.FindGalleryQuery, GQL.FindGalleryQueryVariables>({
-      query: FIND_GALLERY,
-      variables: {
-        id: id
-      }
+    return this.findGalleryGQL.watch({
+      id: id
     });
   }
 
   findTag(id: any) {
-    return this.apollo.watchQuery<GQL.FindTagQuery, GQL.FindTagQueryVariables>({
-      query: FIND_TAG,
-      variables: {
-        id: id
-      }
+    return this.findTagGQL.watch({
+      id: id
     });
   }
 
   markerStrings(q?: string, sort?: string) {
-    return this.apollo.watchQuery<GQL.MarkerStringsQuery, GQL.MarkerStringsQueryVariables>({
-      query: MARKER_STRINGS,
-      variables: {
-        q: q,
-        sort: sort
-      }
+    return this.markerStringsGQL.watch({
+      q: q,
+      sort: sort
     });
   }
 
   scrapeFreeones(performer_name: string) {
-    return this.apollo.watchQuery<GQL.ScrapeFreeonesQuery, GQL.ScrapeFreeonesQueryVariables>({
-      query: SCRAPE_FREEONES,
-      variables: {
-        performer_name: performer_name
-      }
+    return this.scrapeFreeonesGQL.watch({
+      performer_name: performer_name
     });
   }
 
   scrapeFreeonesPerformers(query: string) {
-    return this.apollo.watchQuery<GQL.ScrapeFreeonesPerformersQuery, GQL.ScrapeFreeonesPerformersQueryVariables>({
-      query: SCRAPE_FREEONES_PERFORMERS,
-      variables: {
-        q: query
-      }
+    return this.scrapeFreeonesPerformersGQL.watch({
+      q: query
     });
   }
 
   allTags() {
-    return this.apollo.watchQuery<GQL.AllTagsQuery>({
-      query: ALL_TAGS
-    });
+    return this.allTagsGQL.watch();
   }
 
   allPerformers() {
-    return this.apollo.watchQuery<GQL.AllPerformersQuery>({
-      query: ALL_PERFORMERS
-    });
+    return this.allPerformersGQL.watch();
   }
 
   stats() {
-    return this.apollo.watchQuery<GQL.StatsQuery>({
-      query: STATS
-    });
+    return this.statsGQL.watch();
   }
 
-  sceneUpdate(scene: GQL.SceneUpdateMutationVariables) {
-    return this.apollo.mutate<GQL.SceneUpdateMutation, GQL.SceneUpdateMutationVariables>({
-      mutation: SCENE_UPDATE,
-      variables: {
-        id: scene.id,
-        title: scene.title,
-        details: scene.details,
-        url: scene.url,
-        date: scene.date,
-        rating: scene.rating,
-        studio_id: scene.studio_id,
-        gallery_id: scene.gallery_id,
-        performer_ids: scene.performer_ids,
-        tag_ids: scene.tag_ids
-      },
+  sceneUpdate(scene: GQL.SceneUpdate.Variables) {
+    return this.sceneUpdateGQL.mutate({
+      id: scene.id,
+      title: scene.title,
+      details: scene.details,
+      url: scene.url,
+      date: scene.date,
+      rating: scene.rating,
+      studio_id: scene.studio_id,
+      gallery_id: scene.gallery_id,
+      performer_ids: scene.performer_ids,
+      tag_ids: scene.tag_ids
+    },
+    {
       refetchQueries: [
         {
-          query: FIND_SCENE,
+          query: this.findSceneGQL.document,
           variables: {
             id: scene.id
           }
         }
-      ],
+      ]
     });
   }
 
-  performerCreate(performer: GQL.PerformerCreateMutationVariables) {
-    return this.apollo.mutate<GQL.PerformerCreateMutation, GQL.PerformerCreateMutationVariables>({
-      mutation: PERFORMER_CREATE,
+  performerCreate(performer: GQL.PerformerCreate.Variables) {
+    return this.apollo.mutate<GQL.PerformerCreate.Mutation, GQL.PerformerCreate.Variables>({
+      mutation: (new GQL.PerformerCreateGQL(this.apollo)).document,
       variables: {
         name: performer.name,
         url: performer.url,
@@ -403,15 +335,15 @@ export class StashService {
       },
       refetchQueries: [
         {
-          query: ALL_PERFORMERS
+          query: (new GQL.AllPerformersGQL(this.apollo)).document
         }
       ],
     });
   }
 
-  performerUpdate(performer: GQL.PerformerUpdateMutationVariables) {
-    return this.apollo.mutate<GQL.PerformerUpdateMutation, GQL.PerformerUpdateMutationVariables>({
-      mutation: PERFORMER_UPDATE,
+  performerUpdate(performer: GQL.PerformerUpdate.Variables) {
+    return this.apollo.mutate<GQL.PerformerUpdate.Mutation, GQL.PerformerUpdate.Variables>({
+      mutation: (new GQL.PerformerUpdateGQL(this.apollo)).document,
       variables: {
         id: performer.id,
         name: performer.name,
@@ -434,7 +366,7 @@ export class StashService {
       },
       refetchQueries: [
         {
-          query: FIND_PERFORMER,
+          query: (new GQL.FindPerformerGQL(this.apollo)).document,
           variables: {
             id: performer.id
           }
@@ -443,9 +375,9 @@ export class StashService {
     });
   }
 
-  studioCreate(studio: GQL.StudioCreateMutationVariables) {
-    return this.apollo.mutate<GQL.StudioCreateMutation, GQL.StudioCreateMutationVariables>({
-      mutation: STUDIO_CREATE,
+  studioCreate(studio: GQL.StudioCreate.Variables) {
+    return this.apollo.mutate<GQL.StudioCreate.Mutation, GQL.StudioCreate.Variables>({
+      mutation: (new GQL.StudioCreateGQL(this.apollo)).document,
       variables: {
         name: studio.name,
         url: studio.url,
@@ -453,15 +385,15 @@ export class StashService {
       },
       refetchQueries: [
         {
-          query: ALL_STUDIOS
+          query: (new GQL.AllStudiosGQL(this.apollo)).document
         }
       ],
     });
   }
 
-  studioUpdate(studio: GQL.StudioUpdateMutationVariables) {
-    return this.apollo.mutate<GQL.StudioUpdateMutation, GQL.StudioUpdateMutationVariables>({
-      mutation: STUDIO_UPDATE,
+  studioUpdate(studio: GQL.StudioUpdate.Variables) {
+    return this.apollo.mutate<GQL.StudioUpdate.Mutation, GQL.StudioUpdate.Variables>({
+      mutation: (new GQL.StudioUpdateGQL(this.apollo)).document,
       variables: {
         id: studio.id,
         name: studio.name,
@@ -470,7 +402,7 @@ export class StashService {
       },
       refetchQueries: [
         {
-          query: FIND_STUDIO,
+          query: (new GQL.FindStudioGQL(this.apollo)).document,
           variables: {
             id: studio.id
           }
@@ -479,44 +411,43 @@ export class StashService {
     });
   }
 
-  tagCreate(tag: GQL.TagCreateMutationVariables) {
-    return this.apollo.mutate<GQL.TagCreateMutation, GQL.TagCreateMutationVariables>({
-      mutation: TAG_CREATE,
+  tagCreate(tag: GQL.TagCreate.Variables) {
+    return this.apollo.mutate<GQL.TagCreate.Mutation, GQL.TagCreate.Variables>({
+      mutation: (new GQL.TagCreateGQL(this.apollo)).document,
       variables: {
         name: tag.name
       },
       refetchQueries: [
         {
-          query: ALL_TAGS
+          query: (new GQL.AllTagsGQL(this.apollo)).document
         }
       ],
     });
   }
 
-  tagDestroy(tag: GQL.TagDestroyMutationVariables) {
-    return this.apollo.mutate<GQL.TagDestroyMutation, GQL.TagDestroyMutationVariables>({
-      mutation: TAG_DESTROY,
+  tagDestroy(tag: GQL.TagDestroy.Variables) {
+    return this.apollo.mutate<GQL.TagDestroy.Mutation, GQL.TagDestroy.Variables>({
+      mutation: (new GQL.TagDestroyGQL(this.apollo)).document,
       variables: {
         id: tag.id
       },
       refetchQueries: [
         {
-          query: ALL_TAGS
+          query: (new GQL.AllTagsGQL(this.apollo)).document
         }
       ],
     });
   }
 
-  tagUpdate(tag: GQL.TagUpdateMutationVariables) {
-    return this.apollo.mutate<GQL.TagUpdateMutation, GQL.TagUpdateMutationVariables>({
-      mutation: TAG_UPDATE,
-      variables: {
-        id: tag.id,
-        name: tag.name
-      },
+  tagUpdate(tag: GQL.TagUpdate.Variables) {
+    return this.tagUpdateGQL.mutate({
+      id: tag.id,
+      name: tag.name
+    },
+    {
       refetchQueries: [
         {
-          query: FIND_TAG,
+          query: this.findTagGQL.document,
           variables: {
             id: tag.id
           }
@@ -525,9 +456,9 @@ export class StashService {
     });
   }
 
-  markerCreate(marker: GQL.SceneMarkerCreateMutationVariables) {
-    return this.apollo.mutate<GQL.SceneMarkerCreateMutation, GQL.SceneMarkerCreateMutationVariables>({
-      mutation: MARKER_CREATE,
+  markerCreate(marker: GQL.SceneMarkerCreate.Variables) {
+    return this.apollo.mutate<GQL.SceneMarkerCreate.Mutation, GQL.SceneMarkerCreate.Variables>({
+      mutation: (new GQL.SceneMarkerCreateGQL(this.apollo)).document,
       variables: {
         title: marker.title,
         seconds: marker.seconds,
@@ -537,10 +468,10 @@ export class StashService {
       },
       refetchQueries: [
         {
-          query: ALL_SCENE_MARKERS
+          query: (new GQL.AllSceneMarkersGQL(this.apollo)).document
         },
         {
-          query: FIND_SCENE,
+          query: (new GQL.FindSceneGQL(this.apollo)).document,
           variables: {
             id: marker.scene_id
           }
@@ -549,9 +480,9 @@ export class StashService {
     });
   }
 
-  markerUpdate(marker: GQL.SceneMarkerUpdateMutationVariables) {
-    return this.apollo.mutate<GQL.SceneMarkerUpdateMutation, GQL.SceneMarkerUpdateMutationVariables>({
-      mutation: MARKER_UPDATE,
+  markerUpdate(marker: GQL.SceneMarkerUpdate.Variables) {
+    return this.apollo.mutate<GQL.SceneMarkerUpdate.Mutation, GQL.SceneMarkerUpdate.Variables>({
+      mutation: (new GQL.SceneMarkerUpdateGQL(this.apollo)).document,
       variables: {
         id: marker.id,
         title: marker.title,
@@ -562,10 +493,10 @@ export class StashService {
       },
       refetchQueries: [
         {
-          query: ALL_SCENE_MARKERS
+          query: (new GQL.AllSceneMarkersGQL(this.apollo)).document
         },
         {
-          query: FIND_SCENE,
+          query: (new GQL.FindSceneGQL(this.apollo)).document,
           variables: {
             id: marker.scene_id
           }
@@ -575,17 +506,17 @@ export class StashService {
   }
 
   markerDestroy(id: any, scene_id: any) {
-    return this.apollo.mutate<GQL.SceneMarkerDestroyMutation, GQL.SceneMarkerDestroyMutationVariables>({
-      mutation: MARKER_DESTROY,
+    return this.apollo.mutate<GQL.SceneMarkerDestroy.Mutation, GQL.SceneMarkerDestroy.Variables>({
+      mutation: (new GQL.SceneMarkerDestroyGQL(this.apollo)).document,
       variables: {
         id: id
       },
       refetchQueries: [
         {
-          query: ALL_SCENE_MARKERS
+          query: (new GQL.AllSceneMarkersGQL(this.apollo)).document
         },
         {
-          query: FIND_SCENE,
+          query: (new GQL.FindSceneGQL(this.apollo)).document,
           variables: {
             id: scene_id
           }
@@ -596,38 +527,38 @@ export class StashService {
 
   metadataImport() {
     return this.apollo.watchQuery({
-      query: METADATA_IMPORT
+      query: (new GQL.MetadataImportGQL(this.apollo)).document
     });
   }
 
   metadataExport() {
     return this.apollo.watchQuery({
-      query: METADATA_EXPORT
+      query: (new GQL.MetadataExportGQL(this.apollo)).document
     });
   }
 
   metadataScan() {
     return this.apollo.watchQuery({
-      query: METADATA_SCAN
+      query: (new GQL.MetadataScanGQL(this.apollo)).document
     });
   }
 
   metadataGenerate() {
     return this.apollo.watchQuery({
-      query: METADATA_GENERATE
+      query: (new GQL.MetadataGenerateGQL(this.apollo)).document
     });
   }
 
   metadataClean() {
     return this.apollo.watchQuery({
-      query: METADATA_CLEAN
+      query: (new GQL.MetadataCleanGQL(this.apollo)).document
     });
   }
 
   metadataUpdate() {
-    return this.apollo.subscribe({
-      query: METADATA_UPDATE_SUBSCRIPTION
-    });
+    // return this.apollo.subscribe({
+    //   query: METADATA_UPDATE_SUBSCRIPTION
+    // });
   }
 
 }

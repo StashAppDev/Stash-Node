@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, HostBinding, HostListener, ViewChild } from '@angular/core';
 
-import { SceneDataFragment } from '../../core/graphql-generated';
+import { SceneData } from '../../core/graphql-generated';
 
 @Component({
   selector: 'app-scene-card',
@@ -12,7 +12,7 @@ export class SceneCardComponent implements OnInit {
   private isHovering = false;
   private video: any;
   previewPath: string = null;
-  @Input() scene: SceneDataFragment;
+  @Input() scene: SceneData.Fragment;
 
   // The host class needs to be card
   @HostBinding('class') class = 'card';

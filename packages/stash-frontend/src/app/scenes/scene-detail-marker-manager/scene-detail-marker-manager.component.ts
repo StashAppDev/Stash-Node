@@ -5,7 +5,7 @@ import { StashService } from '../../core/stash.service';
 
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { MarkerStringsQuery, SceneMarkerDataFragment, SceneDataFragment, TagDataFragment } from '../../core/graphql-generated';
+import { MarkerStrings, SceneMarkerData, SceneData, TagData } from '../../core/graphql-generated';
 
 
 @Component({
@@ -14,14 +14,14 @@ import { MarkerStringsQuery, SceneMarkerDataFragment, SceneDataFragment, TagData
   styleUrls: ['./scene-detail-marker-manager.component.css']
 })
 export class SceneDetailMarkerManagerComponent implements OnInit, OnChanges {
-  @Input() scene: SceneDataFragment;
+  @Input() scene: SceneData.Fragment;
   @Input() player: any;
 
   showingMarkerModal = false;
-  markerOptions: MarkerStringsQuery['markerStrings'];
+  markerOptions: MarkerStrings.Query['markerStrings'];
   filteredMarkerOptions: string[] = [];
   hasFocus = false;
-  editingMarker: SceneMarkerDataFragment;
+  editingMarker: SceneMarkerData.Fragment;
   deleteClickCount = 0;
 
   searchFormControl = new FormControl();
@@ -33,7 +33,7 @@ export class SceneDetailMarkerManagerComponent implements OnInit, OnChanges {
   tag_ids: string[] = [];
 
   // From the network
-  tags: TagDataFragment[];
+  tags: TagData.Fragment[];
 
   constructor(private stashService: StashService) {}
 
@@ -111,11 +111,11 @@ export class SceneDetailMarkerManagerComponent implements OnInit, OnChanges {
     this.showModal();
   }
 
-  onClickMarker(marker: SceneMarkerDataFragment) {
+  onClickMarker(marker: SceneMarkerData.Fragment) {
     this.player.seek(marker.seconds);
   }
 
-  onClickEditMarker(marker: SceneMarkerDataFragment) {
+  onClickEditMarker(marker: SceneMarkerData.Fragment) {
     this.showModal(marker);
   }
 
@@ -136,7 +136,7 @@ export class SceneDetailMarkerManagerComponent implements OnInit, OnChanges {
     this.editingMarker = null;
   }
 
-  private showModal(marker: SceneMarkerDataFragment = null) {
+  private showModal(marker: SceneMarkerData.Fragment = null) {
     this.deleteClickCount = 0;
     this.showingMarkerModal = true;
 

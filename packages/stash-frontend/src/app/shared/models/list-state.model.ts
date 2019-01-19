@@ -3,11 +3,11 @@ import {
   ResolutionEnum,
   PerformerFilterType,
   SceneMarkerFilterType,
-  SlimSceneDataFragment,
-  PerformerDataFragment,
-  StudioDataFragment,
-  GalleryDataFragment,
-  SceneMarkerDataFragment
+  SlimSceneData,
+  PerformerData,
+  StudioData,
+  GalleryData,
+  SceneMarkerData
 } from '../../core/graphql-generated';
 
 import { StashService } from '../../core/stash.service';
@@ -325,11 +325,11 @@ export class ListFilter {
           break;
         case CriteriaType.Resolution: {
           switch (criteria.value) {
-            case '240p': result.resolution = ResolutionEnum.LOW; break;
-            case '480p': result.resolution = ResolutionEnum.STANDARD; break;
-            case '720p': result.resolution = ResolutionEnum.STANDARD_HD; break;
-            case '1080p': result.resolution = ResolutionEnum.FULL_HD; break;
-            case '4k': result.resolution = ResolutionEnum.FOUR_K; break;
+            case '240p': result.resolution = ResolutionEnum.Low; break;
+            case '480p': result.resolution = ResolutionEnum.Standard; break;
+            case '720p': result.resolution = ResolutionEnum.StandardHd; break;
+            case '1080p': result.resolution = ResolutionEnum.FullHd; break;
+            case '4k': result.resolution = ResolutionEnum.FourK; break;
           }
           break;
         }
@@ -390,35 +390,35 @@ export class ListState<T> {
   }
 }
 
-export class SceneListState extends ListState<SlimSceneDataFragment> {
+export class SceneListState extends ListState<SlimSceneData.Fragment> {
   constructor() {
     super();
     this.filter.filterMode = FilterMode.Scenes;
   }
 }
 
-export class PerformerListState extends ListState<PerformerDataFragment> {
+export class PerformerListState extends ListState<PerformerData.Fragment> {
   constructor() {
     super();
     this.filter.filterMode = FilterMode.Performers;
   }
 }
 
-export class StudioListState extends ListState<StudioDataFragment> {
+export class StudioListState extends ListState<StudioData.Fragment> {
   constructor() {
     super();
     this.filter.filterMode = FilterMode.Studios;
   }
 }
 
-export class GalleryListState extends ListState<GalleryDataFragment> {
+export class GalleryListState extends ListState<GalleryData.Fragment> {
   constructor() {
     super();
     this.filter.filterMode = FilterMode.Galleries;
   }
 }
 
-export class SceneMarkerListState extends ListState<SceneMarkerDataFragment> {
+export class SceneMarkerListState extends ListState<SceneMarkerData.Fragment> {
   constructor() {
     super();
     this.filter.filterMode = FilterMode.SceneMarkers;

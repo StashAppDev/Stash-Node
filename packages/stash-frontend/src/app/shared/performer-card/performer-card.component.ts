@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, HostBinding } from '@angular/core';
 
-import { PerformerDataFragment } from '../../core/graphql-generated';
+import { PerformerData } from '../../core/graphql-generated';
 
 @Component({
   selector: 'app-performer-card',
@@ -8,7 +8,7 @@ import { PerformerDataFragment } from '../../core/graphql-generated';
   styleUrls: ['./performer-card.component.css']
 })
 export class PerformerCardComponent implements OnInit {
-  @Input() performer: PerformerDataFragment;
+  @Input() performer: PerformerData.Fragment;
   @Input() ageFromDate: string;
 
   // The host class needs to be card

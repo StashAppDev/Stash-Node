@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { StashService } from '../../core/stash.service';
 
-import { SceneDataFragment } from '../../core/graphql-generated';
+import { SceneData } from '../../core/graphql-generated';
 
 @Component({
   selector: 'app-scene-detail',
@@ -11,7 +11,7 @@ import { SceneDataFragment } from '../../core/graphql-generated';
   styleUrls: ['./scene-detail.component.css']
 })
 export class SceneDetailComponent implements OnInit {
-  scene: SceneDataFragment;
+  scene: SceneData.Fragment;
 
   private lastTime = 0;
 

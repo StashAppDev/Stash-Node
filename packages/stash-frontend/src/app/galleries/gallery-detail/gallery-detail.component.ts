@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { StashService } from '../../core/stash.service';
 
 import { GalleryImage } from '../../shared/models/gallery.model';
-import { GalleryDataFragment } from '../../core/graphql-generated';
+import { GalleryData } from '../../core/graphql-generated';
 
 @Component({
   selector: 'app-gallery-detail',
@@ -12,7 +12,7 @@ import { GalleryDataFragment } from '../../core/graphql-generated';
   styleUrls: ['./gallery-detail.component.css']
 })
 export class GalleryDetailComponent implements OnInit {
-  gallery: GalleryDataFragment;
+  gallery: GalleryData.Fragment;
   displayedImage: GalleryImage = null;
 
   constructor(

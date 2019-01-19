@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { StashService } from '../../core/stash.service';
 
 import { GalleryImage } from '../../shared/models/gallery.model';
-import { GalleryDataFragment } from '../../core/graphql-generated';
+import { GalleryData } from '../../core/graphql-generated';
 
 @Component({
   selector: 'app-gallery-preview',
@@ -12,7 +12,7 @@ import { GalleryDataFragment } from '../../core/graphql-generated';
   styleUrls: ['./gallery-preview.component.css']
 })
 export class GalleryPreviewComponent implements OnInit, OnChanges {
-  @Input() gallery: GalleryDataFragment;
+  @Input() gallery: GalleryData.Fragment;
   @Input() galleryId: number;
   @Input() type = 'random';
   @Input() numberOfRandomImages = 12;

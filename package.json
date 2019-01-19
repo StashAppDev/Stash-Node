@@ -2,9 +2,20 @@
   "private": true,
   "scripts": {
     "package": "bash scripts/package.sh",
-    "dev": "lerna run dev:server"
+    "dev": "lerna run dev:server",
+    "schema": "gql-gen"
   },
   "devDependencies": {
+    "graphql": "14.1.1",
+    "graphql-code-generator": "0.15.2",
+    "graphql-codegen-add": "0.15.2",
+    "graphql-codegen-introspection": "0.15.2",
+    "graphql-codegen-time": "0.15.2",
+    "graphql-codegen-typescript-apollo-angular": "0.15.2",
+    "graphql-codegen-typescript-client": "0.15.2",
+    "graphql-codegen-typescript-common": "0.15.2",
+    "graphql-codegen-typescript-resolvers": "0.15.2",
+    "graphql-codegen-typescript-server": "0.15.2",
     "lerna": "3.10.5",
     "rcedit": "1.1.1"
   }

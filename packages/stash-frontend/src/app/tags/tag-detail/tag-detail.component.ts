@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { StashService } from '../../core/stash.service';
 
-import { TagDataFragment } from '../../core/graphql-generated';
+import { TagData } from '../../core/graphql-generated';
 
 @Component({
   selector: 'app-tag-detail',
@@ -18,7 +18,7 @@ import { TagDataFragment } from '../../core/graphql-generated';
   `
 })
 export class TagDetailComponent implements OnInit {
-  tag: TagDataFragment;
+  tag: TagData.Fragment;
 
   constructor(
     private route: ActivatedRoute,

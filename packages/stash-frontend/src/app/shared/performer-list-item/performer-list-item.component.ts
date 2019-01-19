@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, HostBinding, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
-import { PerformerDataFragment, SceneDataFragment } from '../../core/graphql-generated';
+import { PerformerData } from '../../core/graphql-generated';
 import { StashService } from '../../core/stash.service';
 import { ListFilter, FilterMode, Criteria, CriteriaType, CriteriaValueType, CustomCriteria } from '../models/list-state.model';
 
@@ -9,7 +9,7 @@ import { ListFilter, FilterMode, Criteria, CriteriaType, CriteriaValueType, Cust
   styleUrls: ['./performer-list-item.component.scss']
 })
 export class PerformerListItemComponent implements OnInit, OnChanges {
-  @Input() performer: PerformerDataFragment;
+  @Input() performer: PerformerData.Fragment;
   showingScenes = false;
   scenes: any[];
 

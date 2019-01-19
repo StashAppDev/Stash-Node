@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { StashService } from '../../core/stash.service';
 
-import { TagDataFragment } from '../../core/graphql-generated';
+import { TagData } from '../../core/graphql-generated';
 import { CriteriaType } from '../../shared/models/list-state.model';
 
 @Component({
@@ -14,7 +14,7 @@ import { CriteriaType } from '../../shared/models/list-state.model';
 export class TagListComponent implements OnInit {
   CriteriaType = CriteriaType;
 
-  tags: TagDataFragment[];
+  tags: TagData.Fragment[];
 
   constructor(private stashService: StashService,
               private route: ActivatedRoute,
@@ -37,7 +37,7 @@ export class TagListComponent implements OnInit {
     return JSON.stringify({type: CriteriaType.Tags, values: [tag.id]});
   }
 
-  tagCount(tag: TagDataFragment) {
+  tagCount(tag: TagData.Fragment) {
     return tag.scene_count + tag.scene_marker_count;
   }
 

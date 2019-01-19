@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { SceneMarkerDataFragment } from '../../core/graphql-generated';
+import { SceneMarkerData } from '../../core/graphql-generated';
 import { BaseWallItemComponent } from '../base-wall-item/base-wall-item.component';
 
 @Component({
@@ -8,7 +8,7 @@ import { BaseWallItemComponent } from '../base-wall-item/base-wall-item.componen
   templateUrl: './scene-marker-wall-item.component.html'
 })
 export class SceneMarkerWallItemComponent extends BaseWallItemComponent implements OnInit {
-  @Input() sceneMarker: SceneMarkerDataFragment;
+  @Input() sceneMarker: SceneMarkerData.Fragment;
 
   constructor() { super(); }
 
