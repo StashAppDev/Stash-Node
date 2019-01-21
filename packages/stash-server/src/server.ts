@@ -1,6 +1,7 @@
 import { ApolloServer } from "apollo-server-express";
 import bodyParser from "body-parser";
 import compression from "compression";
+import cors from "cors";
 import express from "express";
 import path from "path";
 import { URL } from "url";
@@ -32,6 +33,9 @@ export async function run(options: IStashServerOptions) {
 
   // Use gzip compression
   app.use(compression());
+
+  // Use cors across all routes
+  app.use(cors());
 
   app.use("/performers", PerformerRoutes.buildRouter());
   app.use("/scenes", SceneRoutes.buildRouter());

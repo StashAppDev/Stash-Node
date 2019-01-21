@@ -1,6 +1,6 @@
 # Querys
 
-query FindScenes($filter: FindFilterType, $scene_filter: SceneFilterType, $scene_ids: [Int]) {
+query FindScenes($filter: FindFilterType, $scene_filter: SceneFilterType, $scene_ids: [Int!]) {
   findScenes(filter: $filter, scene_filter: $scene_filter, scene_ids: $scene_ids) {
     count
     scenes {
@@ -204,8 +204,8 @@ mutation SceneUpdate(
   $rating: Int,
   $studio_id: ID,
   $gallery_id: ID,
-  $performer_ids: [ID] = [],
-  $tag_ids: [ID] = []) {
+  $performer_ids: [ID!] = [],
+  $tag_ids: [ID!] = []) {
 
   sceneUpdate(input: {
                         id: $id,
@@ -351,7 +351,7 @@ mutation SceneMarkerCreate(
   $seconds: Float!,
   $scene_id: ID!,
   $primary_tag_id: ID!,
-  $tag_ids: [ID] = []) {
+  $tag_ids: [ID!] = []) {
 
   sceneMarkerCreate(input: {
                               title: $title,
@@ -370,7 +370,7 @@ mutation SceneMarkerUpdate(
   $seconds: Float!,
   $scene_id: ID!,
   $primary_tag_id: ID!,
-  $tag_ids: [ID] = []) {
+  $tag_ids: [ID!] = []) {
 
   sceneMarkerUpdate(input: {
                               id: $id,

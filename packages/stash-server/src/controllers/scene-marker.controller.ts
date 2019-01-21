@@ -1,11 +1,11 @@
 import express from "express";
-import { raw } from "objection";
+import { raw, transaction } from "objection";
 import { SceneMarker } from "../db/models/scene-marker.model";
 import { Scene } from "../db/models/scene.model";
 import { Tag } from "../db/models/tag.model";
 import { SceneMarkerQueryBuilder } from "../querybuilders/scene-marker.querybuilder";
 import { Stash } from "../stash/stash";
-import { GQL, QueryResolvers } from "../typings/graphql";
+import { GQL, MutationResolvers, QueryResolvers } from "../typings/graphql";
 import { ObjectionUtils } from "../utils/objection.utils";
 
 export class SceneMarkerController {
@@ -23,6 +23,50 @@ export class SceneMarkerController {
     // TODO: Model instance doesn't match the GQL interface... remove any?
     // https://github.com/dotansimha/graphql-code-generator/issues/1041
     return { scene_markers: page.results, count: page.total } as any;
+  }
+
+  public static sceneMarkerCreate: MutationResolvers.SceneMarkerCreateResolver = async (root, args, context, info) => {
+    const tagIds = args.input.tag_ids || [];
+    const tags = tagIds.map((tagId) => ({ id: parseInt(tagId, 10) } as any));
+    return transaction(SceneMarker.knex(), (trx) => {
+      return SceneMarker.query(trx)
+        .insertGraphAndFetch({
+          title: args.input.title,
+          seconds: args.input.seconds,
+          scene_id: parseInt(args.input.scene_id, 10),
+          primary_tag_id: parseInt(args.input.primary_tag_id, 10),
+          tags,
+        },
+        {
+          relate: true,
+        });
+    });
+  }
+
+  public static sceneMarkerUpdate: MutationResolvers.SceneMarkerUpdateResolver = async (root, args, context, info) => {
+    const tagIds = args.input.tag_ids || [];
+    const tags = tagIds.map((tagId) => ({ id: parseInt(tagId, 10) } as any));
+    return transaction(SceneMarker.knex(), (trx) => {
+      return SceneMarker.query(trx)
+        .upsertGraphAndFetch({
+          id: parseInt(args.input.id, 10),
+          title: args.input.title,
+          seconds: args.input.seconds,
+          scene_id: parseInt(args.input.scene_id, 10),
+          primary_tag_id: parseInt(args.input.primary_tag_id, 10),
+          tags,
+        },
+        {
+          relate: true,
+          unrelate: true,
+        });
+    });
+  }
+
+  public static sceneMarkerDestroy:
+    MutationResolvers.SceneMarkerDestroyResolver = async (root, args, context, info) => {
+    const numberOfRows = await SceneMarker.query().deleteById(parseInt(args.id, 10));
+    return numberOfRows === 1;
   }
 
   /**

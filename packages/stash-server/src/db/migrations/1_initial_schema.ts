@@ -16,7 +16,7 @@ exports.up = (knex: Knex) => {
     id(table);
     table.string("path", 510).notNullable().unique();
     table.string("checksum").notNullable().unique();
-    table.integer("scene_id").references("id").inTable("scenes");
+    table.integer("scene_id").references("scenes.id").onDelete("SET NULL");
     timestamp(table);
 
     table.index(["scene_id"], "index_galleries_on_scene_id");
@@ -30,7 +30,7 @@ exports.up = (knex: Knex) => {
     table.string("url");
     table.string("twitter");
     table.string("instagram");
-    table.date("birthdate"); // TODO: date? or string?
+    table.date("birthdate");
     table.string("ethnicity");
     table.string("country");
     table.string("eye_color");
@@ -52,8 +52,8 @@ exports.up = (knex: Knex) => {
     id(table);
     table.string("title").notNullable();
     table.decimal("seconds").notNullable();
-    table.integer("primary_tag_id").references("id").inTable("tags");
-    table.integer("scene_id").references("id").inTable("scenes");
+    table.integer("primary_tag_id").references("tags.id");
+    table.integer("scene_id").references("scenes.id").onDelete("CASCADE");
     timestamp(table);
 
     table.index(["primary_tag_id"], "index_scene_markers_on_primary_tag_id");
@@ -67,17 +67,17 @@ exports.up = (knex: Knex) => {
     table.string("title");
     table.text("details");
     table.string("url");
-    table.date("date"); // TODO: date? or string?
-    table.specificType("rating", "tinyint");
+    table.date("date");
+    table.integer("rating");
     table.string("size");
     table.decimal("duration", 7, 2);
     table.string("video_codec");
     table.string("audio_codec");
-    table.specificType("width", "tinyint");
-    table.specificType("height", "tinyint");
+    table.integer("width");
+    table.integer("height");
     table.decimal("framerate", 7, 2);
     table.integer("bitrate");
-    table.integer("studio_id").references("id").inTable("studios").onDelete("CASCADE"); // TODO test
+    table.integer("studio_id").references("studios.id").onDelete("SET NULL");
     timestamp(table);
 
     table.index(["studio_id"], "index_scenes_on_studio_id");
@@ -88,7 +88,7 @@ exports.up = (knex: Knex) => {
     table.string("title");
     table.text("description");
     table.string("url");
-    table.date("date"); // TODO: date? or string?
+    table.date("date");
     table.string("rating");
     table.string("tags", 510);
     table.string("models", 510);
@@ -97,7 +97,7 @@ exports.up = (knex: Knex) => {
     table.string("gallery_url", 510);
     table.string("video_filename");
     table.string("video_url");
-    table.integer("studio_id").references("id").inTable("studios");
+    table.integer("studio_id").references("studios.id").onDelete("SET NULL");
     timestamp(table);
 
     table.index(["studio_id"], "index_scraped_items_on_studio_id");
@@ -128,8 +128,8 @@ exports.up = (knex: Knex) => {
   //
 
   builder.createTable("performers_scenes", (table) => {
-    table.integer("performer_id").references("id").inTable("performers");
-    table.integer("scene_id").references("id").inTable("scenes");
+    table.integer("performer_id").references("performers.id").onDelete("CASCADE");
+    table.integer("scene_id").references("scenes.id").onDelete("CASCADE");
     // timestamp(table);
 
     table.index(["performer_id"], "index_performers_scenes_on_performer_id");
@@ -137,8 +137,8 @@ exports.up = (knex: Knex) => {
   });
 
   builder.createTable("scene_markers_tags", (table) => {
-    table.integer("scene_marker_id").references("id").inTable("scene_markers");
-    table.integer("tag_id").references("id").inTable("tags");
+    table.integer("scene_marker_id").references("scene_markers.id").onDelete("CASCADE");
+    table.integer("tag_id").references("tags.id").onDelete("CASCADE");
     // timestamp(table);
 
     table.index(["scene_marker_id"], "index_scene_markers_tags_on_scene_marker_id");
@@ -146,8 +146,8 @@ exports.up = (knex: Knex) => {
   });
 
   builder.createTable("scenes_tags", (table) => {
-    table.integer("scene_id").references("id").inTable("scenes");
-    table.integer("tag_id").references("id").inTable("tags");
+    table.integer("scene_id").references("scenes.id").onDelete("CASCADE");
+    table.integer("tag_id").references("tags.id").onDelete("CASCADE");
     // timestamp(table);
 
     table.index(["scene_id"], "index_scenes_tags_on_scene_id");

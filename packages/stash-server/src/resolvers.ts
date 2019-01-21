@@ -38,15 +38,15 @@ export const resolvers: IResolvers = {
   Mutation: {
     // sceneUpdate(root, args, context, info) { return SceneController.sceneUpdate(root, args, context, info); },
 
-    // sceneMarkerCreate(root, args, context, info) {
-    //   return SceneMarkerController.sceneMarkerCreate(root, args, context, info);
-    // },
-    // sceneMarkerUpdate(root, args, context, info) {
-    //   return SceneMarkerController.sceneMarkerUpdate(root, args, context, info);
-    // },
-    // sceneMarkerDestroy(root, args, context, info) {
-    //   return SceneMarkerController.sceneMarkerDestroy(root, args, context, info);
-    // },
+    sceneMarkerCreate(root, args, context, info) {
+      return SceneMarkerController.sceneMarkerCreate(root, args, context, info);
+    },
+    sceneMarkerUpdate(root, args, context, info) {
+      return SceneMarkerController.sceneMarkerUpdate(root, args, context, info);
+    },
+    sceneMarkerDestroy(root, args, context, info) {
+      return SceneMarkerController.sceneMarkerDestroy(root, args, context, info);
+    },
 
     performerCreate(root, args, context, info) {
       return PerformerController.performerCreate(root, args, context, info);

@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-18T18:50:01-08:00
+// Generated in 2019-01-21T08:33:09-08:00
 export type Maybe<T> = T | null;
 
 export interface SceneFilterType {
@@ -14,7 +14,7 @@ export interface SceneFilterType {
   /** Filter to only include scenes with this studio */
   studio_id?: Maybe<string>;
   /** Filter to only include scenes with these tags */
-  tags?: Maybe<(Maybe<string>)[]>;
+  tags?: Maybe<string[]>;
   /** Filter to only include scenes with this performer */
   performer_id?: Maybe<string>;
 }
@@ -35,11 +35,11 @@ export interface SceneMarkerFilterType {
   /** Filter to only include scene markers with this tag */
   tag_id?: Maybe<string>;
   /** Filter to only include scene markers with these tags */
-  tags?: Maybe<(Maybe<string>)[]>;
+  tags?: Maybe<string[]>;
   /** Filter to only include scene markers attached to a scene with these tags */
-  scene_tags?: Maybe<(Maybe<string>)[]>;
+  scene_tags?: Maybe<string[]>;
   /** Filter to only include scene markers with these performers */
-  performers?: Maybe<(Maybe<string>)[]>;
+  performers?: Maybe<string[]>;
 }
 
 export interface PerformerFilterType {
@@ -66,9 +66,9 @@ export interface SceneUpdateInput {
 
   gallery_id?: Maybe<string>;
 
-  performer_ids?: Maybe<(Maybe<string>)[]>;
+  performer_ids?: Maybe<string[]>;
 
-  tag_ids?: Maybe<(Maybe<string>)[]>;
+  tag_ids?: Maybe<string[]>;
 }
 
 export interface SceneMarkerCreateInput {
@@ -80,7 +80,7 @@ export interface SceneMarkerCreateInput {
 
   primary_tag_id: string;
 
-  tag_ids?: Maybe<(Maybe<string>)[]>;
+  tag_ids?: Maybe<string[]>;
 }
 
 export interface SceneMarkerUpdateInput {
@@ -94,7 +94,7 @@ export interface SceneMarkerUpdateInput {
 
   primary_tag_id: string;
 
-  tag_ids?: Maybe<(Maybe<string>)[]>;
+  tag_ids?: Maybe<string[]>;
 }
 
 export interface PerformerCreateInput {
@@ -224,7 +224,7 @@ export namespace FindScenes {
   export type Variables = {
     filter?: Maybe<FindFilterType>;
     scene_filter?: Maybe<SceneFilterType>;
-    scene_ids?: Maybe<(Maybe<number>)[]>;
+    scene_ids?: Maybe<number[]>;
   };
 
   export type Query = {
@@ -238,7 +238,7 @@ export namespace FindScenes {
 
     count: number;
 
-    scenes: (Maybe<Scenes>)[];
+    scenes: Scenes[];
   };
 
   export type Scenes = SlimSceneData.Fragment;
@@ -255,7 +255,7 @@ export namespace FindScene {
 
     findScene: Maybe<FindScene>;
 
-    sceneMarkerTags: (Maybe<SceneMarkerTags>)[];
+    sceneMarkerTags: SceneMarkerTags[];
   };
 
   export type FindScene = SceneData.Fragment;
@@ -265,7 +265,7 @@ export namespace FindScene {
 
     tag: Tag;
 
-    scene_markers: (Maybe<SceneMarkers>)[];
+    scene_markers: SceneMarkers[];
   };
 
   export type Tag = {
@@ -289,13 +289,13 @@ export namespace FindSceneForEditing {
 
     findScene: Maybe<FindScene>;
 
-    allPerformers: (Maybe<AllPerformers>)[];
+    allPerformers: AllPerformers[];
 
-    allTags: (Maybe<AllTags>)[];
+    allTags: AllTags[];
 
-    allStudios: (Maybe<AllStudios>)[];
+    allStudios: AllStudios[];
 
-    validGalleriesForScene: (Maybe<ValidGalleriesForScene>)[];
+    validGalleriesForScene: ValidGalleriesForScene[];
   };
 
   export type FindScene = SceneData.Fragment;
@@ -354,7 +354,7 @@ export namespace FindSceneMarkers {
 
     count: number;
 
-    scene_markers: (Maybe<SceneMarkers>)[];
+    scene_markers: SceneMarkers[];
   };
 
   export type SceneMarkers = SceneMarkerData.Fragment;
@@ -368,7 +368,7 @@ export namespace SceneWall {
   export type Query = {
     __typename?: "Query";
 
-    sceneWall: (Maybe<SceneWall>)[];
+    sceneWall: SceneWall[];
   };
 
   export type SceneWall = SceneData.Fragment;
@@ -382,7 +382,7 @@ export namespace MarkerWall {
   export type Query = {
     __typename?: "Query";
 
-    markerWall: (Maybe<MarkerWall>)[];
+    markerWall: MarkerWall[];
   };
 
   export type MarkerWall = SceneMarkerData.Fragment;
@@ -405,7 +405,7 @@ export namespace FindPerformers {
 
     count: number;
 
-    performers: (Maybe<Performers>)[];
+    performers: Performers[];
   };
 
   export type Performers = PerformerData.Fragment;
@@ -441,7 +441,7 @@ export namespace FindStudios {
 
     count: number;
 
-    studios: (Maybe<Studios>)[];
+    studios: Studios[];
   };
 
   export type Studios = StudioData.Fragment;
@@ -477,7 +477,7 @@ export namespace FindGalleries {
 
     count: number;
 
-    galleries: (Maybe<Galleries>)[];
+    galleries: Galleries[];
   };
 
   export type Galleries = GalleryData.Fragment;
@@ -588,7 +588,7 @@ export namespace ScrapeFreeonesPerformers {
   export type Query = {
     __typename?: "Query";
 
-    scrapeFreeonesPerformerList: (Maybe<string>)[];
+    scrapeFreeonesPerformerList: string[];
   };
 }
 
@@ -598,7 +598,7 @@ export namespace AllPerformers {
   export type Query = {
     __typename?: "Query";
 
-    allPerformers: (Maybe<AllPerformers>)[];
+    allPerformers: AllPerformers[];
   };
 
   export type AllPerformers = PerformerData.Fragment;
@@ -610,7 +610,7 @@ export namespace AllStudios {
   export type Query = {
     __typename?: "Query";
 
-    allStudios: (Maybe<AllStudios>)[];
+    allStudios: AllStudios[];
   };
 
   export type AllStudios = StudioData.Fragment;
@@ -622,7 +622,7 @@ export namespace AllTags {
   export type Query = {
     __typename?: "Query";
 
-    allTags: (Maybe<AllTags>)[];
+    allTags: AllTags[];
   };
 
   export type AllTags = TagData.Fragment;
@@ -634,7 +634,7 @@ export namespace AllSceneMarkers {
   export type Query = {
     __typename?: "Query";
 
-    allSceneMarkers: (Maybe<AllSceneMarkers>)[];
+    allSceneMarkers: AllSceneMarkers[];
   };
 
   export type AllSceneMarkers = SceneMarkerData.Fragment;
@@ -674,8 +674,8 @@ export namespace SceneUpdate {
     rating?: Maybe<number>;
     studio_id?: Maybe<string>;
     gallery_id?: Maybe<string>;
-    performer_ids?: Maybe<(Maybe<string>)[]>;
-    tag_ids?: Maybe<(Maybe<string>)[]>;
+    performer_ids?: Maybe<string[]>;
+    tag_ids?: Maybe<string[]>;
   };
 
   export type Mutation = {
@@ -828,7 +828,7 @@ export namespace SceneMarkerCreate {
     seconds: number;
     scene_id: string;
     primary_tag_id: string;
-    tag_ids?: Maybe<(Maybe<string>)[]>;
+    tag_ids?: Maybe<string[]>;
   };
 
   export type Mutation = {
@@ -847,7 +847,7 @@ export namespace SceneMarkerUpdate {
     seconds: number;
     scene_id: string;
     primary_tag_id: string;
-    tag_ids?: Maybe<(Maybe<string>)[]>;
+    tag_ids?: Maybe<string[]>;
   };
 
   export type Mutation = {
@@ -943,7 +943,7 @@ export namespace GalleryData {
 
     title: Maybe<string>;
 
-    files: (Maybe<Files>)[];
+    files: Files[];
   };
 
   export type Files = {
@@ -1021,7 +1021,7 @@ export namespace SceneMarkerData {
 
     primary_tag: PrimaryTag;
 
-    tags: (Maybe<Tags>)[];
+    tags: Tags[];
   };
 
   export type Scene = {
@@ -1071,15 +1071,15 @@ export namespace SlimSceneData {
 
     paths: Paths;
 
-    scene_markers: (Maybe<SceneMarkers>)[];
+    scene_markers: SceneMarkers[];
 
     gallery: Maybe<Gallery>;
 
     studio: Maybe<Studio>;
 
-    tags: (Maybe<Tags>)[];
+    tags: Tags[];
 
-    performers: (Maybe<Performers>)[];
+    performers: Performers[];
   };
 
   export type File = {
@@ -1193,9 +1193,9 @@ export namespace SceneData {
 
     paths: Paths;
 
-    scene_markers: (Maybe<SceneMarkers>)[];
+    scene_markers: SceneMarkers[];
 
-    scene_marker_tags: (Maybe<SceneMarkerTags>)[];
+    scene_marker_tags: SceneMarkerTags[];
 
     is_streamable: boolean;
 
@@ -1203,9 +1203,9 @@ export namespace SceneData {
 
     studio: Maybe<Studio>;
 
-    tags: (Maybe<Tags>)[];
+    tags: Tags[];
 
-    performers: (Maybe<Performers>)[];
+    performers: Performers[];
   };
 
   export type File = {
@@ -1251,7 +1251,7 @@ export namespace SceneData {
 
     tag: Tag;
 
-    scene_markers: (Maybe<_SceneMarkers>)[];
+    scene_markers: _SceneMarkers[];
   };
 
   export type Tag = {
@@ -1531,7 +1531,7 @@ export class FindScenesGQL extends Apollo.Query<
     query FindScenes(
       $filter: FindFilterType
       $scene_filter: SceneFilterType
-      $scene_ids: [Int]
+      $scene_ids: [Int!]
     ) {
       findScenes(
         filter: $filter
@@ -1955,8 +1955,8 @@ export class SceneUpdateGQL extends Apollo.Mutation<
       $rating: Int
       $studio_id: ID
       $gallery_id: ID
-      $performer_ids: [ID] = []
-      $tag_ids: [ID] = []
+      $performer_ids: [ID!] = []
+      $tag_ids: [ID!] = []
     ) {
       sceneUpdate(
         input: {
@@ -2190,7 +2190,7 @@ export class SceneMarkerCreateGQL extends Apollo.Mutation<
       $seconds: Float!
       $scene_id: ID!
       $primary_tag_id: ID!
-      $tag_ids: [ID] = []
+      $tag_ids: [ID!] = []
     ) {
       sceneMarkerCreate(
         input: {
@@ -2222,7 +2222,7 @@ export class SceneMarkerUpdateGQL extends Apollo.Mutation<
       $seconds: Float!
       $scene_id: ID!
       $primary_tag_id: ID!
-      $tag_ids: [ID] = []
+      $tag_ids: [ID!] = []
     ) {
       sceneMarkerUpdate(
         input: {

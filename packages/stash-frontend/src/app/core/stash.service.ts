@@ -477,9 +477,9 @@ export class StashService {
     },
     {
       refetchQueries: [
-        {
-          query: this.allSceneMarkersGQL.document
-        },
+        // {
+        //   query: this.allSceneMarkersGQL.document
+        // },
         {
           query: this.findSceneGQL.document,
           variables: {
@@ -501,9 +501,9 @@ export class StashService {
     },
     {
       refetchQueries: [
-        {
-          query: this.allSceneMarkersGQL.document
-        },
+        // {
+        //   query: this.allSceneMarkersGQL.document
+        // },
         {
           query: this.findSceneGQL.document,
           variables: {
@@ -520,9 +520,9 @@ export class StashService {
     },
     {
       refetchQueries: [
-        {
-          query: this.allSceneMarkersGQL.document
-        },
+        // {
+        //   query: this.allSceneMarkersGQL.document
+        // },
         {
           query: this.findSceneGQL.document,
           variables: {

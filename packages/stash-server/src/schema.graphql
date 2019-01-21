@@ -10,7 +10,7 @@ type Gallery {
   title: String
 
   """The files in the gallery"""
-  files: [GalleryFilesType]! # Resolver
+  files: [GalleryFilesType!]! # Resolver
 }
 
 type GalleryFilesType {
@@ -21,7 +21,7 @@ type GalleryFilesType {
 
 type FindGalleriesResultType {
   count: Int!
-  galleries: [Gallery]!
+  galleries: [Gallery!]!
 }
 
 #######################################
@@ -50,7 +50,7 @@ type Performer {
 
   image_path: String # Resolver
   scene_count: Int # Resolver
-  scenes: [Scene]!
+  scenes: [Scene!]!
 }
 
 input PerformerCreateInput {
@@ -98,7 +98,7 @@ input PerformerUpdateInput {
 
 type FindPerformersResultType {
   count: Int!
-  performers: [Performer]!
+  performers: [Performer!]!
 }
 
 #######################################
@@ -107,7 +107,7 @@ type FindPerformersResultType {
 
 type SceneMarkerTag {
   tag: Tag!
-  scene_markers: [SceneMarker]!
+  scene_markers: [SceneMarker!]!
 }
 
 #######################################
@@ -120,7 +120,7 @@ type SceneMarker {
   title: String!
   seconds: Float!
   primary_tag: Tag!
-  tags: [Tag]!
+  tags: [Tag!]!
 
   """The path to stream this marker"""
   stream: String! # Resolver
@@ -133,7 +133,7 @@ input SceneMarkerCreateInput {
   seconds: Float!
   scene_id: ID!
   primary_tag_id: ID!
-  tag_ids: [ID]
+  tag_ids: [ID!]
 }
 
 input SceneMarkerUpdateInput {
@@ -142,12 +142,12 @@ input SceneMarkerUpdateInput {
   seconds: Float!
   scene_id: ID!
   primary_tag_id: ID!
-  tag_ids: [ID]
+  tag_ids: [ID!]
 }
 
 type FindSceneMarkersResultType {
   count: Int!
-  scene_markers: [SceneMarker]!
+  scene_markers: [SceneMarker!]!
 }
 
 type MarkerStringsResultType {
@@ -194,13 +194,13 @@ type Scene {
   paths: ScenePathsType! # Resolver
   is_streamable: Boolean! # Resolver
 
-  scene_markers: [SceneMarker]!
+  scene_markers: [SceneMarker!]!
   gallery: Gallery
   studio: Studio
-  tags: [Tag]!
-  performers: [Performer]!
+  tags: [Tag!]!
+  performers: [Performer!]!
 
-  scene_marker_tags: [SceneMarkerTag]! # TODO remove?
+  scene_marker_tags: [SceneMarkerTag!]! # TODO remove?
 }
 
 input SceneUpdateInput {
@@ -213,13 +213,13 @@ input SceneUpdateInput {
   rating: Int
   studio_id: ID
   gallery_id: ID
-  performer_ids: [ID]
-  tag_ids: [ID]
+  performer_ids: [ID!]
+  tag_ids: [ID!]
 }
 
 type FindScenesResultType {
   count: Int!
-  scenes: [Scene]!
+  scenes: [Scene!]!
 }
 
 #######################################
@@ -288,7 +288,7 @@ input StudioUpdateInput {
 
 type FindStudiosResultType {
   count: Int!
-  studios: [Studio]!
+  studios: [Studio!]!
 }
 
 #######################################
@@ -350,11 +350,11 @@ input SceneMarkerFilterType {
   """Filter to only include scene markers with this tag"""
   tag_id: ID
   """Filter to only include scene markers with these tags"""
-  tags: [ID]
+  tags: [ID!]
   """Filter to only include scene markers attached to a scene with these tags"""
-  scene_tags: [ID]
+  scene_tags: [ID!]
   """Filter to only include scene markers with these performers"""
-  performers: [ID]
+  performers: [ID!]
 }
 
 input SceneFilterType {
@@ -369,7 +369,7 @@ input SceneFilterType {
   """Filter to only include scenes with this studio"""
   studio_id: ID
   """Filter to only include scenes with these tags"""
-  tags: [ID]
+  tags: [ID!]
   """Filter to only include scenes with this performer"""
   performer_id: ID
 }
@@ -383,7 +383,7 @@ type Query {
   """Find a scene by ID or Checksum"""
   findScene(id: ID, checksum: String): Scene
   """A function which queries Scene objects"""
-  findScenes(scene_filter: SceneFilterType, scene_ids: [Int], filter: FindFilterType): FindScenesResultType!
+  findScenes(scene_filter: SceneFilterType, scene_ids: [Int!], filter: FindFilterType): FindScenesResultType!
 
   """A function which queries SceneMarker objects"""
   findSceneMarkers(scene_marker_filter: SceneMarkerFilterType filter: FindFilterType): FindSceneMarkersResultType!
@@ -404,25 +404,25 @@ type Query {
   findTag(id: ID!): Tag
 
   """Retrieve random scene markers for the wall"""
-  markerWall(q: String): [SceneMarker]!
+  markerWall(q: String): [SceneMarker!]!
   """Retrieve random scenes for the wall"""
-  sceneWall(q: String): [Scene]!
+  sceneWall(q: String): [Scene!]!
 
   """Get marker strings"""
   markerStrings(q: String, sort: String): [MarkerStringsResultType]!
   """Get the list of valid galleries for a given scene ID"""
-  validGalleriesForScene(scene_id: ID): [Gallery]!
+  validGalleriesForScene(scene_id: ID): [Gallery!]!
   """Get stats"""
   stats: StatsResultType!
   """Organize scene markers by tag for a given scene ID"""
-  sceneMarkerTags(scene_id: ID): [SceneMarkerTag]! # TODO ID! scene_id
+  sceneMarkerTags(scene_id: ID): [SceneMarkerTag!]! # TODO ID! scene_id
 
   # Scrapers
 
   """Scrape a performer using Freeones"""
   scrapeFreeones(performer_name: String!): ScrapedPerformer
   """Scrape a list of performers from a query"""
-  scrapeFreeonesPerformerList(query: String!): [String]!
+  scrapeFreeonesPerformerList(query: String!): [String!]!
 
   # Metadata
 
@@ -439,10 +439,10 @@ type Query {
 
   # Get everything
 
-  allPerformers: [Performer]!
-  allStudios: [Studio]!
-  allTags: [Tag]!
-  allSceneMarkers: [SceneMarker]!
+  allPerformers: [Performer!]!
+  allStudios: [Studio!]!
+  allTags: [Tag!]!
+  allSceneMarkers: [SceneMarker!]!
 }
 
 type Mutation {

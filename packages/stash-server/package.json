@@ -10,7 +10,8 @@
     "package": "yarn build && pkg package.json --out-path builds --options max_old_space_size=4096",
     "lint": "tslint -c ./tslint.json 'src/**/*.ts'",
     "lint:fix": "tslint --fix -c ./tslint.json 'src/**/*.ts'",
-    "dev:server": "nodemon"
+    "dev:server": "nodemon",
+    "stash:import": "NODE_OPTIONS='--inspect' ts-node -r tsconfig-paths/register ./src/index.ts import"
   },
   "pkg": {
     "scripts": [
@@ -27,6 +28,7 @@
     "apollo-server-express": "2.3.1",
     "commander": "2.19.0",
     "compression": "1.7.3",
+    "cors": "2.8.5",
     "express": "4.16.4",
     "file-type": "10.7.0",
     "fs-extra": "7.0.1",
@@ -49,6 +51,7 @@
   "devDependencies": {
     "@types/body-parser": "1.17.0",
     "@types/compression": "0.0.36",
+    "@types/cors": "2.8.4",
     "@types/express": "4.16.0",
     "@types/file-type": "10.6.0",
     "@types/fs-extra": "5.0.4",
