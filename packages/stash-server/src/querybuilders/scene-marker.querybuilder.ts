@@ -1,5 +1,5 @@
 import { SceneMarker } from "../db/models/scene-marker.model";
-import { GQL, Maybe } from "../typings/graphql";
+import { GQL } from "../typings/graphql";
 import { BaseQueryBuilder } from "./base.querybuilder";
 
 export class SceneMarkerQueryBuilder extends BaseQueryBuilder<SceneMarker> {
@@ -11,6 +11,10 @@ export class SceneMarkerQueryBuilder extends BaseQueryBuilder<SceneMarker> {
   }
 
   public filter() {
+    this.leftJoinRelation("primary_tag");
+    this.leftJoinRelation("tags");
+    this.leftJoinRelation("scene");
+
     if (!this.args.scene_marker_filter) { return this; }
     const sceneMarkerFilter = this.args.scene_marker_filter;
 
@@ -36,7 +40,6 @@ export class SceneMarkerQueryBuilder extends BaseQueryBuilder<SceneMarker> {
     this
     //  # scoped_search relation: :primary_tag, on: :name
     // # scoped_search relation: :tags, on: :name
-    .leftJoinRelation("scene")
     .where((builder) => {
       builder
         .where("scene_markers.title", "LIKE", `%${q}%`)
@@ -46,8 +49,7 @@ export class SceneMarkerQueryBuilder extends BaseQueryBuilder<SceneMarker> {
   }
 
   private tagId(id: string) {
-    return this.
-      leftJoinRelation("tags")
+    return this
       .where((b) => {
         b.where("scene_markers.primary_tag_id", "=", id)
           .orWhere("tags.id", "=", id);
@@ -55,67 +57,58 @@ export class SceneMarkerQueryBuilder extends BaseQueryBuilder<SceneMarker> {
       .distinct();
   }
 
-  private tags(ids: Array<Maybe<string>>) {
-    // tag_ids = tag_ids.map { |id| id.to_i  }.uniq
+  private tags(ids: string[]) {
+    if (ids.length === 0) { return this; }
 
-    // markers = left_outer_joins(:tags)
-    //             .where(:scene_markers => {:primary_tag_id => tag_ids})
-    //             .distinct
+    // select `scene_markers`.* from `scene_markers`
+    // left join `tags` as `primary_tags_join`
+    //   on `primary_tags_join`.`id` = `scene_markers`.`primary_tag_id`
+    //   and `primary_tags_join`.`id` in ('3', '37', '9', '89')
+    // left join `scene_markers_tags` as `tags_join`
+    //   on `tags_join`.`scene_marker_id` = `scene_markers`.`id`
+    //   and `tags_join`.`tag_id` in ('3', '37', '9', '89')
+    // group by `scene_markers`.`id`
+    // having ((count(distinct `primary_tags_join`.`id`) + count(distinct `tags_join`.`tag_id`)) = 4)
 
-    // ids = []
-    // if markers.count == 0
-    //   return left_outer_joins(:tags)
-    //             .where(:tags => {:id => tag_ids})
-    //             .group("scene_markers.id")
-    //             .having("count(taggings.tag_id) = #{tag_ids.length}")
-    //             .unscope(:order)
-    //             .distinct
-    // else
-    //   ids += left_outer_joins(:tags)
-    //             .where(:tags => {:id => tag_ids})
-    //             .group("scene_markers.id")
-    //             .having("count(taggings.tag_id) = #{tag_ids.length}")
-    //             .unscope(:order)
-    //             .distinct
-    //             .pluck(:id)
-    // end
+    const query = this
+      .leftJoin("tags as ptj", (builder) => {
+        builder
+          .on("ptj.id", "scene_markers.primary_tag_id")
+          .onIn("ptj.id", ids);
+      })
+      .leftJoin("scene_markers_tags as tj", (builder) => {
+        builder
+          .on("tj.scene_marker_id", "scene_markers.id")
+          .onIn("tj.tag_id", ids);
+      })
+      .groupBy("scene_markers.id")
+      .havingRaw("(count(distinct `ptj`.`id`) + count(distinct `tj`.`tag_id`)) is ?", ids.length);
 
-    // markers.each { |marker|
-    //   difference = tag_ids - [marker.primary_tag_id]
-    //   difference = difference - marker.tags.pluck(:id)
-
-    //   ids << marker.id if difference.length == 0
-    // }
-
-    // where(id: ids.uniq)
+    return query;
   }
 
-  private sceneTags(ids: Array<Maybe<string>>) {
-    // tag_ids = scene_tag_ids.map { |id| id.to_i  }.uniq
+  private sceneTags(ids: string[]) {
+    if (ids.length === 0) { return this; }
 
-    // left_outer_joins(scene: [:tags])
-    //   .where(scene: {taggings: {tag_id: tag_ids}})
-    //   .group("scene_markers.id")
-    //   .having("count(taggings.tag_id) = #{scene_tag_ids.length}")
-    //   .distinct
+    const query = this
+      .leftJoin("scenes_tags as scene_tags_join", (builder) => {
+        builder
+          .on("scene_tags_join.scene_id", "scene.id")
+          .onIn("scene_tags_join.tag_id", ids);
+      })
+      .groupBy("scene_markers.id")
+      .havingRaw("count(distinct `scene_tags_join`.`tag_id`) is ?", ids.length);
+
+    return query;
   }
 
-  // scope :marker_and_scene_tags, -> (marker_tag_ids, scene_tag_ids) {
-  //   scene_tag_ids = scene_tag_ids.map { |id| id.to_i  }.uniq
-  //   marker_tag_ids = marker_tag_ids.map { |id| id.to_i  }.uniq
-  //
-  //   scene = scene_tags(scene_tag_ids)
-  //   marker = tags(marker_tag_ids)
-  //
-  //   ids = marker.pluck(:id) & scene.pluck(:id)
-  //   where(id: ids.uniq)
-  // }
+  private performers(ids: string[]) {
+    if (ids.length === 0) { return this; }
 
-  private performers(ids: Array<Maybe<string>>) {
-    // performer_ids = scene_performer_ids.map { |id| id.to_i  }.uniq
+    const query = this
+      .leftJoin("performers_scenes as scene_performers", "scene.id", "scene_performers.scene_id")
+      .whereIn("scene_performers.performer_id", ids);
 
-    // left_outer_joins(scene: [:performers])
-    //   .where(scene: {performers: {id: performer_ids}})
-    //   .distinct
+    return query;
   }
 }
