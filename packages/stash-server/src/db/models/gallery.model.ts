@@ -1,5 +1,5 @@
 // tslint:disable:object-literal-sort-keys variable-name
-import { Model } from "objection";
+import { Model, QueryBuilder } from "objection";
 import path from "path";
 import BaseModel from "./base.model";
 import { Scene } from "./scene.model";
@@ -30,6 +30,10 @@ export class Gallery extends BaseModel {
         to: "scenes.id",
       },
     },
+  };
+
+  public static modifiers = {
+    unowned: (builder: QueryBuilder<Gallery>) => builder.whereNull("scene_id"),
   };
 
   public readonly id: number;

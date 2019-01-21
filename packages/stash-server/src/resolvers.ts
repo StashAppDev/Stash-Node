@@ -16,6 +16,7 @@ import { Tag } from "./db/models/tag.model";
 import { PerformerRoutes } from "./routes/performer.route";
 import { SceneRoutes } from "./routes/scene.route";
 import { StudioRoutes } from "./routes/studio.route";
+import { FreeonesScraper } from "./scrapers/freeones";
 import { IResolvers } from "./typings/graphql";
 import { ObjectionUtils } from "./utils/objection.utils";
 
@@ -35,9 +36,30 @@ export const resolvers: IResolvers = {
     },
   },
   Mutation: {
+    // sceneUpdate(root, args, context, info) { return SceneController.sceneUpdate(root, args, context, info); },
+
+    // sceneMarkerCreate(root, args, context, info) {
+    //   return SceneMarkerController.sceneMarkerCreate(root, args, context, info);
+    // },
+    // sceneMarkerUpdate(root, args, context, info) {
+    //   return SceneMarkerController.sceneMarkerUpdate(root, args, context, info);
+    // },
+    // sceneMarkerDestroy(root, args, context, info) {
+    //   return SceneMarkerController.sceneMarkerDestroy(root, args, context, info);
+    // },
+
+    // performerCreate(root, args, context, info) {
+    //   return PerformerController.performerCreate(root, args, context, info);
+    // },
+    // performerUpdate(root, args, context, info) {
+    //   return PerformerController.performerUpdate(root, args, context, info);
+    // },
+
     studioCreate(root, args, context, info) { return StudioController.studioCreate(root, args, context, info); },
     studioUpdate(root, args, context, info) { return StudioController.studioUpdate(root, args, context, info); },
+
     tagCreate(root, args, context, info) { return TagController.tagCreate(root, args, context, info); },
+    tagDestroy(root, args, context, info) { return TagController.tagDestroy(root, args, context, info); },
     tagUpdate(root, args, context, info) { return TagController.tagUpdate(root, args, context, info); },
   },
   Performer: {
@@ -82,10 +104,18 @@ export const resolvers: IResolvers = {
       return { scene_count, gallery_count, performer_count, studio_count, tag_count };
       // tslint:enable:variable-name
     },
-    // TODO validGalleriesForScene(root, args, context, info) {},
+    validGalleriesForScene(root, args, context, info) {
+      return SceneController.validGalleries(root, args, context, info);
+    },
 
-    // TODO: scrapeFreeones
-    // TODO: scrapeFreeonesPerformerList
+    scrapeFreeones(root, args, context, info) {
+      const scraper = new FreeonesScraper();
+      return scraper.getPerformer(args.performer_name);
+    },
+    scrapeFreeonesPerformerList(root, args, context, info) {
+      const scraper = new FreeonesScraper();
+      return scraper.getPerformerNames(args.query);
+    },
 
     // TODO: metadataImport
     // TODO: metadataExport
@@ -95,7 +125,7 @@ export const resolvers: IResolvers = {
 
     async allPerformers() { return await Performer.query(); },
     async allStudios() { return await Studio.query(); },
-    async allTags() { return await Tag.query(); },
+    async allTags() { return await Tag.query().orderBy("name"); },
     async allSceneMarkers() { return await SceneMarker.query(); },
   },
   Scene: {

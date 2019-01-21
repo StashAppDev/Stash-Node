@@ -82,7 +82,7 @@ export class StudioFormComponent implements OnInit, OnDestroy {
         url: this.url,
         image: this.image
       }).subscribe(result => {
-        this.router.navigate(['/studios', result.data.studioCreate.studio.id]);
+        this.router.navigate(['/studios', result.data.studioCreate.id]);
       });
     }
   }

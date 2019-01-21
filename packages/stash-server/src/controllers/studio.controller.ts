@@ -38,7 +38,6 @@ export class StudioController {
   }
 
   public static studioUpdate: MutationResolvers.StudioUpdateResolver = async (root, args, context, info) => {
-    // TODO: check what happens if an input variable is undefined
     const updatedStudio: Partial<Studio> = {
       name: args.input.name,
       url: args.input.url,

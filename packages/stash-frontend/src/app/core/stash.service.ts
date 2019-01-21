@@ -35,10 +35,25 @@ export class StashService {
   private scrapeFreeonesPerformersGQL = new GQL.ScrapeFreeonesPerformersGQL(this.apollo);
   private allTagsGQL = new GQL.AllTagsGQL(this.apollo);
   private allPerformersGQL = new GQL.AllPerformersGQL(this.apollo);
+  private allStudiosGQL = new GQL.AllStudiosGQL(this.apollo);
+  private allSceneMarkersGQL = new GQL.AllSceneMarkersGQL(this.apollo);
   private statsGQL = new GQL.StatsGQL(this.apollo);
   private sceneUpdateGQL = new GQL.SceneUpdateGQL(this.apollo);
-  // TODO
+  private performerCreateGQL = new GQL.PerformerCreateGQL(this.apollo);
+  private performerUpdateGQL = new GQL.PerformerUpdateGQL(this.apollo);
+  private studioCreateGQL = new GQL.StudioCreateGQL(this.apollo);
+  private studioUpdateGQL = new GQL.StudioUpdateGQL(this.apollo);
+  private tagCreateGQL = new GQL.TagCreateGQL(this.apollo);
+  private tagDestroyGQL = new GQL.TagDestroyGQL(this.apollo);
   private tagUpdateGQL = new GQL.TagUpdateGQL(this.apollo);
+  private sceneMarkerCreateGQL = new GQL.SceneMarkerCreateGQL(this.apollo);
+  private sceneMarkerUpdateGQL = new GQL.SceneMarkerUpdateGQL(this.apollo);
+  private sceneMarkerDestroyGQL = new GQL.SceneMarkerDestroyGQL(this.apollo);
+  private metadataImportGQL = new GQL.MetadataImportGQL(this.apollo);
+  private metadataExportGQL = new GQL.MetadataExportGQL(this.apollo);
+  private metadataScanGQL = new GQL.MetadataScanGQL(this.apollo);
+  private metadataGenerateGQL = new GQL.MetadataGenerateGQL(this.apollo);
+  private metadataCleanGQL = new GQL.MetadataCleanGQL(this.apollo);
 
   public static makeApolloClient(platformLocation: PlatformLocation, httpLink: HttpLink) {
     const platform: any = platformLocation;
@@ -312,61 +327,59 @@ export class StashService {
   }
 
   performerCreate(performer: GQL.PerformerCreate.Variables) {
-    return this.apollo.mutate<GQL.PerformerCreate.Mutation, GQL.PerformerCreate.Variables>({
-      mutation: (new GQL.PerformerCreateGQL(this.apollo)).document,
-      variables: {
-        name: performer.name,
-        url: performer.url,
-        birthdate: performer.birthdate,
-        ethnicity: performer.ethnicity,
-        country: performer.country,
-        eye_color: performer.eye_color,
-        height: performer.height,
-        measurements: performer.measurements,
-        fake_tits: performer.fake_tits,
-        career_length: performer.career_length,
-        tattoos: performer.tattoos,
-        piercings: performer.piercings,
-        aliases: performer.aliases,
-        twitter: performer.twitter,
-        instagram: performer.instagram,
-        favorite: performer.favorite,
-        image: performer.image
-      },
+    return this.performerCreateGQL.mutate({
+      name: performer.name,
+      url: performer.url,
+      birthdate: performer.birthdate,
+      ethnicity: performer.ethnicity,
+      country: performer.country,
+      eye_color: performer.eye_color,
+      height: performer.height,
+      measurements: performer.measurements,
+      fake_tits: performer.fake_tits,
+      career_length: performer.career_length,
+      tattoos: performer.tattoos,
+      piercings: performer.piercings,
+      aliases: performer.aliases,
+      twitter: performer.twitter,
+      instagram: performer.instagram,
+      favorite: performer.favorite,
+      image: performer.image
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllPerformersGQL(this.apollo)).document
+          query: this.allPerformersGQL.document
         }
       ],
     });
   }
 
   performerUpdate(performer: GQL.PerformerUpdate.Variables) {
-    return this.apollo.mutate<GQL.PerformerUpdate.Mutation, GQL.PerformerUpdate.Variables>({
-      mutation: (new GQL.PerformerUpdateGQL(this.apollo)).document,
-      variables: {
-        id: performer.id,
-        name: performer.name,
-        url: performer.url,
-        birthdate: performer.birthdate,
-        ethnicity: performer.ethnicity,
-        country: performer.country,
-        eye_color: performer.eye_color,
-        height: performer.height,
-        measurements: performer.measurements,
-        fake_tits: performer.fake_tits,
-        career_length: performer.career_length,
-        tattoos: performer.tattoos,
-        piercings: performer.piercings,
-        aliases: performer.aliases,
-        twitter: performer.twitter,
-        instagram: performer.instagram,
-        favorite: performer.favorite,
-        image: performer.image
-      },
+    return this.performerUpdateGQL.mutate({
+      id: performer.id,
+      name: performer.name,
+      url: performer.url,
+      birthdate: performer.birthdate,
+      ethnicity: performer.ethnicity,
+      country: performer.country,
+      eye_color: performer.eye_color,
+      height: performer.height,
+      measurements: performer.measurements,
+      fake_tits: performer.fake_tits,
+      career_length: performer.career_length,
+      tattoos: performer.tattoos,
+      piercings: performer.piercings,
+      aliases: performer.aliases,
+      twitter: performer.twitter,
+      instagram: performer.instagram,
+      favorite: performer.favorite,
+      image: performer.image
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.FindPerformerGQL(this.apollo)).document,
+          query: this.findPerformerGQL.document,
           variables: {
             id: performer.id
           }
@@ -376,33 +389,31 @@ export class StashService {
   }
 
   studioCreate(studio: GQL.StudioCreate.Variables) {
-    return this.apollo.mutate<GQL.StudioCreate.Mutation, GQL.StudioCreate.Variables>({
-      mutation: (new GQL.StudioCreateGQL(this.apollo)).document,
-      variables: {
-        name: studio.name,
-        url: studio.url,
-        image: studio.image
-      },
+    return this.studioCreateGQL.mutate({
+      name: studio.name,
+      url: studio.url,
+      image: studio.image
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllStudiosGQL(this.apollo)).document
+          query: this.allStudiosGQL.document
         }
       ],
     });
   }
 
   studioUpdate(studio: GQL.StudioUpdate.Variables) {
-    return this.apollo.mutate<GQL.StudioUpdate.Mutation, GQL.StudioUpdate.Variables>({
-      mutation: (new GQL.StudioUpdateGQL(this.apollo)).document,
-      variables: {
-        id: studio.id,
-        name: studio.name,
-        url: studio.url,
-        image: studio.image
-      },
+    return this.studioUpdateGQL.mutate({
+      id: studio.id,
+      name: studio.name,
+      url: studio.url,
+      image: studio.image
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.FindStudioGQL(this.apollo)).document,
+          query: this.findStudioGQL.document,
           variables: {
             id: studio.id
           }
@@ -412,28 +423,26 @@ export class StashService {
   }
 
   tagCreate(tag: GQL.TagCreate.Variables) {
-    return this.apollo.mutate<GQL.TagCreate.Mutation, GQL.TagCreate.Variables>({
-      mutation: (new GQL.TagCreateGQL(this.apollo)).document,
-      variables: {
-        name: tag.name
-      },
+    return this.tagCreateGQL.mutate({
+      name: tag.name
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllTagsGQL(this.apollo)).document
+          query: this.allTagsGQL.document
         }
       ],
     });
   }
 
   tagDestroy(tag: GQL.TagDestroy.Variables) {
-    return this.apollo.mutate<GQL.TagDestroy.Mutation, GQL.TagDestroy.Variables>({
-      mutation: (new GQL.TagDestroyGQL(this.apollo)).document,
-      variables: {
-        id: tag.id
-      },
+    return this.tagDestroyGQL.mutate({
+      id: tag.id
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllTagsGQL(this.apollo)).document
+          query: this.allTagsGQL.document
         }
       ],
     });
@@ -457,21 +466,20 @@ export class StashService {
   }
 
   markerCreate(marker: GQL.SceneMarkerCreate.Variables) {
-    return this.apollo.mutate<GQL.SceneMarkerCreate.Mutation, GQL.SceneMarkerCreate.Variables>({
-      mutation: (new GQL.SceneMarkerCreateGQL(this.apollo)).document,
-      variables: {
-        title: marker.title,
-        seconds: marker.seconds,
-        scene_id: marker.scene_id,
-        primary_tag_id: marker.primary_tag_id,
-        tag_ids: marker.tag_ids
-      },
+    return this.sceneMarkerCreateGQL.mutate({
+      title: marker.title,
+      seconds: marker.seconds,
+      scene_id: marker.scene_id,
+      primary_tag_id: marker.primary_tag_id,
+      tag_ids: marker.tag_ids
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllSceneMarkersGQL(this.apollo)).document
+          query: this.allSceneMarkersGQL.document
         },
         {
-          query: (new GQL.FindSceneGQL(this.apollo)).document,
+          query: this.findSceneGQL.document,
           variables: {
             id: marker.scene_id
           }
@@ -481,22 +489,21 @@ export class StashService {
   }
 
   markerUpdate(marker: GQL.SceneMarkerUpdate.Variables) {
-    return this.apollo.mutate<GQL.SceneMarkerUpdate.Mutation, GQL.SceneMarkerUpdate.Variables>({
-      mutation: (new GQL.SceneMarkerUpdateGQL(this.apollo)).document,
-      variables: {
-        id: marker.id,
-        title: marker.title,
-        seconds: marker.seconds,
-        scene_id: marker.scene_id,
-        primary_tag_id: marker.primary_tag_id,
-        tag_ids: marker.tag_ids
-      },
+    return this.sceneMarkerUpdateGQL.mutate({
+      id: marker.id,
+      title: marker.title,
+      seconds: marker.seconds,
+      scene_id: marker.scene_id,
+      primary_tag_id: marker.primary_tag_id,
+      tag_ids: marker.tag_ids
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllSceneMarkersGQL(this.apollo)).document
+          query: this.allSceneMarkersGQL.document
         },
         {
-          query: (new GQL.FindSceneGQL(this.apollo)).document,
+          query: this.findSceneGQL.document,
           variables: {
             id: marker.scene_id
           }
@@ -506,17 +513,16 @@ export class StashService {
   }
 
   markerDestroy(id: any, scene_id: any) {
-    return this.apollo.mutate<GQL.SceneMarkerDestroy.Mutation, GQL.SceneMarkerDestroy.Variables>({
-      mutation: (new GQL.SceneMarkerDestroyGQL(this.apollo)).document,
-      variables: {
-        id: id
-      },
+    return this.sceneMarkerDestroyGQL.mutate({
+      id: id
+    },
+    {
       refetchQueries: [
         {
-          query: (new GQL.AllSceneMarkersGQL(this.apollo)).document
+          query: this.allSceneMarkersGQL.document
         },
         {
-          query: (new GQL.FindSceneGQL(this.apollo)).document,
+          query: this.findSceneGQL.document,
           variables: {
             id: scene_id
           }
@@ -526,33 +532,23 @@ export class StashService {
   }
 
   metadataImport() {
-    return this.apollo.watchQuery({
-      query: (new GQL.MetadataImportGQL(this.apollo)).document
-    });
+    return this.metadataImportGQL.watch();
   }
 
   metadataExport() {
-    return this.apollo.watchQuery({
-      query: (new GQL.MetadataExportGQL(this.apollo)).document
-    });
+    return this.metadataExportGQL.watch();
   }
 
   metadataScan() {
-    return this.apollo.watchQuery({
-      query: (new GQL.MetadataScanGQL(this.apollo)).document
-    });
+    return this.metadataScanGQL.watch();
   }
 
   metadataGenerate() {
-    return this.apollo.watchQuery({
-      query: (new GQL.MetadataGenerateGQL(this.apollo)).document
-    });
+    return this.metadataGenerateGQL.watch();
   }
 
   metadataClean() {
-    return this.apollo.watchQuery({
-      query: (new GQL.MetadataCleanGQL(this.apollo)).document
-    });
+    return this.metadataCleanGQL.watch();
   }
 
   metadataUpdate() {

@@ -1,5 +1,7 @@
 import express from "express";
 import fs from "fs";
+import path from "path";
+import { Gallery } from "../db/models/gallery.model";
 import { Scene } from "../db/models/scene.model";
 import { HttpError } from "../errors/http.error";
 import { SceneQueryBuilder } from "../querybuilders/scene.querybuilder";
@@ -31,6 +33,20 @@ export class SceneController {
     // TODO: Model instance doesn't match the GQL interface... remove any?
     // https://github.com/dotansimha/graphql-code-generator/issues/1041
     return { scenes: page.results, count: page.total } as any;
+  }
+
+  public static validGalleries: QueryResolvers.ValidGalleriesForSceneResolver = async (root, args, context, info) => {
+    const scene = await ObjectionUtils.getEntity(Scene, { id: args.scene_id });
+    await scene.$relatedQuery("gallery");
+    const unownedGalleries = await Gallery.query().modify("unowned").orderBy("path");
+    const validGalleries = unownedGalleries.filter((gallery) => {
+      if (!scene.path) { return false; }
+      return gallery.path.includes(path.dirname(scene.path));
+    });
+    if (!!scene.gallery) {
+      validGalleries.push(scene.gallery);
+    }
+    return validGalleries;
   }
 
   // #endregion

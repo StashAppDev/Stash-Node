@@ -13,6 +13,11 @@ export class TagController {
     return Tag.query().insert(args.input); // TODO: unsafe
   }
 
+  public static tagDestroy: MutationResolvers.TagDestroyResolver = async (root, args, context, info) => {
+    const numberOfRows = await Tag.query().deleteById(args.input.id);
+    return numberOfRows === 1;
+  }
+
   public static tagUpdate: MutationResolvers.TagUpdateResolver = async (root, args, context, info) => {
     return Tag.query().updateAndFetchById(args.input.id, { name: args.input.name });
   }

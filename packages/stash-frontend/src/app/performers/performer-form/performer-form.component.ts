@@ -174,7 +174,7 @@ export class PerformerFormComponent implements OnInit, OnDestroy {
         favorite: this.favorite,
         image: this.image
       }).subscribe(result => {
-        this.router.navigate(['/performers', result.data.performerCreate.performer.id]);
+        this.router.navigate(['/performers', result.data.performerCreate.id]);
       });
     }
   }
