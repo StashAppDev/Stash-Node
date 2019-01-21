@@ -48,12 +48,12 @@ export const resolvers: IResolvers = {
     //   return SceneMarkerController.sceneMarkerDestroy(root, args, context, info);
     // },
 
-    // performerCreate(root, args, context, info) {
-    //   return PerformerController.performerCreate(root, args, context, info);
-    // },
-    // performerUpdate(root, args, context, info) {
-    //   return PerformerController.performerUpdate(root, args, context, info);
-    // },
+    performerCreate(root, args, context, info) {
+      return PerformerController.performerCreate(root, args, context, info);
+    },
+    performerUpdate(root, args, context, info) {
+      return PerformerController.performerUpdate(root, args, context, info);
+    },
 
     studioCreate(root, args, context, info) { return StudioController.studioCreate(root, args, context, info); },
     studioUpdate(root, args, context, info) { return StudioController.studioUpdate(root, args, context, info); },

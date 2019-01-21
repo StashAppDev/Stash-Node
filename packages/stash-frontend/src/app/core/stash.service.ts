@@ -55,7 +55,7 @@ export class StashService {
   private metadataGenerateGQL = new GQL.MetadataGenerateGQL(this.apollo);
   private metadataCleanGQL = new GQL.MetadataCleanGQL(this.apollo);
 
-  public static makeApolloClient(platformLocation: PlatformLocation, httpLink: HttpLink) {
+  constructor(private apollo: Apollo, private platformLocation: PlatformLocation, private httpLink: HttpLink) {
     const platform: any = platformLocation;
     const platformUrl = new URL(platform.location.origin);
     platformUrl.port = '7000';
@@ -96,8 +96,14 @@ export class StashService {
       splitLink
     ]);
 
-    return {
+    apollo.create({
       link: link,
+      defaultOptions: {
+        watchQuery: {
+          fetchPolicy: 'network-only',
+          errorPolicy: 'all'
+        },
+      },
       cache: new InMemoryCache({
         // dataIdFromObject: o => {
         //   if (o.__typename === "MarkerStringsResultType") {
@@ -113,13 +119,9 @@ export class StashService {
               return context.getCacheKey({__typename: 'Scene', id: args.id});
             }
           }
-        }
+        },
       })
-    };
-  }
-
-  constructor(private apollo: Apollo, private platformLocation: PlatformLocation, private httpLink: HttpLink) {
-    apollo.create(StashService.makeApolloClient(this.platformLocation, this.httpLink));
+    });
   }
 
   findScenes(page?: number, filter?: ListFilter): QueryRef<GQL.FindScenes.Query, Record<string, any>> {
