@@ -18,6 +18,8 @@ export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
     this.leftJoinRelation("scene_markers");
     this.leftJoinRelation("performers");
     this.leftJoinRelation("studio");
+    this.leftJoinRelation("gallery");
+    this.leftJoinRelation("tags");
 
     if (!!sceneFilter.rating) {
       this.rating(sceneFilter.rating);
@@ -27,6 +29,12 @@ export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
     }
     if (!!sceneFilter.has_markers) {
       this.hasMarkers(sceneFilter.has_markers);
+    }
+    if (!!sceneFilter.is_missing) {
+      this.isMissing(sceneFilter.is_missing);
+    }
+    if (!!sceneFilter.tags) {
+      this.tags(sceneFilter.tags);
     }
     if (!!sceneFilter.performer_id) {
       this.performerId(sceneFilter.performer_id);
@@ -89,6 +97,30 @@ export class SceneQueryBuilder extends BaseQueryBuilder<Scene> {
     } else {
       return this.whereNull("scene_markers.id");
     }
+  }
+
+  private isMissing(item: string) {
+    switch (item) {
+      case "gallery": return this.whereNull(`gallery.scene_id`);
+      case "studio": return this.whereNull(`scenes.studio_id`);
+      case "performers": return this.whereNull(`performers_join.scene_id`);
+      default: return this.whereNull(`scenes.${item}`);
+    }
+  }
+
+  private tags(ids: string[]) {
+    if (ids.length === 0) { return this; }
+
+    const query = this
+      .leftJoin("scenes_tags as tj", (builder) => {
+        builder
+          .on("tj.scene_id", "scenes.id")
+          .onIn("tj.tag_id", ids);
+      })
+      .groupBy("scenes.id")
+      .havingRaw("count(distinct `tj`.`tag_id`) is ?", ids.length);
+
+    return query;
   }
 
   private performerId(id: string) {
