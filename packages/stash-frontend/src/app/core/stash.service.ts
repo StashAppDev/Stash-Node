@@ -451,14 +451,7 @@ export class StashService {
       tag_ids: marker.tag_ids
     },
     {
-      refetchQueries: [
-        {
-          query: this.findSceneGQL.document,
-          variables: {
-            id: marker.scene_id
-          }
-        }
-      ]
+      refetchQueries: () => ['FindScene']
     });
   }
 
@@ -472,14 +465,7 @@ export class StashService {
       tag_ids: marker.tag_ids
     },
     {
-      refetchQueries: [
-        {
-          query: this.findSceneGQL.document,
-          variables: {
-            id: marker.scene_id
-          }
-        }
-      ]
+      refetchQueries: () => ['FindScene']
     });
   }
 
@@ -488,14 +474,7 @@ export class StashService {
       id: id
     },
     {
-      refetchQueries: [
-        {
-          query: this.findSceneGQL.document,
-          variables: {
-            id: scene_id
-          }
-        }
-      ],
+      refetchQueries: () => ['FindScene']
     });
   }
 

@@ -199,8 +199,6 @@ type Scene {
   studio: Studio
   tags: [Tag!]!
   performers: [Performer!]!
-
-  scene_marker_tags: [SceneMarkerTag!]! # TODO remove?
 }
 
 input SceneUpdateInput {
@@ -415,7 +413,7 @@ type Query {
   """Get stats"""
   stats: StatsResultType!
   """Organize scene markers by tag for a given scene ID"""
-  sceneMarkerTags(scene_id: ID): [SceneMarkerTag!]! # TODO ID! scene_id
+  sceneMarkerTags(scene_id: ID!): [SceneMarkerTag!]!
 
   # Scrapers
 

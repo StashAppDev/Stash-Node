@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-21T16:58:39-08:00
+// Generated in 2019-01-21T17:49:42-08:00
 export type Maybe<T> = T | null;
 
 export interface SceneFilterType {
@@ -246,7 +246,7 @@ export namespace FindScenes {
 
 export namespace FindScene {
   export type Variables = {
-    id?: Maybe<string>;
+    id: string;
     checksum?: Maybe<string>;
   };
 
@@ -1201,8 +1201,6 @@ export namespace SceneData {
 
     scene_markers: SceneMarkers[];
 
-    scene_marker_tags: SceneMarkerTags[];
-
     is_streamable: boolean;
 
     gallery: Maybe<Gallery>;
@@ -1251,24 +1249,6 @@ export namespace SceneData {
   };
 
   export type SceneMarkers = SceneMarkerData.Fragment;
-
-  export type SceneMarkerTags = {
-    __typename?: "SceneMarkerTag";
-
-    tag: Tag;
-
-    scene_markers: _SceneMarkers[];
-  };
-
-  export type Tag = {
-    __typename?: "Tag";
-
-    id: string;
-
-    name: string;
-  };
-
-  export type _SceneMarkers = SceneMarkerData.Fragment;
 
   export type Gallery = GalleryData.Fragment;
 
@@ -1499,15 +1479,6 @@ export const SceneDataFragment = gql`
     scene_markers {
       ...SceneMarkerData
     }
-    scene_marker_tags {
-      tag {
-        id
-        name
-      }
-      scene_markers {
-        ...SceneMarkerData
-      }
-    }
     is_streamable
     gallery {
       ...GalleryData
@@ -1570,7 +1541,7 @@ export class FindSceneGQL extends Apollo.Query<
   FindScene.Variables
 > {
   document: any = gql`
-    query FindScene($id: ID, $checksum: String) {
+    query FindScene($id: ID!, $checksum: String) {
       findScene(id: $id, checksum: $checksum) {
         ...SceneData
       }

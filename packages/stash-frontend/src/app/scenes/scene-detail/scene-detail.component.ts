@@ -31,9 +31,7 @@ export class SceneDetailComponent implements OnInit {
     const id = parseInt(this.route.snapshot.params['id'], 10);
 
     this.stashService.findScene(id).valueChanges.subscribe(result => {
-      // TODO
-      // this.scene = Object.assign({scene_marker_tags: result.data.sceneMarkerTags}, result.data.findScene);
-      this.scene = result.data.findScene;
+      this.scene = Object.assign({scene_marker_tags: result.data.sceneMarkerTags}, result.data.findScene);
 
       // TODO: Check this, this didn't matter before...
       if (!this.isPlayerSetup) {

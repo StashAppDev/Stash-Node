@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-21T16:58:39-08:00
+// Generated in 2019-01-21T17:49:41-08:00
 export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
@@ -304,8 +304,6 @@ export namespace GQL {
     tags: Tag[];
 
     performers: Performer[];
-
-    scene_marker_tags: SceneMarkerTag[];
   }
 
   export interface SceneFileType {
@@ -447,12 +445,6 @@ export namespace GQL {
     scenes: Scene[];
   }
 
-  export interface SceneMarkerTag {
-    tag: Tag;
-
-    scene_markers: SceneMarker[];
-  }
-
   export interface FindScenesResultType {
     count: number;
 
@@ -501,6 +493,12 @@ export namespace GQL {
     studio_count: number;
 
     tag_count: number;
+  }
+
+  export interface SceneMarkerTag {
+    tag: Tag;
+
+    scene_markers: SceneMarker[];
   }
 
   /** A performer from a scraping operation... */
@@ -624,7 +622,7 @@ export namespace GQL {
     scene_id?: Maybe<string>;
   }
   export interface SceneMarkerTagsQueryArgs {
-    scene_id?: Maybe<string>;
+    scene_id: string;
   }
   export interface ScrapeFreeonesQueryArgs {
     performer_name: string;
@@ -981,7 +979,7 @@ export namespace QueryResolvers {
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context, SceneMarkerTagsArgs>;
   export interface SceneMarkerTagsArgs {
-    scene_id?: Maybe<string>;
+    scene_id: string;
   }
 
   export type ScrapeFreeonesResolver<
@@ -1077,12 +1075,6 @@ export namespace SceneResolvers {
     tags?: TagsResolver<Tag[], TypeParent, Context>;
 
     performers?: PerformersResolver<Performer[], TypeParent, Context>;
-
-    scene_marker_tags?: SceneMarkerTagsResolver<
-      GQL.SceneMarkerTag[],
-      TypeParent,
-      Context
-    >;
   }
 
   export type IdResolver<
@@ -1162,11 +1154,6 @@ export namespace SceneResolvers {
   > = Resolver<R, Parent, Context>;
   export type PerformersResolver<
     R = Performer[],
-    Parent = Scene,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-  export type SceneMarkerTagsResolver<
-    R = GQL.SceneMarkerTag[],
     Parent = Scene,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
@@ -1658,28 +1645,6 @@ export namespace PerformerResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
-export namespace SceneMarkerTagResolvers {
-  export interface Resolvers<
-    Context = IGraphQLContext,
-    TypeParent = GQL.SceneMarkerTag
-  > {
-    tag?: TagResolver<Tag, TypeParent, Context>;
-
-    scene_markers?: SceneMarkersResolver<SceneMarker[], TypeParent, Context>;
-  }
-
-  export type TagResolver<
-    R = Tag,
-    Parent = GQL.SceneMarkerTag,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-  export type SceneMarkersResolver<
-    R = SceneMarker[],
-    Parent = GQL.SceneMarkerTag,
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-}
-
 export namespace FindScenesResultTypeResolvers {
   export interface Resolvers<
     Context = IGraphQLContext,
@@ -1858,6 +1823,28 @@ export namespace StatsResultTypeResolvers {
   export type TagCountResolver<
     R = number,
     Parent = GQL.StatsResultType,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace SceneMarkerTagResolvers {
+  export interface Resolvers<
+    Context = IGraphQLContext,
+    TypeParent = GQL.SceneMarkerTag
+  > {
+    tag?: TagResolver<Tag, TypeParent, Context>;
+
+    scene_markers?: SceneMarkersResolver<SceneMarker[], TypeParent, Context>;
+  }
+
+  export type TagResolver<
+    R = Tag,
+    Parent = GQL.SceneMarkerTag,
+    Context = IGraphQLContext
+  > = Resolver<R, Parent, Context>;
+  export type SceneMarkersResolver<
+    R = SceneMarker[],
+    Parent = GQL.SceneMarkerTag,
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;
 }
@@ -2177,7 +2164,6 @@ export interface IResolvers {
   GalleryFilesType?: GalleryFilesTypeResolvers.Resolvers;
   Studio?: StudioResolvers.Resolvers;
   Performer?: PerformerResolvers.Resolvers;
-  SceneMarkerTag?: SceneMarkerTagResolvers.Resolvers;
   FindScenesResultType?: FindScenesResultTypeResolvers.Resolvers;
   FindSceneMarkersResultType?: FindSceneMarkersResultTypeResolvers.Resolvers;
   FindPerformersResultType?: FindPerformersResultTypeResolvers.Resolvers;
@@ -2185,6 +2171,7 @@ export interface IResolvers {
   FindGalleriesResultType?: FindGalleriesResultTypeResolvers.Resolvers;
   MarkerStringsResultType?: MarkerStringsResultTypeResolvers.Resolvers;
   StatsResultType?: StatsResultTypeResolvers.Resolvers;
+  SceneMarkerTag?: SceneMarkerTagResolvers.Resolvers;
   ScrapedPerformer?: ScrapedPerformerResolvers.Resolvers;
   Mutation?: MutationResolvers.Resolvers;
   Subscription?: SubscriptionResolvers.Resolvers;

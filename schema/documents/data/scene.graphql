@@ -32,17 +32,6 @@ fragment SceneData on Scene {
     ...SceneMarkerData
   }
 
-  # TODO: Remove this
-  scene_marker_tags {
-    tag {
-      id
-      name
-    }
-    scene_markers {
-      ...SceneMarkerData
-    }
-  }
-
   is_streamable
 
   gallery {
