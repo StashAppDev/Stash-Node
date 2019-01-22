@@ -43,6 +43,7 @@ export class SceneWallComponent implements OnInit {
 
   async getScenes(q: string) {
     this.items = null;
+    this.searchTerm = q;
     if (this.mode === WallMode.Scenes) {
       const response = await this.stashService.sceneWall(q).result();
       this.items = response.data.sceneWall;
@@ -70,7 +71,7 @@ export class SceneWallComponent implements OnInit {
   }
 
   onClickMarker(marker) {
-    this.searchTerm = `"${marker.title}"`;
+    this.searchTerm = `${marker.title}`;
     this.searchFormControl.setValue(this.searchTerm);
     this.showingMarkerList = false;
   }

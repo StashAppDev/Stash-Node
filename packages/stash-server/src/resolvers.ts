@@ -85,8 +85,12 @@ export const resolvers: IResolvers = {
     findStudio(root, args, context, info) { return StudioController.findStudio(root, args, context, info); },
     findStudios(root, args, context, info) { return StudioController.findStudios(root, args, context, info); },
 
-    // TODO markerWall
-    // TODO sceneWall
+    markerWall(root, args, context, info) {
+      return SceneMarker.query().where("scene_markers.title", "LIKE", `%${args.q}%`).limit(80).orderByRaw("RANDOM()");
+    },
+    sceneWall(root, args, context, info) {
+      return Scene.query().where("scenes.details", "LIKE", `%${args.q}%`).limit(80).orderByRaw("RANDOM()");
+    },
 
     markerStrings(root, args, context, info) { return SceneMarkerController.markerStrings(root, args, context, info); },
     sceneMarkerTags(root, args, context, info) {
