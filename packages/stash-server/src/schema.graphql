@@ -442,7 +442,6 @@ type Query {
   allPerformers: [Performer!]!
   allStudios: [Studio!]!
   allTags: [Tag!]!
-  allSceneMarkers: [SceneMarker!]!
 }
 
 type Mutation {

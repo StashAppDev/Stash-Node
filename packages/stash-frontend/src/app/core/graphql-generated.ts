@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-21T08:33:09-08:00
+// Generated in 2019-01-21T16:58:39-08:00
 export type Maybe<T> = T | null;
 
 export interface SceneFilterType {
@@ -592,30 +592,6 @@ export namespace ScrapeFreeonesPerformers {
   };
 }
 
-export namespace AllPerformers {
-  export type Variables = {};
-
-  export type Query = {
-    __typename?: "Query";
-
-    allPerformers: AllPerformers[];
-  };
-
-  export type AllPerformers = PerformerData.Fragment;
-}
-
-export namespace AllStudios {
-  export type Variables = {};
-
-  export type Query = {
-    __typename?: "Query";
-
-    allStudios: AllStudios[];
-  };
-
-  export type AllStudios = StudioData.Fragment;
-}
-
 export namespace AllTags {
   export type Variables = {};
 
@@ -628,16 +604,34 @@ export namespace AllTags {
   export type AllTags = TagData.Fragment;
 }
 
-export namespace AllSceneMarkers {
+export namespace AllPerformersForFilter {
   export type Variables = {};
 
   export type Query = {
     __typename?: "Query";
 
-    allSceneMarkers: AllSceneMarkers[];
+    allPerformers: AllPerformers[];
   };
 
-  export type AllSceneMarkers = SceneMarkerData.Fragment;
+  export type AllPerformers = SlimPerformerData.Fragment;
+}
+
+export namespace AllTagsForFilter {
+  export type Variables = {};
+
+  export type Query = {
+    __typename?: "Query";
+
+    allTags: AllTags[];
+  };
+
+  export type AllTags = {
+    __typename?: "Tag";
+
+    id: string;
+
+    name: string;
+  };
 }
 
 export namespace Stats {
@@ -954,6 +948,18 @@ export namespace GalleryData {
     name: Maybe<string>;
 
     path: Maybe<string>;
+  };
+}
+
+export namespace SlimPerformerData {
+  export type Fragment = {
+    __typename?: "Performer";
+
+    id: string;
+
+    name: Maybe<string>;
+
+    image_path: Maybe<string>;
   };
 }
 
@@ -1317,6 +1323,14 @@ import gql from "graphql-tag";
 // ====================================================
 // GraphQL Fragments
 // ====================================================
+
+export const SlimPerformerDataFragment = gql`
+  fragment SlimPerformerData on Performer {
+    id
+    name
+    image_path
+  }
+`;
 
 export const SlimSceneDataFragment = gql`
   fragment SlimSceneData on Scene {
@@ -1860,40 +1874,6 @@ export class ScrapeFreeonesPerformersGQL extends Apollo.Query<
 @Injectable({
   providedIn: "root"
 })
-export class AllPerformersGQL extends Apollo.Query<
-  AllPerformers.Query,
-  AllPerformers.Variables
-> {
-  document: any = gql`
-    query AllPerformers {
-      allPerformers {
-        ...PerformerData
-      }
-    }
-
-    ${PerformerDataFragment}
-  `;
-}
-@Injectable({
-  providedIn: "root"
-})
-export class AllStudiosGQL extends Apollo.Query<
-  AllStudios.Query,
-  AllStudios.Variables
-> {
-  document: any = gql`
-    query AllStudios {
-      allStudios {
-        ...StudioData
-      }
-    }
-
-    ${StudioDataFragment}
-  `;
-}
-@Injectable({
-  providedIn: "root"
-})
 export class AllTagsGQL extends Apollo.Query<AllTags.Query, AllTags.Variables> {
   document: any = gql`
     query AllTags {
@@ -1908,18 +1888,34 @@ export class AllTagsGQL extends Apollo.Query<AllTags.Query, AllTags.Variables> {
 @Injectable({
   providedIn: "root"
 })
-export class AllSceneMarkersGQL extends Apollo.Query<
-  AllSceneMarkers.Query,
-  AllSceneMarkers.Variables
+export class AllPerformersForFilterGQL extends Apollo.Query<
+  AllPerformersForFilter.Query,
+  AllPerformersForFilter.Variables
 > {
   document: any = gql`
-    query AllSceneMarkers {
-      allSceneMarkers {
-        ...SceneMarkerData
+    query AllPerformersForFilter {
+      allPerformers {
+        ...SlimPerformerData
       }
     }
 
-    ${SceneMarkerDataFragment}
+    ${SlimPerformerDataFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class AllTagsForFilterGQL extends Apollo.Query<
+  AllTagsForFilter.Query,
+  AllTagsForFilter.Variables
+> {
+  document: any = gql`
+    query AllTagsForFilter {
+      allTags {
+        id
+        name
+      }
+    }
   `;
 }
 @Injectable({

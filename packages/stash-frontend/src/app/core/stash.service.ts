@@ -34,9 +34,8 @@ export class StashService {
   private scrapeFreeonesGQL = new GQL.ScrapeFreeonesGQL(this.apollo);
   private scrapeFreeonesPerformersGQL = new GQL.ScrapeFreeonesPerformersGQL(this.apollo);
   private allTagsGQL = new GQL.AllTagsGQL(this.apollo);
-  private allPerformersGQL = new GQL.AllPerformersGQL(this.apollo);
-  private allStudiosGQL = new GQL.AllStudiosGQL(this.apollo);
-  private allSceneMarkersGQL = new GQL.AllSceneMarkersGQL(this.apollo);
+  private allTagsForFilterGQL = new GQL.AllTagsForFilterGQL(this.apollo);
+  private allPerformersForFilterGQL = new GQL.AllPerformersForFilterGQL(this.apollo);
   private statsGQL = new GQL.StatsGQL(this.apollo);
   private sceneUpdateGQL = new GQL.SceneUpdateGQL(this.apollo);
   private performerCreateGQL = new GQL.PerformerCreateGQL(this.apollo);
@@ -295,8 +294,12 @@ export class StashService {
     return this.allTagsGQL.watch();
   }
 
-  allPerformers() {
-    return this.allPerformersGQL.watch();
+  allTagsForFilter() {
+    return this.allTagsForFilterGQL.watch();
+  }
+
+  allPerformersForFilter() {
+    return this.allPerformersForFilterGQL.watch();
   }
 
   stats() {
@@ -347,13 +350,6 @@ export class StashService {
       instagram: performer.instagram,
       favorite: performer.favorite,
       image: performer.image
-    },
-    {
-      refetchQueries: [
-        {
-          query: this.allPerformersGQL.document
-        }
-      ],
     });
   }
 
@@ -395,13 +391,6 @@ export class StashService {
       name: studio.name,
       url: studio.url,
       image: studio.image
-    },
-    {
-      refetchQueries: [
-        {
-          query: this.allStudiosGQL.document
-        }
-      ],
     });
   }
 
@@ -427,26 +416,12 @@ export class StashService {
   tagCreate(tag: GQL.TagCreate.Variables) {
     return this.tagCreateGQL.mutate({
       name: tag.name
-    },
-    {
-      refetchQueries: [
-        {
-          query: this.allTagsGQL.document
-        }
-      ],
     });
   }
 
   tagDestroy(tag: GQL.TagDestroy.Variables) {
     return this.tagDestroyGQL.mutate({
       id: tag.id
-    },
-    {
-      refetchQueries: [
-        {
-          query: this.allTagsGQL.document
-        }
-      ],
     });
   }
 
@@ -477,9 +452,6 @@ export class StashService {
     },
     {
       refetchQueries: [
-        // {
-        //   query: this.allSceneMarkersGQL.document
-        // },
         {
           query: this.findSceneGQL.document,
           variables: {
@@ -501,9 +473,6 @@ export class StashService {
     },
     {
       refetchQueries: [
-        // {
-        //   query: this.allSceneMarkersGQL.document
-        // },
         {
           query: this.findSceneGQL.document,
           variables: {
@@ -520,9 +489,6 @@ export class StashService {
     },
     {
       refetchQueries: [
-        // {
-        //   query: this.allSceneMarkersGQL.document
-        // },
         {
           query: this.findSceneGQL.document,
           variables: {

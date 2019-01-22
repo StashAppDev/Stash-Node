@@ -5,7 +5,7 @@ import { StashService } from '../../core/stash.service';
 
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { MarkerStrings, SceneMarkerData, SceneData, TagData } from '../../core/graphql-generated';
+import { MarkerStrings, SceneMarkerData, SceneData, AllTagsForFilter } from '../../core/graphql-generated';
 
 
 @Component({
@@ -33,12 +33,12 @@ export class SceneDetailMarkerManagerComponent implements OnInit, OnChanges {
   tag_ids: string[] = [];
 
   // From the network
-  tags: TagData.Fragment[];
+  tags: AllTagsForFilter.AllTags[];
 
   constructor(private stashService: StashService) {}
 
   ngOnInit() {
-    this.stashService.allTags().valueChanges.subscribe(result => {
+    this.stashService.allTagsForFilter().valueChanges.subscribe(result => {
       this.tags = result.data.allTags;
     });
 

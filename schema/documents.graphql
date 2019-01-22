@@ -157,27 +157,22 @@ query ScrapeFreeonesPerformers($q: String!) {
   scrapeFreeonesPerformerList(query: $q)
 }
 
-query AllPerformers {
-  allPerformers {
-    ...PerformerData
-  }
-}
-
-query AllStudios {
-  allStudios {
-    ...StudioData
-  }
-}
-
 query AllTags {
   allTags {
     ...TagData
   }
 }
 
-query AllSceneMarkers {
-  allSceneMarkers {
-    ...SceneMarkerData
+query AllPerformersForFilter {
+  allPerformers {
+    ...SlimPerformerData
+  }
+}
+
+query AllTagsForFilter {
+  allTags {
+    id
+    name
   }
 }
 

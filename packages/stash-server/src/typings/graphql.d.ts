@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated in 2019-01-21T08:33:09-08:00
+// Generated in 2019-01-21T16:58:39-08:00
 export type Maybe<T> = T | undefined;
 
 export interface SceneFilterType {
@@ -270,8 +270,6 @@ export namespace GQL {
     allStudios: Studio[];
 
     allTags: Tag[];
-
-    allSceneMarkers: SceneMarker[];
   }
 
   export interface Scene {
@@ -832,12 +830,6 @@ export namespace QueryResolvers {
     allStudios?: AllStudiosResolver<Studio[], TypeParent, Context>;
 
     allTags?: AllTagsResolver<Tag[], TypeParent, Context>;
-
-    allSceneMarkers?: AllSceneMarkersResolver<
-      SceneMarker[],
-      TypeParent,
-      Context
-    >;
   }
 
   export type FindSceneResolver<
@@ -1047,11 +1039,6 @@ export namespace QueryResolvers {
   > = Resolver<R, Parent, Context>;
   export type AllTagsResolver<
     R = Tag[],
-    Parent = {},
-    Context = IGraphQLContext
-  > = Resolver<R, Parent, Context>;
-  export type AllSceneMarkersResolver<
-    R = SceneMarker[],
     Parent = {},
     Context = IGraphQLContext
   > = Resolver<R, Parent, Context>;

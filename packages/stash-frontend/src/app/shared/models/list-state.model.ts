@@ -130,7 +130,7 @@ export class Criteria {
   }
 
   private async configureTags(name: string) {
-    const result = await this.stashService.allTags().result();
+    const result = await this.stashService.allTagsForFilter().result();
     return {
       valueType: CriteriaValueType.Multiple,
       parameterName: name,
@@ -141,7 +141,7 @@ export class Criteria {
   }
 
   private async configurePerformers(name: string) {
-    const result = await this.stashService.allPerformers().result();
+    const result = await this.stashService.allPerformersForFilter().result();
     return {
       valueType: CriteriaValueType.Multiple,
       parameterName: name,

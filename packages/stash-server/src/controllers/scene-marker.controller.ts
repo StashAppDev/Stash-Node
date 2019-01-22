@@ -12,7 +12,6 @@ export class SceneMarkerController {
 
   // #region GraphQL Resolvers
 
-  // TODO:  Missing rails logic
   public static findSceneMarkers: QueryResolvers.FindSceneMarkersResolver = async (root, args, context, info) => {
     const builder = new SceneMarkerQueryBuilder(args);
     builder.filter();

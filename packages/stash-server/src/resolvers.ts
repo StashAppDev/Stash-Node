@@ -123,10 +123,9 @@ export const resolvers: IResolvers = {
     // TODO: metadataGenerate
     // TODO: metadataClean
 
-    async allPerformers() { return await Performer.query(); },
+    async allPerformers() { return await Performer.query().select("id", "name", "birthdate"); },
     async allStudios() { return await Studio.query(); },
-    async allTags() { return await Tag.query().orderBy("name"); },
-    async allSceneMarkers() { return await SceneMarker.query(); },
+    async allTags() { return await Tag.query().select("id", "name").orderBy("name"); },
   },
   Scene: {
     file(scene, args, context, info) {
