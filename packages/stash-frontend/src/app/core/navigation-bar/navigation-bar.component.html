@@ -1,4 +1,4 @@
-<div class="ui top fixed menu">
+<!-- <div class="ui top fixed menu">
   <div class="ui container">
     <div class="header item">
       <a routerLink="/">Stash</a>
@@ -35,4 +35,18 @@
       Settings
     </a>
   </div>
-</div>
+</div> -->
+
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span routerLink="/">Stash</span>
+    <button routerLink="/scenes" routerLinkActive #rla="routerLinkActive" [class.active]="isScenesActiveHack(rla)" mat-button>Scenes</button>
+    <button routerLink="/scenes/markers" routerLinkActive="active" mat-button>Scene Markers</button>
+    <button routerLink="/galleries" routerLinkActive="active" mat-button>Galleries</button>
+    <button routerLink="/performers" routerLinkActive="active" mat-button>Performers</button>
+    <button routerLink="/studios" routerLinkActive="active" mat-button>Studios</button>
+    <button routerLink="/tags" routerLinkActive="active" mat-button>Tags</button>
+    <button routerLink="/wall" routerLinkActive="active" mat-button>Scene Wall</button>
+    <button routerLink="/settings" routerLinkActive="active" mat-button>Settings</button>
+  </mat-toolbar-row>
+</mat-toolbar>

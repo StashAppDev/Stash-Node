@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ApolloModule } from 'apollo-angular';
 import { HttpLinkModule } from 'apollo-angular-link-http';
+import { MatToolbarModule, MatIconModule, MatButtonModule } from '@angular/material';
 
 import { NavigationBarComponent } from './navigation-bar/navigation-bar.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
@@ -20,7 +21,10 @@ import { StashService } from './stash.service';
     FormsModule,
     ReactiveFormsModule,
     ApolloModule,
-    HttpLinkModule
+    HttpLinkModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule
   ],
   declarations: [
     NavigationBarComponent,

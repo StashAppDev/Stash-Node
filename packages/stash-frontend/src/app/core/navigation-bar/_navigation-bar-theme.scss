@@ -1,0 +1,15 @@
+@mixin navigation-bar-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+
+  app-navigation-bar {
+    color: mat-color($primary, default-contrast);
+
+    .stash-navbar, .stash-navbar-header {
+      background: mat-color($primary);
+    }
+  }
+}
