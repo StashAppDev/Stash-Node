@@ -17,10 +17,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription = this.stashService.statsGQL.watch()
-    .valueChanges
-    .subscribe(result => {
-      this.stats = result.data.stats;
-    });
+      .valueChanges
+      .subscribe(result => {
+        this.stats = result.data.stats;
+      });
   }
 
   ngOnDestroy() {

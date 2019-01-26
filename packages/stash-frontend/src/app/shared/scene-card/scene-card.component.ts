@@ -55,4 +55,8 @@ export class SceneCardComponent implements OnInit {
   hasFavoritePerformer(): boolean {
     return this.scene.performers.filter(performer => performer.favorite === true).length > 0;
   }
+
+  performerNames(): string {
+    return this.scene.performers.map(p => p.name).join(', ');
+  }
 }

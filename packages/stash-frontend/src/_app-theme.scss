@@ -1,0 +1,14 @@
+@import '~@angular/material/theming';
+
+@mixin stash-app-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $next-theme: mat-palette($mat-red);
+
+  .stash-app-background {
+    background: mat-color($background, background);
+  }
+}

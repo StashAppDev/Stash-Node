@@ -1,12 +1,19 @@
-<div class="ui segement">
+<div class="content-container">
   <app-list-filter (filterUpdated)="onFilterUpdate($event)" [filter]="state.filter"></app-list-filter>
 
-  <div *ngIf="state.filter.displayMode == DisplayMode.Grid" class="ui four doubling cards">
+  <!-- <div *ngIf="state.filter.displayMode == DisplayMode.Grid" class="ui four doubling cards">
     <div *ngIf="state.filter.filterMode == FilterMode.Scenes; then sceneCards"></div>
     <div *ngIf="state.filter.filterMode == FilterMode.Galleries; then galleryCards"></div>
     <div *ngIf="state.filter.filterMode == FilterMode.Performers; then performerCards"></div>
     <div *ngIf="state.filter.filterMode == FilterMode.Studios; then studioCards"></div>
-  </div>
+  </div> -->
+
+  <!-- <mat-grid-list *ngIf="state.filter.displayMode == DisplayMode.Grid" cols="4" rowHeight="3:4">
+    <ng-container *ngIf="state.filter.filterMode == FilterMode.Scenes; then sceneCards"></ng-container>
+    <div *ngIf="state.filter.filterMode == FilterMode.Galleries; then galleryCards"></div>
+    <div *ngIf="state.filter.filterMode == FilterMode.Performers; then performerCards"></div>
+    <div *ngIf="state.filter.filterMode == FilterMode.Studios; then studioCards"></div>
+  </mat-grid-list>
   <div *ngIf="state.filter.displayMode == DisplayMode.List" class="ui divided items">
     <div *ngIf="state.filter.filterMode == FilterMode.Scenes; then sceneListItems"></div>
     <div *ngIf="state.filter.filterMode == FilterMode.Galleries; then galleryListItems"></div>
@@ -18,7 +25,9 @@
       <div *ngIf="state.filter.filterMode == FilterMode.Scenes; then sceneWallItems"></div>
       <div *ngIf="state.filter.filterMode == FilterMode.SceneMarkers; then sceneMarkerWallItems"></div>
     </div>
-  </div>
+  </div> -->
+
+  <ng-container *ngIf="state.filter.filterMode == FilterMode.Scenes; then sceneList"></ng-container>
 
   <app-sui-pagination #pagination id="main-pagination" (pageChange)="getPage($event)"></app-sui-pagination>
 
@@ -27,15 +36,31 @@
   </div>
 </div>
 
-<ng-template #sceneCards>
-  <app-scene-card *ngFor="let scene of state.data | paginate: { itemsPerPage: state.filter.itemsPerPage, currentPage: state.filter.currentPage, totalItems: state.totalCount }"
-      [scene]="scene">
-  </app-scene-card>
+
+<ng-template #sceneList>
+  <div *ngIf="state.filter.displayMode == DisplayMode.Grid">
+    <div
+      fxLayout="row wrap"
+      fxLayout.xs="column wrap"
+      fxLayoutGap="10px grid">
+      <app-scene-card fxFlex="25" fxFlex.xs="100" *ngFor="let scene of state.data | paginate: { itemsPerPage: state.filter.itemsPerPage, currentPage: state.filter.currentPage, totalItems: state.totalCount }" [scene]="scene"></app-scene-card>
+    </div>
+  </div>
+
+  <mat-list *ngIf="state.filter.displayMode == DisplayMode.List">
+    <mat-list-item *ngFor="let scene of state.data | paginate: { itemsPerPage: state.filter.itemsPerPage, currentPage: state.filter.currentPage, totalItems: state.totalCount }">
+      <app-scene-list-item [scene]="scene"></app-scene-list-item>
+    </mat-list-item>
+  </mat-list>
 </ng-template>
-<ng-template #sceneListItems>
-  <app-scene-list-item *ngFor="let scene of state.data | paginate: { itemsPerPage: state.filter.itemsPerPage, currentPage: state.filter.currentPage, totalItems: state.totalCount }" [scene]="scene">
-  </app-scene-list-item>
-</ng-template>
+
+
+
+
+
+
+
+
 <ng-template #sceneWallItems>
   <div
     *ngFor="let scene of state.data | paginate: { itemsPerPage: state.filter.itemsPerPage, currentPage: state.filter.currentPage, totalItems: state.totalCount }"

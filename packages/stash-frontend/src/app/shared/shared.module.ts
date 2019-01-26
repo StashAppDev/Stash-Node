@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
@@ -29,6 +30,7 @@ import { SceneWallItemComponent } from './scene-wall-item/scene-wall-item.compon
 import { BaseWallItemComponent } from './base-wall-item/base-wall-item.component';
 import { ShufflePipe } from './shuffle.pipe';
 import { PerformerListItemComponent } from './performer-list-item/performer-list-item.component';
+import { MaterialModule } from '../core/material.module';
 
 // Import blah.  Include in dec and exports (https://angular.io/guide/ngmodule#shared-modules)
 
@@ -41,7 +43,9 @@ import { PerformerListItemComponent } from './performer-list-item/performer-list
     SuiModule,
     NgxPaginationModule,
     ClipboardModule,
-    LazyLoadImageModule
+    LazyLoadImageModule,
+    MaterialModule,
+    FlexLayoutModule
   ],
   declarations: [
     TruncatePipe,

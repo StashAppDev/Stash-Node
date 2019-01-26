@@ -1,52 +1,19 @@
-<!-- <div class="ui top fixed menu">
-  <div class="ui container">
-    <div class="header item">
-      <a routerLink="/">Stash</a>
-    </div>
-    <a routerLink="/scenes" routerLinkActive #rla="routerLinkActive" [class.active]="isScenesActiveHack(rla)" class="item">
-      <i class="video play icon"></i>Scenes
-    </a>
-    <a routerLink="/scenes/markers" routerLinkActive="active" class="item">
-      <i class="marker icon"></i>
-      Markers
-    </a>
-    <a routerLink="/galleries" routerLinkActive="active" class="item">
-      <i class="image icon"></i>
-      Galleries
-    </a>
-    <a routerLink="/performers" routerLinkActive="active" class="item">
-      <i class="user icon"></i>
-      Performers
-    </a>
-    <a routerLink="/studios" routerLinkActive="active" class="item">
-      <i class="record icon"></i>
-      Studios
-    </a>
-    <a routerLink="/tags" routerLinkActive="active" class="item">
-      <i class="tags icon"></i>
-      Tags
-    </a>
-    <a routerLink="/scenes/wall" routerLinkActive="active" class="item">
-      <i class="film icon"></i>
-      Scene Wall
-    </a>
-    <a routerLink="/settings" routerLinkActive="active" class="item">
-      <i class="settings icon"></i>
-      Settings
-    </a>
-  </div>
-</div> -->
-
 <mat-toolbar color="primary">
   <mat-toolbar-row>
     <span routerLink="/">Stash</span>
-    <button routerLink="/scenes" routerLinkActive #rla="routerLinkActive" [class.active]="isScenesActiveHack(rla)" mat-button>Scenes</button>
-    <button routerLink="/scenes/markers" routerLinkActive="active" mat-button>Scene Markers</button>
-    <button routerLink="/galleries" routerLinkActive="active" mat-button>Galleries</button>
-    <button routerLink="/performers" routerLinkActive="active" mat-button>Performers</button>
-    <button routerLink="/studios" routerLinkActive="active" mat-button>Studios</button>
-    <button routerLink="/tags" routerLinkActive="active" mat-button>Tags</button>
-    <button routerLink="/wall" routerLinkActive="active" mat-button>Scene Wall</button>
-    <button routerLink="/settings" routerLinkActive="active" mat-button>Settings</button>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button routerLink="/settings">
+      <mat-icon>settings</mat-icon>
+    </button>
   </mat-toolbar-row>
 </mat-toolbar>
+
+<nav mat-tab-nav-bar mat-align-tabs="center" color="primary" backgroundColor="primary">
+  <a mat-tab-link
+     *ngFor="let link of navLinks"
+     [routerLink]="link.path"
+     routerLinkActive #rla="routerLinkActive"
+     [active]="isActive(rla, link)">
+    {{link.label}}
+  </a>
+</nav>

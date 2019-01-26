@@ -24,6 +24,8 @@ export class ListComponent implements OnInit, OnDestroy, AfterViewInit {
   DisplayMode = DisplayMode;
   FilterMode = FilterMode;
 
+  public gutterSize = '10px';
+
   @Input() state: ListState<any>;
 
   loading = true;

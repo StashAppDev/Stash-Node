@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   template: `
     <app-navigation-bar></app-navigation-bar>
-    <div class="ui main container">
+    <div class="stash-app-background">
       <router-outlet></router-outlet>
     </div>
   `

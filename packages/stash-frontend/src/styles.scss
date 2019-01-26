@@ -1,4 +1,5 @@
 @import '~@angular/material/theming';
+@import './app-theme';
 
 // Plus imports for other components in your app.
 @import './app/core/navigation-bar/navigation-bar-theme';
@@ -11,31 +12,37 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$stash-app-primary: mat-palette($mat-indigo);
-$stash-app-accent:  mat-palette($mat-pink, A200, A100, A400);
+$stash-app-primary: mat-palette($mat-brown);
+$stash-app-accent:  mat-palette($mat-deep-orange, A200, A100, A400);
 $stash-app-warn:    mat-palette($mat-red);
 
 // Create the theme object (a Sass map containing all of the palettes).
-$stash-app-theme: mat-light-theme($stash-app-primary, $stash-app-accent, $stash-app-warn);
+$stash-app-theme: mat-dark-theme($stash-app-primary, $stash-app-accent, $stash-app-warn);
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include navigation-bar-theme($stash-app-theme);
 @include angular-material-theme($stash-app-theme);
+@include stash-app-theme($stash-app-theme);
 
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-
-
-
-
-
-body {
-  background-color: #FFFFFF;
+.content-container {
+  max-width: 85vw;
+  margin: auto;
 }
+
+mat-grid-list {
+  margin: 10px;
+}
+
+
+// body {
+//   background-color: #FFFFFF;
+// }
 
 .simple-modal-container {
   position: fixed;
@@ -92,8 +99,7 @@ body {
 }
 
 video.preview {
-  width: 100%;
-  /*height: 200px;*/
+  height: 200px;
   object-fit: cover;
 }
 

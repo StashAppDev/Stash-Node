@@ -1,10 +1,7 @@
-<a [routerLink]="['/scenes', scene.id]" class="image previewable">
+<!-- <a [routerLink]="['/scenes', scene.id]" class="image previewable">
   <video class="preview" loop [poster]="this.scene.paths.screenshot" #videoTag>
     <source *ngIf="previewPath" [src]="previewPath" />
   </video>
-  <!--<div class="glass">
-    <h3 style="margin: 10px;">{{scene.title || scene.path}}</h3>
-  </div>-->
 </a>
 <div class="content">
   <div class="header">{{scene.title || scene.path}}</div>
@@ -87,4 +84,55 @@
     <i class="huge record icon"></i>
   </a>
   <span *ngIf="!scene.studio">No Studio</span>
-</div>
+</div> -->
+
+<mat-card >
+  <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+  <video mat-card-image class="preview" loop [poster]="this.scene.paths.screenshot" #videoTag>
+    <source *ngIf="previewPath" [src]="previewPath" />
+  </video>
+  <mat-card-content>
+    <mat-card-title
+      [matBadgeHidden]="!scene.rating"
+      [matBadge]="scene?.rating"
+      matBadgePosition="above after"
+      matBadgeColor="accent"
+      [routerLink]="['/scenes', scene.id]">{{scene.title || "No Title"}}</mat-card-title>
+    <mat-card-subtitle *ngIf="!!scene.date">{{scene.date}}</mat-card-subtitle>
+    <p *ngIf="scene.details; else descriptionEmptyBlock">
+      {{scene.details | truncate : 100 : '... (continued)'}}
+    </p>
+    <ng-template #descriptionEmptyBlock>No details</ng-template>
+  </mat-card-content>
+  <mat-card-actions align="center">
+    <button
+      *ngIf="!!scene.tags && scene.tags.length > 0"
+      mat-button>
+      <mat-icon>label</mat-icon>
+      {{scene.tags.length}}
+    </button>
+    <button
+      *ngIf="!!scene.performers && scene.performers.length > 0"
+      [class.red]="hasFavoritePerformer()"
+      [matTooltip]="performerNames()"
+      mat-button>
+      <mat-icon>person</mat-icon>
+      {{scene.performers.length}}
+    </button>
+    <button
+      *ngIf="!!scene.scene_markers && scene.scene_markers.length > 0"
+      mat-button>
+      <mat-icon>location_on</mat-icon>
+      {{scene.scene_markers.length}}
+    </button>
+  </mat-card-actions>
+  <mat-card-footer>
+    <a *ngIf="scene.studio"
+      [routerLink]="['/studios', scene.studio.id]"
+      [style.background-image]="'url(' + this.scene.studio.image_path + ')'"
+      style="width: 100%; line-height: 5; background-size: contain; display: inline-block; background-position: right; background-repeat: no-repeat;">
+      <i class="huge record icon"></i>
+    </a>
+    <span *ngIf="!scene.studio">No Studio</span>
+  </mat-card-footer>
+</mat-card>
