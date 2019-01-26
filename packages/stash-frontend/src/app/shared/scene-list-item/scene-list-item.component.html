@@ -4,7 +4,7 @@
   </video>
 </a>
 <div class="content">
-  <div class="header">{{scene.title || scene.path}}</div>
+  <div class="header">{{scene.title || scene.path | filename}}</div>
   <div *ngIf="scene.rating || scene.date" class="meta">
     <span *ngIf="scene.date" class="date">{{scene.date}}</span>
     <sui-rating *ngIf="scene.rating" class="ui tiny rating" [(ngModel)]="scene.rating" [maximum]="5" [isReadonly]="true"></sui-rating>

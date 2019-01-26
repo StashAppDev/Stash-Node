@@ -1,9 +1,9 @@
 <button style="margin: 5px;" (click)="onClickAddMarker()" class="ui button">Create Marker</button>
 
 <div [suiCollapse]="!showingMarkerModal">
-  <div class="ui segment">
+  <div class="ui inverted segment">
     <h4 class="ui header">{{!!editingMarker ? 'Edit' : 'Create'}} Marker</h4>
-    <div class="ui form">
+    <div class="ui inverted form">
       <div class="field">
         <label>Title</label>
         <div class="ui search focus">
@@ -59,7 +59,7 @@
 </div>
 
 <div *ngIf="!!scene" class="ui container" style="overflow-y: hidden; overflow-x: auto; white-space: nowrap;">
-  <div *ngFor="let primary_tag of scene.scene_marker_tags" class="ui card" style="max-height: 300px; height: 100vh; overflow-y: auto; overflow-x: hidden; display: inline-block; margin: 5px;">
+  <div *ngFor="let primary_tag of scene.scene_marker_tags" class="ui dark card" style="max-height: 300px; height: 100vh; overflow-y: auto; overflow-x: hidden; display: inline-block; margin: 5px;">
     <div class="content" style="white-space: normal;">
       <div class="header">{{primary_tag.tag.name}}</div>
       <div class="ui divided items">

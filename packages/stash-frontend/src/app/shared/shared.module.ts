@@ -29,6 +29,7 @@ import { SceneWallItemComponent } from './scene-wall-item/scene-wall-item.compon
 import { BaseWallItemComponent } from './base-wall-item/base-wall-item.component';
 import { ShufflePipe } from './shuffle.pipe';
 import { PerformerListItemComponent } from './performer-list-item/performer-list-item.component';
+import { FileNamePipe } from './file-name.pipe';
 
 // Import blah.  Include in dec and exports (https://angular.io/guide/ngmodule#shared-modules)
 
@@ -64,7 +65,8 @@ import { PerformerListItemComponent } from './performer-list-item/performer-list
     SceneWallItemComponent,
     BaseWallItemComponent,
     ShufflePipe,
-    PerformerListItemComponent
+    PerformerListItemComponent,
+    FileNamePipe,
   ],
   exports: [
     CommonModule,
@@ -93,7 +95,11 @@ import { PerformerListItemComponent } from './performer-list-item/performer-list
     SceneMarkerWallItemComponent,
     SceneWallItemComponent,
     BaseWallItemComponent,
-    ShufflePipe
+    ShufflePipe,
+    FileNamePipe
+  ],
+  providers: [
+    FileNamePipe
   ]
 })
 export class SharedModule { }

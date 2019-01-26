@@ -14,7 +14,7 @@ export class PerformerListItemComponent implements OnInit, OnChanges {
   scenes: any[];
 
   // The host class needs to be card
-  @HostBinding('class') class = 'item';
+  @HostBinding('class') class = 'dark item';
 
   constructor(private stashService: StashService) { }
 

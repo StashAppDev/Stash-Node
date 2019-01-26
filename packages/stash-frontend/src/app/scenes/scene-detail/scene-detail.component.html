@@ -5,7 +5,7 @@
 </app-jwplayer>
 
 <div class="ui container segments">
-  <div class="ui top attached segment">
+  <div class="ui inverted top attached segment">
 
     <app-scene-detail-scrubber
       #scrubber
@@ -21,8 +21,8 @@
     </app-scene-detail-marker-manager>
   </div>
 
-  <div class="ui attached clearing segment">
-    <h1 class="ui left floated marginless header">
+  <div class="ui inverted attached clearing segment">
+    <h1 class="ui inverted left floated marginless header">
       {{scene?.title || 'No Title'}}
       <div *ngIf="!!scene?.date" class="sub header">{{scene?.date | date:"MM/dd/yy"}}</div>
       <div class="sub header">{{scene?.file.size | fileSize}}</div>
@@ -39,12 +39,12 @@
     </div>
   </div>
 
-  <div *ngIf="!!scene?.details && scene?.details.length != 0" class="ui attached segment">
+  <div *ngIf="!!scene?.details && scene?.details.length != 0" class="ui inverted attached segment">
     <h3>Details</h3>
     <p class="pre">{{scene.details}}</p>
   </div>
 
-  <div *ngIf="scene?.performers.length > 0" class="ui attached segment">
+  <div *ngIf="scene?.performers.length > 0" class="ui inverted attached segment">
     <h3>Performers</h3>
     <div class="ui four centered stackable link cards">
       <app-performer-card *ngFor="let performer of scene?.performers"
@@ -54,22 +54,22 @@
     </div>
   </div>
 
-  <div *ngIf="scene?.tags.length > 0" class="ui attached segment">
+  <div *ngIf="scene?.tags.length > 0" class="ui inverted attached segment">
     <h3>Tags</h3>
     <div class="ui labels">
       <a *ngFor="let tag of scene?.tags" class="ui label">{{tag.name}}</a>
     </div>
   </div>
 
-  <div *ngIf="!!scene?.gallery" class="ui attached segment">
+  <div *ngIf="!!scene?.gallery" class="ui inverted attached segment">
     <h3 class="ui header">
       Gallery
     </h3>
     <app-gallery-preview *ngIf="!!scene?.gallery" [gallery]="scene?.gallery"></app-gallery-preview>
   </div>
 
-  <div class="ui bottom attached segment">
-    <div class="ui list">
+  <div class="ui inverted bottom attached segment">
+    <div class="ui inverted list">
       <a class="clippable item" title="Click to copy" ngxClipboard [cbContent]="scene?.checksum">
         <i class="privacy icon"></i>
         <div class="content">

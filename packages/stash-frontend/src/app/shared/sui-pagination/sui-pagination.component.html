@@ -1,5 +1,5 @@
 <pagination-template #p="paginationApi" (pageChange)="pageChange.emit($event)" class="ui center aligned container">
-  <nav class="ui pagination menu">
+  <nav class="ui inverted pagination menu">
     <a *ngIf="directionLinks && !p.isFirstPage()" class="item" title="First" (click)="p.setCurrent(1)">
       <i class="fast backward icon"></i>
     </a>

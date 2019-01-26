@@ -15,7 +15,7 @@ export class SceneCardComponent implements OnInit {
   @Input() scene: SceneData.Fragment;
 
   // The host class needs to be card
-  @HostBinding('class') class = 'card';
+  @HostBinding('class') class = 'dark card';
   @ViewChild('videoTag') videoTag: any;
 
   constructor() {}

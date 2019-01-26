@@ -18,10 +18,10 @@
   line-height: 120px;
   padding: 0;
   text-align: center;
-  border: 1px solid #EEE;
+  border: 1px solid #555;
   font-weight: 800;
   font-size: 20px;
-  color: black;
+  color: #FFF;
   cursor: pointer;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .scrubber-tags-background {
-  background-color: #F0F0F0;
+  background-color: #555;
   position: absolute;
   left: 0;
   right: 0;
@@ -59,7 +59,7 @@
 }
 
 #scrubber-current-position {
-  background-color: black;
+  background-color: #FFF;
   width: 2px;
   height: 30px;
   left: 50%;
@@ -89,7 +89,7 @@
 
 .scrubber-tag {
   position: absolute;
-  background-color: #DDD;
+  background-color: #000;
   font-size: 10px;
   white-space: nowrap;
   padding: 0 10px;
@@ -97,7 +97,7 @@
 }
 .scrubber-tag:hover {
   z-index: 1;
-  background-color: #CCC;
+  background-color: #444;
 }
 .scrubber-tag:after {
   content: "";
@@ -105,7 +105,7 @@
   bottom: -5px;
   left: 50%;
   margin-left: -5px;
-  border-top: solid 5px #DDD;
+  border-top: solid 5px #000;
   border-left: solid 5px transparent;
   border-right: solid 5px transparent;
 }

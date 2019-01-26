@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 
 import { SceneData, SceneMarkerData } from '../../core/graphql-generated';
 import { BaseWallItemComponent } from '../base-wall-item/base-wall-item.component';
+import { FileNamePipe } from '../file-name.pipe';
 
 @Component({
   selector: 'app-scene-wall-item',
@@ -12,7 +13,7 @@ export class SceneWallItemComponent extends BaseWallItemComponent implements OnI
   @Input() scene: SceneData.Fragment;
   @Input() marker: SceneMarkerData.Fragment;
 
-  constructor(private router: Router) { super(); }
+  constructor(private router: Router, private fileNamePipe: FileNamePipe) { super(); }
 
   ngOnInit() {
     if (!!this.marker) {
@@ -20,7 +21,7 @@ export class SceneWallItemComponent extends BaseWallItemComponent implements OnI
       this.imagePath = this.marker.preview;
       this.videoPath = this.marker.stream;
     } else if (!!this.scene) {
-      this.title = this.scene.title;
+      this.title = this.scene.title || this.fileNamePipe.transform(this.scene.path);
       this.imagePath = this.scene.paths.webp;
       this.videoPath = this.scene.paths.preview;
     } else {

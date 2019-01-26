@@ -12,7 +12,7 @@ export class StudioCardComponent implements OnInit {
   @Input() studio: StudioData.Fragment;
 
   // The host class needs to be card
-  @HostBinding('class') class = 'card';
+  @HostBinding('class') class = 'dark card';
 
   constructor(
     private router: Router

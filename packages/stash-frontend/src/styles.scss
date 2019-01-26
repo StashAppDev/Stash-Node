@@ -1,7 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 
 body {
-  background-color: #FFFFFF;
+  background-color: #000000;
+}
+
+.ui.inverted.form input {
+  background: #333 !important;
+  color: #FFF !important;
+}
+
+.ui.selection.dropdown {
+  background: #333;
+  color: #FFF;
+}
+
+.ui.selection.dropdown .menu > .item {
+  border-top: 1px solid #555;
+  background: #333;
+  color: #FFF;
 }
 
 .simple-modal-container {
@@ -263,4 +279,140 @@ sui-search div.message.empty {
 /* TODO: Hack for JWPlayer 8 chapter marker offsets */
 .jw-slider-time .jw-cue {
   margin-left: -5.5px;
+}
+
+
+
+// Dark theme
+
+.ui.button, .ui.basic.button {
+  :not(.primary, .negative) {
+    background: #333;
+    color: #EEE !important;
+  }
+  &.active {
+    background: #555 !important;
+  }
+  &:hover {
+    background: #555 !important;
+    color: #EEE !important;
+  }
+}
+
+.ui.form.inverted textarea {
+  background-color: #333;
+  color: #EEE;
+}
+
+.ui.segments:not(.horizontal)>.segment:first-child {
+  border-top: 1px solid #555;
+}
+
+.ui.menu .ui.dropdown .menu > .item {
+  color: unset !important;
+}
+
+.ui.dropdown .menu {
+  background: #555;
+  > .item {
+    color: #EEE !important;
+  }
+}
+
+// rating
+
+.ui.rating .icon {
+  background: unset;
+  color: rgba(100,100,100,.85);
+}
+
+.ui.rating .selected.icon, .ui.rating .active.selected.icon {
+  background: unset;
+  color: rgba(150,150,150,.85);
+}
+
+.ui.rating .active.icon {
+  background: unset;
+  color: rgba(255,255,255,.85);
+}
+
+// items
+
+.ui.dark.items > .dark.item, .ui.dark.item {
+  border-bottom: 1px solid #555;
+  color: #EEE;
+}
+
+.ui.dark.items > .dark.item .icon {
+  color: #EEE;
+}
+
+.ui.dark.items > .dark.item .meta {
+  color: #EEE;
+}
+
+.ui.dark.items > .dark.item .extra {
+  color: #EEE;
+}
+
+.ui.dark.items > .dark.item > .content > .header {
+  color: #EEE;
+}
+
+.ui.dark.items > .dark.item > .content > .ui.header .sub.header {
+  color: #AAA;
+}
+
+.ui.dark.items > .dark.item > .content > .description {
+  color: #EEE;
+}
+
+// Cards
+
+.ui.dark.cards > .dark.card, .ui.dark.card {
+  background: #1b1c1d;
+  border: 1px solid #555;
+  box-shadow: 0px 1px 3px 0px #000, 0px 0px 0px 1px #000;
+  color: #EEE;
+}
+
+.dark.card .icon {
+  color: #555 !important;
+}
+
+.ui.dark.card .item .meta {
+  color: #EEE;
+}
+
+.ui.dark.card {
+  background: #1b1c1d;
+  color: #EEE;
+}
+
+.ui.dark.cards > .dark.card > .content > a.header, .ui.dark.card > .content > a.header {
+  color: white;
+}
+
+.ui.cards > .card .meta, .ui.card .meta {
+  font-size: 1em;
+  color: #555;
+}
+
+.ui.dark.cards > .dark.card > .content > .header, .ui.dark.card > .content > .header {
+  color: white;
+}
+
+.ui.dark.cards > .dark.card > .content > .description, .ui.dark.card > .content > .description {
+  clear: both;
+  color: #EEE;
+}
+
+.ui.dark.cards > .dark.card > .content > a.header:hover, .ui.dark.card > .content > a.header:hover {
+  color: rgba(0, 0, 0, .8);
+}
+
+.ui.dark.cards > .dark.card > .extra,
+.ui.dark.card > .extra {
+  border-top: 1px solid #555 !important;
+  color: inherit;
 }
