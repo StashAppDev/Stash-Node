@@ -1,0 +1,14 @@
+.studio-link {
+  height: 50px;
+  background-size: contain;
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 20px 10px 5px 10px;
+}
+
+.mat-card-actions .mat-stroked-button {
+  transform: scale(0.8);
+  padding: 0;
+  margin: 0;
+}

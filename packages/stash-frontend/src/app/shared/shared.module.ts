@@ -11,7 +11,7 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
 
 import { SuiPaginationComponent } from './sui-pagination/sui-pagination.component';
 import { JwplayerComponent } from './jwplayer/jwplayer.component';
-import { SceneCardComponent } from './scene-card/scene-card.component';
+import { SceneCardComponent, SceneCardPerformersDialogComponent, SceneCardMarkersDialogComponent, SceneCardTagsDialogComponent } from './scene-card/scene-card.component';
 import { PerformerCardComponent } from './performer-card/performer-card.component';
 import { ListFilterComponent } from './list-filter/list-filter.component';
 import { TruncatePipe } from './truncate.pipe';
@@ -52,6 +52,9 @@ import { MaterialModule } from '../core/material.module';
     SuiPaginationComponent,
     JwplayerComponent,
     SceneCardComponent,
+    SceneCardPerformersDialogComponent,
+    SceneCardMarkersDialogComponent,
+    SceneCardTagsDialogComponent,
     PerformerCardComponent,
     ListFilterComponent,
     CapitalizePipe,
@@ -98,6 +101,11 @@ import { MaterialModule } from '../core/material.module';
     SceneWallItemComponent,
     BaseWallItemComponent,
     ShufflePipe
-  ]
+  ],
+  entryComponents: [
+    SceneCardPerformersDialogComponent,
+    SceneCardMarkersDialogComponent,
+    SceneCardTagsDialogComponent
+  ],
 })
 export class SharedModule { }

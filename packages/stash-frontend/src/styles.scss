@@ -31,13 +31,21 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .content-container {
-  max-width: 85vw;
+  max-width: 80vw;
   margin: auto;
 }
 
 mat-grid-list {
   margin: 10px;
 }
+
+.card {
+  display: flex;
+  align-items: center;
+}
+
+
+
 
 
 // body {

@@ -86,8 +86,7 @@
   <span *ngIf="!scene.studio">No Studio</span>
 </div> -->
 
-<mat-card >
-  <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+<mat-card>
   <video mat-card-image class="preview" loop [poster]="this.scene.paths.screenshot" #videoTag>
     <source *ngIf="previewPath" [src]="previewPath" />
   </video>
@@ -103,34 +102,38 @@
       {{scene.details | truncate : 100 : '... (continued)'}}
     </p>
     <ng-template #descriptionEmptyBlock>No details</ng-template>
+    <h4>{{scene?.file.size | fileSize}} | {{scene?.file.duration | seconds}} | {{scene.file.width}} x {{scene.file.height}}</h4>
   </mat-card-content>
   <mat-card-actions align="center">
     <button
       *ngIf="!!scene.tags && scene.tags.length > 0"
-      mat-button>
+      (click)="openTagsDialog()"
+      mat-stroked-button>
       <mat-icon>label</mat-icon>
       {{scene.tags.length}}
     </button>
     <button
       *ngIf="!!scene.performers && scene.performers.length > 0"
-      [class.red]="hasFavoritePerformer()"
-      [matTooltip]="performerNames()"
-      mat-button>
+      [class.mat-warn]="hasFavoritePerformer()"
+      (click)="openPerformersDialog()"
+      mat-stroked-button>
       <mat-icon>person</mat-icon>
       {{scene.performers.length}}
     </button>
     <button
       *ngIf="!!scene.scene_markers && scene.scene_markers.length > 0"
-      mat-button>
+      (click)="openMarkersDialog()"
+      mat-stroked-button>
       <mat-icon>location_on</mat-icon>
       {{scene.scene_markers.length}}
     </button>
   </mat-card-actions>
+  <mat-divider></mat-divider>
   <mat-card-footer>
     <a *ngIf="scene.studio"
       [routerLink]="['/studios', scene.studio.id]"
       [style.background-image]="'url(' + this.scene.studio.image_path + ')'"
-      style="width: 100%; line-height: 5; background-size: contain; display: inline-block; background-position: right; background-repeat: no-repeat;">
+      class="studio-link">
       <i class="huge record icon"></i>
     </a>
     <span *ngIf="!scene.studio">No Studio</span>
