@@ -74,7 +74,7 @@ export class SceneMarkerController {
   public static sceneMarkerTags: QueryResolvers.SceneMarkerTagsResolver = async (root, args, context, info) => {
     const tags: { [s: number]: GQL.SceneMarkerTag } = {};
     const scene = await ObjectionUtils.getEntity(Scene, { id: args.scene_id! });
-    const markers = await scene.$relatedQuery<SceneMarker>("scene_markers");
+    const markers = await scene.$relatedQuery<SceneMarker>("scene_markers").orderBy("scene_markers.seconds", "ASC");
     for (const marker of markers) {
       const markerPrimaryTag = await marker.$relatedQuery<Tag>("primary_tag").first();
       if (!markerPrimaryTag || !markerPrimaryTag.id) { throw Error("Missing primary tag"); }

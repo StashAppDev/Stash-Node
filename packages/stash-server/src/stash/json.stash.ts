@@ -109,7 +109,7 @@ class Json {
   }
 
   public saveScene(checksum: string, json: ISceneJson): Promise<void> {
-    StashManager.info(`Saving scene to ${checksum}json...`);
+    StashManager.info(`Saving scene to ${checksum}.json...`);
     return FileUtils.writeJson(Stash.paths.json.sceneJsonPath(checksum), json);
   }
 

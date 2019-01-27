@@ -7,10 +7,10 @@ import { Scene } from "../../db/models/scene.model";
 import { ScrapedItem } from "../../db/models/scraped-item.model";
 import { Studio } from "../../db/models/studio.model";
 import { Tag } from "../../db/models/tag.model";
-import { IMappingJson, IScrapedJson, StashJson, ISceneJson, ISceneMarkerJson } from "../json.stash";
+import { log } from "../../logger";
+import { IMappingJson, ISceneJson, ISceneMarkerJson, IScrapedJson, StashJson } from "../json.stash";
 import { StashManager } from "../manager.stash";
 import { BaseTask } from "./base.task";
-import { log } from "../../logger";
 
 export class ExportTask extends BaseTask {
   private mappings: IMappingJson = { performers: [], studios: [], galleries: [], scenes: []};
@@ -108,6 +108,7 @@ export class ExportTask extends BaseTask {
         results.push(object.name);
       }
     }
+    // TODO: Sort
     return results;
   }
 
