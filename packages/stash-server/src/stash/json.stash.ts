@@ -100,8 +100,18 @@ class Json {
     return FileUtils.readJson(Stash.paths.json.scrapedFile);
   }
 
+  public saveScraped(json: IScrapedJson): Promise<void> {
+    StashManager.info("Saving scraped file...");
+    return FileUtils.writeJson(Stash.paths.json.scrapedFile, json);
+  }
+
   public getPerformer(checksum: string): Promise<IPerformerJson> {
     return FileUtils.readJson(Stash.paths.json.performerJsonPath(checksum));
+  }
+
+  public savePerformer(checksum: string, json: IPerformerJson): Promise<void> {
+    StashManager.info(`Saving performer to ${checksum}.json...`);
+    return FileUtils.writeJson(Stash.paths.json.performerJsonPath(checksum), json);
   }
 
   public getScene(checksum: string): Promise<ISceneJson> {
@@ -115,6 +125,11 @@ class Json {
 
   public getStudio(checksum: string): Promise<IStudioJson> {
     return FileUtils.readJson(Stash.paths.json.studioJsonPath(checksum));
+  }
+
+  public saveStudio(checksum: string, json: IStudioJson): Promise<void> {
+    StashManager.info(`Saving studio to ${checksum}.json...`);
+    return FileUtils.writeJson(Stash.paths.json.studioJsonPath(checksum), json);
   }
 }
 

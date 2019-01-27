@@ -36,6 +36,14 @@ export class Performer extends BaseModel {
     },
   };
 
+  public $parseDatabaseJson(json: any) {
+    json = super.$parseDatabaseJson(json);
+    if (typeof json.favorite === "number") {
+      json.favorite = json.favorite === 1;
+    }
+    return json;
+  }
+
   public id?: number;
   public image?: Buffer;
   public checksum?: string;

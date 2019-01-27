@@ -26,4 +26,11 @@ export class ImageUtils {
     object.checksum = await CryptoUtils.md5FromPath(tempFile);
     object.image = image;
   }
+
+  public static encodeBase64Image(object: { image?: Buffer }) {
+    if (!object.image) { return; }
+    let result = object.image.toString("base64").replace(/(.{60})/g, "$1\n");
+    if (result[result.length - 1] !== "\n") { result = result.concat("\n"); }
+    return result;
+  }
 }

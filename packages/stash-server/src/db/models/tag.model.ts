@@ -1,5 +1,5 @@
 // tslint:disable:object-literal-sort-keys variable-name
-import { Model } from "objection";
+import { Model, QueryBuilder } from "objection";
 import path from "path";
 import { GQL } from "../../typings/graphql";
 import BaseModel from "./base.model";
@@ -56,6 +56,10 @@ export class Tag extends BaseModel {
         to: "scenes.id",
       },
     },
+  };
+
+  public static modifiers = {
+    orderedByName: (builder: QueryBuilder<Tag>) => builder.orderBy("name"),
   };
 
   public id?: number;
