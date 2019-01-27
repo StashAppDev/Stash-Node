@@ -35,7 +35,7 @@ export interface IPerformerJson extends IJsonObject {
 
 export interface ISceneMarkerJson extends IJsonObject {
   title: string;
-  seconds: number;
+  seconds: string;
   primary_tag: string;
   tags: string[];
 }
@@ -53,12 +53,12 @@ export interface ISceneJson extends IJsonObject {
   markers?: ISceneMarkerJson[];
   file?: {
     size?: string;
-    duration?: number;
+    duration?: string;
     video_codec?: string;
     audio_codec?: string;
     width?: number;
     height?: number;
-    framerate?: number;
+    framerate?: string;
     bitrate?: number;
   };
 }
@@ -106,6 +106,11 @@ class Json {
 
   public getScene(checksum: string): Promise<ISceneJson> {
     return FileUtils.readJson(Stash.paths.json.sceneJsonPath(checksum));
+  }
+
+  public saveScene(checksum: string, json: ISceneJson): Promise<void> {
+    StashManager.info(`Saving scene to ${checksum}json...`);
+    return FileUtils.writeJson(Stash.paths.json.sceneJsonPath(checksum), json);
   }
 
   public getStudio(checksum: string): Promise<IStudioJson> {

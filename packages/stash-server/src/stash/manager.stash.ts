@@ -5,6 +5,7 @@ import { FileUtils } from "../utils/file.utils";
 import { ObjectionUtils } from "../utils/objection.utils";
 import { log } from "./../logger";
 import { Stash } from "./stash";
+import { ExportTask } from "./tasks/export.task";
 import { GenerateSpriteTask } from "./tasks/generate-sprite.task";
 import { GenerateTranscodeTask } from "./tasks/generate-transcode.task";
 import { ImportTask } from "./tasks/import.task";
@@ -52,6 +53,23 @@ class Manager {
     const importTask = new ImportTask();
     try {
       await importTask.start();
+    } catch (e) {
+      this.handleError(e);
+    }
+
+    this.idle();
+  }
+
+  public async export(jobId: string) {
+    if (this.job.status !== Job.Status.Idle) { return; }
+    this.job.id = jobId;
+    this.job.status = Job.Status.Export;
+    this.job.message = "Exporting...";
+    this.job.logs = [];
+
+    const exportTask = new ExportTask();
+    try {
+      await exportTask.start();
     } catch (e) {
       this.handleError(e);
     }

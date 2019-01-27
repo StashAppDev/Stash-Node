@@ -42,6 +42,17 @@
             "outputCapture": "std"
         },
         {
+            "name": "Run Export",
+            "type": "node",
+            "request": "launch",
+            "args": ["${workspaceRoot}/src/index.ts", "export"],
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+            "sourceMaps": true,
+            "cwd": "${workspaceRoot}",
+            "protocol": "inspector",
+            "outputCapture": "std"
+        },
+        {
             "name": "Run Generate",
             "type": "node",
             "request": "launch",

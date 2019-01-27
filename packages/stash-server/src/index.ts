@@ -30,6 +30,13 @@ function configureCommander() {
     });
 
   program
+    .command("export")
+    .action(async () => {
+      await StashManager.export("");
+      await Stash.shutdown();
+    });
+
+  program
     .command("generate")
     .action(async () => {
       await StashManager.generate("");
