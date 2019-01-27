@@ -88,6 +88,24 @@ class GeneratedPaths {
   public async removeTmpDir() { await fse.remove(this.tmp); }
 }
 
+class GalleryPaths {
+  private paths: Paths;
+  private generatedPaths: GeneratedPaths;
+
+  constructor(paths: Paths, generatedPaths: GeneratedPaths) {
+    this.paths = paths;
+    this.generatedPaths = generatedPaths;
+  }
+
+  public getExtractedPath(checksum: string): string {
+    return path.join(this.paths.cache, checksum);
+  }
+
+  public getExtractedFilePath(checksum: string, fileName: string): string {
+    return path.join(this.paths.cache, checksum, fileName);
+  }
+}
+
 class ScenePaths {
   private generatedPaths: GeneratedPaths;
 
@@ -153,6 +171,7 @@ export class Paths {
   public fixed: FixedPaths;
   public generated: GeneratedPaths;
   public json: JsonPaths;
+  public gallery: GalleryPaths;
   public scene: ScenePaths;
   public sceneMarker: SceneMarkerPaths;
 
@@ -174,6 +193,7 @@ export class Paths {
 
     this.generated = new GeneratedPaths(this);
     this.json = new JsonPaths(this);
+    this.gallery = new GalleryPaths(this, this.generated);
     this.scene = new ScenePaths(this.generated);
     this.sceneMarker = new SceneMarkerPaths(this.generated);
   }

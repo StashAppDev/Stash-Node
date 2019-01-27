@@ -3,10 +3,12 @@ import fse from "fs-extra";
 import inquirer from "inquirer";
 import { Database } from "../db/database";
 import { FileUtils } from "../utils/file.utils";
+import { GalleryZip } from "./gallery-zip.stash";
 import { FixedPaths, Paths } from "./paths.stash";
 
 class StashImpl {
   public paths: Paths;
+  public zip: GalleryZip = new GalleryZip();
 
   public async initialize() {
     await this.refreshPaths();

@@ -1,7 +1,9 @@
 import express = require("express");
 import { Gallery } from "../db/models/gallery.model";
 import { GalleryQueryBuilder } from "../querybuilders/gallery.querybuilder";
+import { Stash } from "../stash/stash";
 import { QueryResolvers } from "../typings/graphql";
+import { FileUtils } from "../utils/file.utils";
 import { ObjectionUtils } from "../utils/objection.utils";
 
 export class GalleryController {
@@ -27,25 +29,26 @@ export class GalleryController {
   // #endregion
 
   public static async file(req: express.Request, res: express.Response, next: express.NextFunction) {
-    // TODO
+    try {
+      // if (req.fresh) { return; } // TODO
 
-    // if stale?(@gallery)
-    //   index = params[:index].to_i
-    //   file = @gallery.files[index]
-    //
-    //   file_path = nil
-    //   if params[:thumb]
-    //     file_path = Stash::ZipUtility.get_thumbnail(gallery: @gallery, index: index)
-    //   else
-    //     file_path = Stash::ZipUtility.get_image(gallery: @gallery, index: index)
-    //   end
-    //
-    //   raise ActionController::RoutingError.new('Not Found') unless file_path
-    //
-    //   expires_in 1.week
-    //   response.headers['Content-Length'] = File.size(file_path).to_s
-    //
-    //   send_file file_path, filename: file.name, disposition: 'inline'
-    // end
+      const gallery = await ObjectionUtils.getEntity(Gallery, { id: req.params.id });
+
+      let imagePath: string = "invalid";
+      if (req.query.thumb === "true") {
+        imagePath = await Stash.zip.getThumbnail(gallery, req.params.fileIndex);
+      } else {
+        imagePath = await Stash.zip.getImage(gallery, req.params.fileIndex);
+      }
+      const imageExists = await FileUtils.fileExists(imagePath);
+      if (!imageExists) { throw new Error(`Can't find gallery image ${imagePath}`); }
+
+      const sendFileOptions = {
+        maxAge: 604800000, // 1 Week
+      };
+      res.sendFile(imagePath, sendFileOptions);
+    } catch (e) {
+      next(e);
+    }
   }
 }

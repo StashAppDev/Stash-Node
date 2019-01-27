@@ -13,6 +13,7 @@ import { SceneMarker } from "./db/models/scene-marker.model";
 import { Scene } from "./db/models/scene.model";
 import { Studio } from "./db/models/studio.model";
 import { Tag } from "./db/models/tag.model";
+import { GalleryRoutes } from "./routes/gallery.route";
 import { PerformerRoutes } from "./routes/performer.route";
 import { SceneRoutes } from "./routes/scene.route";
 import { StudioRoutes } from "./routes/studio.route";
@@ -29,10 +30,15 @@ export const typeDefs = gql`
 
 export const resolvers: IResolvers = {
   Gallery: {
-    files(root, args, context, info) {
-      // TODO: Find files for given root id
-      // GalleryController.find(root.id);
-      return [];
+    async files(gallery, args, context, info) {
+      const files = await gallery.getFiles();
+      return files.map((filePath: string, index: number) => {
+        return {
+          index,
+          name: path.basename(filePath),
+          path: GalleryRoutes.getGalleryImageUrl(context.baseUrl, gallery.id, index),
+        };
+      });
     },
   },
   Mutation: {

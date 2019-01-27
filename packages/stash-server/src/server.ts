@@ -3,11 +3,14 @@ import bodyParser from "body-parser";
 import compression from "compression";
 import cors from "cors";
 import express from "express";
+import fs from "fs";
 import path from "path";
-import { URL } from "url";
+import spdy from "spdy";
+import url from "url";
 import { HttpError } from "./errors/http.error";
 import { log } from "./logger";
 import { resolvers, typeDefs } from "./resolvers";
+import { GalleryRoutes } from "./routes/gallery.route";
 import { PerformerRoutes } from "./routes/performer.route";
 import { SceneRoutes } from "./routes/scene.route";
 import { StudioRoutes } from "./routes/studio.route";
@@ -19,7 +22,7 @@ export interface IStashServerOptions {
 export interface IGraphQLContext {
   req: express.Request;
   res: express.Response;
-  baseUrl: URL;
+  baseUrl: url.URL;
 }
 
 export async function run(options: IStashServerOptions) {
@@ -37,10 +40,12 @@ export async function run(options: IStashServerOptions) {
   // Use cors across all routes
   app.use(cors());
 
+  app.use("/galleries", GalleryRoutes.buildRouter());
   app.use("/performers", PerformerRoutes.buildRouter());
   app.use("/scenes", SceneRoutes.buildRouter());
   app.use("/studios", StudioRoutes.buildRouter());
   app.use(express.static(path.join(__dirname, "../dist-ui")));
+  app.use("/server.crt", express.static(path.join(__dirname, "../certs/server.crt")));
   app.use("*", express.static(path.join(__dirname, "../dist-ui/index.html")));
 
   // Error handling
@@ -56,7 +61,7 @@ export async function run(options: IStashServerOptions) {
 
   const server = new ApolloServer({
     context: (msg: {req: express.Request, res: express.Response}): IGraphQLContext => ({
-      baseUrl: new URL(`${msg.req.protocol}://${msg.req.get("host")}`),
+      baseUrl: new url.URL(`${msg.req.protocol}://${msg.req.get("host")}`),
       req: msg.req,
       res: msg.res,
     }),
@@ -67,8 +72,16 @@ export async function run(options: IStashServerOptions) {
 
   server.applyMiddleware({ app, path: serverPath });
 
-  app.listen({ port: options.port }, () => {
-    log.info(`Server ready at http://localhost:${options.port}`);
+  const sslOptions = {
+    cert:  fs.readFileSync(path.join(__dirname, "../certs/server.crt")),
+    key: fs.readFileSync(path.join(__dirname, "../certs/server.key")),
+  };
+  spdy.createServer(sslOptions, app).listen({ port: options.port }, () => {
+    log.info(`HTTPS server ready at https://localhost:${options.port}`);
+  });
+
+  app.listen({ port: 7002 }, () => {
+    log.info(`HTTP server ready at http://localhost:7002`);
   });
 }
 

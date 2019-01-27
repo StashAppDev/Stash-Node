@@ -3,6 +3,7 @@ import { Model, QueryBuilder } from "objection";
 import path from "path";
 import BaseModel from "./base.model";
 import { Scene } from "./scene.model";
+import { Stash } from "../../stash/stash";
 
 export class Gallery extends BaseModel {
   public static tableName = "galleries";
@@ -43,4 +44,8 @@ export class Gallery extends BaseModel {
 
   // Optional eager relations.
   public scene?: Scene;
+
+  public async getFiles() {
+    return await Stash.zip.getFiles(this);
+  }
 }

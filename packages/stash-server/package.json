@@ -20,10 +20,12 @@
     ],
     "assets": [
       "src/**/*.graphql",
-      "dist-ui/**/*"
+      "dist-ui/**/*",
+      "certs/*"
     ]
   },
   "dependencies": {
+    "adm-zip": "0.4.13",
     "apollo-server": "2.3.1",
     "apollo-server-express": "2.3.1",
     "commander": "2.19.0",
@@ -44,11 +46,13 @@
     "objection": "1.4.0",
     "p-queue": "3.0.0",
     "read-chunk": "3.0.0",
+    "spdy": "4.0.0",
     "sqlite3": "4.0.4",
     "tempy": "0.2.1",
     "winston": "3.1.0"
   },
   "devDependencies": {
+    "@types/adm-zip": "0.4.31",
     "@types/body-parser": "1.17.0",
     "@types/compression": "0.0.36",
     "@types/cors": "2.8.4",
@@ -63,6 +67,7 @@
     "@types/node": "10.12.18",
     "@types/p-queue": "3.0.0",
     "@types/read-chunk": "2.1.0",
+    "@types/spdy": "3.4.4",
     "@types/tempy": "0.2.0",
     "nodemon": "1.18.9",
     "pkg": "4.3.7",

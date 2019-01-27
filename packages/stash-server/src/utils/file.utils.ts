@@ -62,6 +62,18 @@ export class FileUtils {
     }
   }
 
+  /**
+   * Ensures that the directory path for the given file is created if it doesn't already exist.
+   */
+  public static async ensureFileDirectoryExists(filePath?: string) {
+    try {
+      if (!filePath) { throw new Error("No file path given."); }
+      return await fse.ensureDir(path.dirname(filePath));
+    } catch (e) {
+      return false;
+    }
+  }
+
   public static async move(fromPath: string, toPath: string) {
     try {
       return fse.move(fromPath, toPath);
